@@ -73,6 +73,7 @@ contract AgentScopeModule {
     error FunctionNotWhitelisted(bytes4 selector);
     error ExecutionFailed();
     error TokenLimitExceeded(address token, uint256 requested, uint256 remaining);
+    error CannotTargetModule();
 
     // ═══════════════════════════════════════════════════════
     //  MODIFIERS
@@ -163,6 +164,9 @@ contract AgentScopeModule {
         uint256 value,
         bytes calldata data
     ) external returns (bool success) {
+        // ── Check 0: Cannot target this module (prevents privilege escalation) ──
+        if (to == address(this)) revert CannotTargetModule();
+
         Policy storage policy = _policies[msg.sender];
 
         // ── Check 1: Agent is active ──
@@ -175,37 +179,71 @@ contract AgentScopeModule {
         }
 
         // ── Check 3: Contract whitelist ──
-        if (policy.allowedContracts.length > 0) {
-            bool allowed = false;
-            for (uint256 i = 0; i < policy.allowedContracts.length; i++) {
-                if (policy.allowedContracts[i] == to) {
-                    allowed = true;
-                    break;
+        {
+            uint256 len = policy.allowedContracts.length;
+            if (len > 0) {
+                bool allowed = false;
+                for (uint256 i = 0; i < len; i++) {
+                    if (policy.allowedContracts[i] == to) {
+                        allowed = true;
+                        break;
+                    }
                 }
-            }
-            if (!allowed) {
-                emit PolicyViolation(msg.sender, "contract_not_whitelisted");
-                revert ContractNotWhitelisted(to);
+                if (!allowed) {
+                    emit PolicyViolation(msg.sender, "contract_not_whitelisted");
+                    revert ContractNotWhitelisted(to);
+                }
             }
         }
 
         // ── Check 4: Function selector whitelist ──
-        if (data.length >= 4 && policy.allowedFunctions.length > 0) {
-            bytes4 selector = bytes4(data[:4]);
-            bool allowed = false;
-            for (uint256 i = 0; i < policy.allowedFunctions.length; i++) {
-                if (policy.allowedFunctions[i] == selector) {
-                    allowed = true;
-                    break;
+        if (data.length >= 4) {
+            uint256 len = policy.allowedFunctions.length;
+            if (len > 0) {
+                bytes4 selector = bytes4(data[:4]);
+                bool allowed = false;
+                for (uint256 i = 0; i < len; i++) {
+                    if (policy.allowedFunctions[i] == selector) {
+                        allowed = true;
+                        break;
+                    }
                 }
-            }
-            if (!allowed) {
-                emit PolicyViolation(msg.sender, "function_not_whitelisted");
-                revert FunctionNotWhitelisted(selector);
+                if (!allowed) {
+                    emit PolicyViolation(msg.sender, "function_not_whitelisted");
+                    revert FunctionNotWhitelisted(selector);
+                }
             }
         }
 
-        // ── Check 5: Daily ETH spend limit ──
+        // ── Check 5: ERC20 token allowance enforcement ──
+        if (data.length >= 68) {
+            bytes4 selector = bytes4(data[:4]);
+            // transfer(address,uint256) = 0xa9059cbb
+            // approve(address,uint256) = 0x095ea7b3
+            if (selector == 0xa9059cbb || selector == 0x095ea7b3) {
+                uint256 tokenAmount = abi.decode(data[36:68], (uint256));
+                uint256 allowance = tokenAllowances[msg.sender][to];
+
+                // If a token allowance is set (>0), enforce it
+                if (allowance > 0) {
+                    // Reset window if 24h has passed
+                    if (block.timestamp >= tokenWindowStart[msg.sender][to] + 24 hours) {
+                        tokenSpent[msg.sender][to] = 0;
+                        tokenWindowStart[msg.sender][to] = block.timestamp;
+                    }
+
+                    uint256 tokenRemaining = allowance - tokenSpent[msg.sender][to];
+                    if (tokenAmount > tokenRemaining) {
+                        emit PolicyViolation(msg.sender, "token_limit_exceeded");
+                        revert TokenLimitExceeded(to, tokenAmount, tokenRemaining);
+                    }
+
+                    tokenSpent[msg.sender][to] += tokenAmount;
+                }
+            }
+        }
+
+        // ── Check 6: Daily ETH spend limit ──
         if (value > 0) {
             SpendState storage state = _spendState[msg.sender];
 
@@ -290,6 +328,8 @@ contract AgentScopeModule {
         uint256 value,
         bytes calldata data
     ) external view returns (bool allowed, string memory reason) {
+        if (to == address(this)) return (false, "cannot_target_module");
+
         Policy storage policy = _policies[agent];
 
         if (!policy.active) return (false, "agent_not_active");
@@ -297,22 +337,28 @@ contract AgentScopeModule {
             return (false, "session_expired");
 
         // Contract whitelist check
-        if (policy.allowedContracts.length > 0) {
-            bool found = false;
-            for (uint256 i = 0; i < policy.allowedContracts.length; i++) {
-                if (policy.allowedContracts[i] == to) { found = true; break; }
+        {
+            uint256 len = policy.allowedContracts.length;
+            if (len > 0) {
+                bool found = false;
+                for (uint256 i = 0; i < len; i++) {
+                    if (policy.allowedContracts[i] == to) { found = true; break; }
+                }
+                if (!found) return (false, "contract_not_whitelisted");
             }
-            if (!found) return (false, "contract_not_whitelisted");
         }
 
         // Function selector check
-        if (data.length >= 4 && policy.allowedFunctions.length > 0) {
-            bytes4 selector = bytes4(data[:4]);
-            bool found = false;
-            for (uint256 i = 0; i < policy.allowedFunctions.length; i++) {
-                if (policy.allowedFunctions[i] == selector) { found = true; break; }
+        if (data.length >= 4) {
+            uint256 len = policy.allowedFunctions.length;
+            if (len > 0) {
+                bytes4 selector = bytes4(data[:4]);
+                bool found = false;
+                for (uint256 i = 0; i < len; i++) {
+                    if (policy.allowedFunctions[i] == selector) { found = true; break; }
+                }
+                if (!found) return (false, "function_not_whitelisted");
             }
-            if (!found) return (false, "function_not_whitelisted");
         }
 
         // Spend limit check

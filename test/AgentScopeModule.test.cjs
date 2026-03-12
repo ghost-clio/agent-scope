@@ -216,6 +216,123 @@ describe("AgentScopeModule", function () {
     });
   });
 
+  describe("Security — Self-Targeting Prevention", function () {
+    beforeEach(async function () {
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, [], [], // empty whitelists = allow all
+        ])
+      );
+    });
+
+    it("should revert when agent targets the module itself", async function () {
+      // Agent tries to call setAgentPolicy on the module through executeAsAgent
+      const escalationData = module.interface.encodeFunctionData("setAgentPolicy", [
+        agent.address,
+        ethers.MaxUint256, // unlimited spend
+        0,                 // no expiry
+        [],
+        [],
+      ]);
+
+      await expect(
+        module.connect(agent).executeAsAgent(
+          await module.getAddress(),
+          0,
+          escalationData
+        )
+      ).to.be.revertedWithCustomError(module, "CannotTargetModule");
+    });
+
+    it("should block self-targeting in checkPermission too", async function () {
+      const [allowed, reason] = await module.checkPermission(
+        agent.address,
+        await module.getAddress(),
+        0,
+        "0x"
+      );
+      expect(allowed).to.be.false;
+      expect(reason).to.equal("cannot_target_module");
+    });
+  });
+
+  describe("Token Allowance Enforcement", function () {
+    const TRANSFER_SELECTOR = "0xa9059cbb"; // transfer(address,uint256)
+    const APPROVE_SELECTOR = "0x095ea7b3";  // approve(address,uint256)
+
+    beforeEach(async function () {
+      // Set policy allowing all contracts/functions
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, [], [],
+        ])
+      );
+    });
+
+    it("should enforce token transfer limits when allowance is set", async function () {
+      const tokenAddr = randomContract.address;
+      const allowance = ethers.parseEther("100"); // 100 tokens/day
+
+      // Set token allowance
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setTokenAllowance", [
+          agent.address, tokenAddr, allowance,
+        ])
+      );
+
+      // Encode transfer(address,uint256) — 200 tokens (exceeds allowance)
+      const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+      const transferData = TRANSFER_SELECTOR + abiCoder.encode(
+        ["address", "uint256"],
+        [owner.address, ethers.parseEther("200")]
+      ).slice(2);
+
+      await expect(
+        module.connect(agent).executeAsAgent(tokenAddr, 0, transferData)
+      ).to.be.revertedWithCustomError(module, "TokenLimitExceeded");
+    });
+
+    it("should allow transfers within token allowance", async function () {
+      const tokenAddr = randomContract.address;
+      const allowance = ethers.parseEther("100");
+
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setTokenAllowance", [
+          agent.address, tokenAddr, allowance,
+        ])
+      );
+
+      // Transfer 50 tokens — within limit
+      const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+      const transferData = TRANSFER_SELECTOR + abiCoder.encode(
+        ["address", "uint256"],
+        [owner.address, ethers.parseEther("50")]
+      ).slice(2);
+
+      await expect(
+        module.connect(agent).executeAsAgent(tokenAddr, 0, transferData)
+      ).to.emit(module, "AgentExecuted");
+    });
+
+    it("should not enforce token limits when no allowance is set", async function () {
+      // No setTokenAllowance called — allowance is 0 (means unrestricted)
+      const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+      const transferData = TRANSFER_SELECTOR + abiCoder.encode(
+        ["address", "uint256"],
+        [owner.address, ethers.parseEther("999999")]
+      ).slice(2);
+
+      // Should succeed because no allowance = unrestricted
+      await expect(
+        module.connect(agent).executeAsAgent(randomContract.address, 0, transferData)
+      ).to.emit(module, "AgentExecuted");
+    });
+  });
+
   describe("Proof of Scope", function () {
     it("should return accurate scope for verification", async function () {
       const expiry = (await time.latest()) + 86400;
