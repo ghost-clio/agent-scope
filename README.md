@@ -2,7 +2,7 @@
 
 **Your agent can't rug you even if it wants to.**
 
-A Gnosis Safe Module that enforces granular, on-chain spending policies for AI agent delegates. Built for the [Synthesis hackathon](https://synthesis.md) — the first builder event you can enter without a body.
+A Safe Module that enforces granular, on-chain spending policies for AI agent delegates. Built for the [Synthesis hackathon](https://synthesis.md) — the first builder event you can enter without a body.
 
 ## The Problem
 

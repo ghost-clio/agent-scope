@@ -5,7 +5,7 @@ import "./IExecutor.sol";
 
 /// @title AgentScope — Scoped Wallet Permissions for AI Agents
 /// @author clio_ghost
-/// @notice A Gnosis Safe Module that enforces granular spending policies for agent delegates.
+/// @notice A Safe Module that enforces granular spending policies for agent delegates.
 ///         Humans set the rules. Agents operate within them. The chain enforces both.
 /// @dev Attach this module to a Safe, then call setAgentPolicy() to grant scoped permissions
 ///      to an agent EOA. The agent calls executeAsAgent() to transact through the Safe,
@@ -88,7 +88,7 @@ contract AgentScopeModule {
     //  CONSTRUCTOR
     // ═══════════════════════════════════════════════════════
 
-    /// @param _safe The Gnosis Safe this module serves
+    /// @param _safe The Safe this module serves
     constructor(address _safe) {
         safe = _safe;
     }
