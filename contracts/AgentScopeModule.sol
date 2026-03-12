@@ -18,7 +18,8 @@ contract AgentScopeModule {
 
     struct Policy {
         bool active;
-        uint256 dailySpendLimitWei;    // Max ETH (in wei) per rolling 24h window
+        uint256 dailySpendLimitWei;    // Max ETH (in wei) per fixed 24h window
+        uint256 maxPerTxWei;           // Max ETH per single transaction (0 = use daily limit)
         uint256 sessionExpiry;          // Unix timestamp — permissions die after this
         address[] allowedContracts;     // Whitelist of contracts the agent can touch
         bytes4[] allowedFunctions;      // Whitelist of function selectors
@@ -26,7 +27,7 @@ contract AgentScopeModule {
 
     struct SpendState {
         uint256 spent;                  // Wei spent in current window
-        uint256 windowStart;            // Start of current 24h window
+        uint256 windowStart;            // Start of current fixed 24h window
     }
 
     // ═══════════════════════════════════════════════════════
@@ -35,6 +36,9 @@ contract AgentScopeModule {
 
     /// @notice The Safe this module is attached to
     address public immutable safe;
+
+    /// @notice Global pause — kills all agent execution instantly
+    bool public paused;
 
     /// @notice Agent address => their spending policy
     mapping(address => Policy) private _policies;
@@ -55,11 +59,12 @@ contract AgentScopeModule {
     //  EVENTS
     // ═══════════════════════════════════════════════════════
 
-    event AgentPolicySet(address indexed agent, uint256 dailyLimit, uint256 expiry);
+    event AgentPolicySet(address indexed agent, uint256 dailyLimit, uint256 maxPerTx, uint256 expiry);
     event AgentExecuted(address indexed agent, address indexed to, uint256 value, bytes4 selector);
     event AgentRevoked(address indexed agent);
     event PolicyViolation(address indexed agent, string reason);
     event TokenAllowanceSet(address indexed agent, address indexed token, uint256 dailyAllowance);
+    event GlobalPause(bool paused);
 
     // ═══════════════════════════════════════════════════════
     //  ERRORS
@@ -69,11 +74,13 @@ contract AgentScopeModule {
     error AgentNotActive();
     error SessionExpired();
     error DailyLimitExceeded(uint256 requested, uint256 remaining);
+    error PerTxLimitExceeded(uint256 requested, uint256 maxPerTx);
     error ContractNotWhitelisted(address target);
     error FunctionNotWhitelisted(bytes4 selector);
     error ExecutionFailed();
     error TokenLimitExceeded(address token, uint256 requested, uint256 remaining);
     error CannotTargetModule();
+    error ModulePaused();
 
     // ═══════════════════════════════════════════════════════
     //  MODIFIERS
@@ -81,6 +88,11 @@ contract AgentScopeModule {
 
     modifier onlySafe() {
         if (msg.sender != safe) revert NotSafe();
+        _;
+    }
+
+    modifier whenNotPaused() {
+        if (paused) revert ModulePaused();
         _;
     }
 
@@ -99,13 +111,15 @@ contract AgentScopeModule {
 
     /// @notice Set or update an agent's spending policy
     /// @param agent The agent EOA to authorize
-    /// @param dailySpendLimitWei Max ETH per day in wei
+    /// @param dailySpendLimitWei Max ETH per fixed 24h window in wei
+    /// @param maxPerTxWei Max ETH per single transaction (0 = no per-tx limit, uses daily limit)
     /// @param sessionExpiry Unix timestamp when permissions expire (0 = no expiry)
     /// @param allowedContracts Whitelist of contract addresses (empty = any contract)
     /// @param allowedFunctions Whitelist of function selectors (empty = any function)
     function setAgentPolicy(
         address agent,
         uint256 dailySpendLimitWei,
+        uint256 maxPerTxWei,
         uint256 sessionExpiry,
         address[] calldata allowedContracts,
         bytes4[] calldata allowedFunctions
@@ -113,6 +127,7 @@ contract AgentScopeModule {
         _policies[agent] = Policy({
             active: true,
             dailySpendLimitWei: dailySpendLimitWei,
+            maxPerTxWei: maxPerTxWei,
             sessionExpiry: sessionExpiry,
             allowedContracts: allowedContracts,
             allowedFunctions: allowedFunctions
@@ -124,7 +139,7 @@ contract AgentScopeModule {
             windowStart: block.timestamp
         });
 
-        emit AgentPolicySet(agent, dailySpendLimitWei, sessionExpiry);
+        emit AgentPolicySet(agent, dailySpendLimitWei, maxPerTxWei, sessionExpiry);
     }
 
     /// @notice Set a per-token daily allowance for an agent
@@ -150,6 +165,13 @@ contract AgentScopeModule {
         emit AgentRevoked(agent);
     }
 
+    /// @notice Emergency pause — instantly blocks ALL agent execution
+    /// @param _paused true to pause, false to unpause
+    function setPaused(bool _paused) external onlySafe {
+        paused = _paused;
+        emit GlobalPause(_paused);
+    }
+
     // ═══════════════════════════════════════════════════════
     //  AGENT FUNCTIONS
     // ═══════════════════════════════════════════════════════
@@ -163,7 +185,7 @@ contract AgentScopeModule {
         address to,
         uint256 value,
         bytes calldata data
-    ) external returns (bool success) {
+    ) external whenNotPaused returns (bool success) {
         // ── Check 0: Cannot target this module (prevents privilege escalation) ──
         if (to == address(this)) revert CannotTargetModule();
 
@@ -219,35 +241,29 @@ contract AgentScopeModule {
         if (data.length >= 68) {
             bytes4 selector = bytes4(data[:4]);
             // transfer(address,uint256) = 0xa9059cbb
-            // approve(address,uint256) = 0x095ea7b3
+            // approve(address,uint256)  = 0x095ea7b3
+            // transferFrom(address,address,uint256) = 0x23b872dd
             if (selector == 0xa9059cbb || selector == 0x095ea7b3) {
-                uint256 tokenAmount = abi.decode(data[36:68], (uint256));
-                uint256 allowance = tokenAllowances[msg.sender][to];
-
-                // If a token allowance is set (>0), enforce it
-                if (allowance > 0) {
-                    // Reset window if 24h has passed
-                    if (block.timestamp >= tokenWindowStart[msg.sender][to] + 24 hours) {
-                        tokenSpent[msg.sender][to] = 0;
-                        tokenWindowStart[msg.sender][to] = block.timestamp;
-                    }
-
-                    uint256 tokenRemaining = allowance - tokenSpent[msg.sender][to];
-                    if (tokenAmount > tokenRemaining) {
-                        emit PolicyViolation(msg.sender, "token_limit_exceeded");
-                        revert TokenLimitExceeded(to, tokenAmount, tokenRemaining);
-                    }
-
-                    tokenSpent[msg.sender][to] += tokenAmount;
-                }
+                _enforceTokenLimit(msg.sender, to, abi.decode(data[36:68], (uint256)));
+            } else if (selector == 0x23b872dd && data.length >= 100) {
+                // transferFrom: amount is the third arg (bytes 68-100)
+                _enforceTokenLimit(msg.sender, to, abi.decode(data[68:100], (uint256)));
             }
         }
 
-        // ── Check 6: Daily ETH spend limit ──
+        // ── Check 6: Per-transaction ETH limit ──
+        if (value > 0 && policy.maxPerTxWei > 0) {
+            if (value > policy.maxPerTxWei) {
+                emit PolicyViolation(msg.sender, "per_tx_limit_exceeded");
+                revert PerTxLimitExceeded(value, policy.maxPerTxWei);
+            }
+        }
+
+        // ── Check 7: Daily ETH spend limit ──
         if (value > 0) {
             SpendState storage state = _spendState[msg.sender];
 
-            // Reset window if 24h has passed
+            // Reset window if 24h has passed (fixed window, not rolling)
             if (block.timestamp >= state.windowStart + 24 hours) {
                 state.spent = 0;
                 state.windowStart = block.timestamp;
@@ -279,13 +295,42 @@ contract AgentScopeModule {
     }
 
     // ═══════════════════════════════════════════════════════
-    //  VIEW FUNCTIONS — Portable Proof of Scope
+    //  INTERNAL
     // ═══════════════════════════════════════════════════════
 
-    /// @notice Get an agent's current policy (other agents can verify scope on-chain)
+    /// @dev Enforce token allowance for a given agent and token
+    function _enforceTokenLimit(address agent, address token, uint256 amount) internal {
+        uint256 allowance = tokenAllowances[agent][token];
+
+        // If no allowance set (0), token is unrestricted
+        if (allowance == 0) return;
+
+        // Reset window if 24h has passed
+        if (block.timestamp >= tokenWindowStart[agent][token] + 24 hours) {
+            tokenSpent[agent][token] = 0;
+            tokenWindowStart[agent][token] = block.timestamp;
+        }
+
+        uint256 tokenRemaining = allowance - tokenSpent[agent][token];
+        if (amount > tokenRemaining) {
+            emit PolicyViolation(agent, "token_limit_exceeded");
+            revert TokenLimitExceeded(token, amount, tokenRemaining);
+        }
+
+        tokenSpent[agent][token] += amount;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  VIEW FUNCTIONS — Proof of Scope
+    // ═══════════════════════════════════════════════════════
+
+    /// @notice Get an agent's current policy on this module.
+    /// @dev This proves what the agent can do through THIS Safe only — not a universal identity.
+    ///      Other agents can call this on-chain to verify scope before transacting.
     /// @param agent The agent to query
     /// @return active Whether the agent is authorized
     /// @return dailySpendLimitWei Daily ETH limit
+    /// @return maxPerTxWei Per-transaction ETH limit (0 = no per-tx limit)
     /// @return sessionExpiry When permissions expire
     /// @return remainingBudget How much ETH the agent can still spend today
     /// @return allowedContracts Whitelisted contract addresses
@@ -293,6 +338,7 @@ contract AgentScopeModule {
     function getAgentScope(address agent) external view returns (
         bool active,
         uint256 dailySpendLimitWei,
+        uint256 maxPerTxWei,
         uint256 sessionExpiry,
         uint256 remainingBudget,
         address[] memory allowedContracts,
@@ -303,6 +349,7 @@ contract AgentScopeModule {
 
         active = policy.active;
         dailySpendLimitWei = policy.dailySpendLimitWei;
+        maxPerTxWei = policy.maxPerTxWei;
         sessionExpiry = policy.sessionExpiry;
         allowedContracts = policy.allowedContracts;
         allowedFunctions = policy.allowedFunctions;
@@ -328,6 +375,7 @@ contract AgentScopeModule {
         uint256 value,
         bytes calldata data
     ) external view returns (bool allowed, string memory reason) {
+        if (paused) return (false, "module_paused");
         if (to == address(this)) return (false, "cannot_target_module");
 
         Policy storage policy = _policies[agent];
@@ -359,6 +407,11 @@ contract AgentScopeModule {
                 }
                 if (!found) return (false, "function_not_whitelisted");
             }
+        }
+
+        // Per-tx limit check
+        if (value > 0 && policy.maxPerTxWei > 0) {
+            if (value > policy.maxPerTxWei) return (false, "per_tx_limit_exceeded");
         }
 
         // Spend limit check

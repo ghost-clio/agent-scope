@@ -34,6 +34,7 @@ describe("AgentScopeModule", function () {
         module.interface.encodeFunctionData("setAgentPolicy", [
           agent.address,
           ONE_ETH,
+          0, // no per-tx limit
           0, // no expiry
           [],
           [],
@@ -48,7 +49,7 @@ describe("AgentScopeModule", function () {
 
     it("should reject non-Safe callers setting policy", async function () {
       await expect(
-        module.setAgentPolicy(agent.address, ONE_ETH, 0, [], [])
+        module.setAgentPolicy(agent.address, ONE_ETH, 0, 0, [], [])
       ).to.be.revertedWithCustomError(module, "NotSafe");
     });
 
@@ -57,7 +58,7 @@ describe("AgentScopeModule", function () {
       await mockSafe.callModule(
         await module.getAddress(),
         module.interface.encodeFunctionData("setAgentPolicy", [
-          agent.address, ONE_ETH, 0, [], [],
+          agent.address, ONE_ETH, 0, 0, [], [],
         ])
       );
 
@@ -77,7 +78,7 @@ describe("AgentScopeModule", function () {
       await mockSafe.callModule(
         await module.getAddress(),
         module.interface.encodeFunctionData("setAgentPolicy", [
-          agent.address, ONE_ETH, 0, [], [],
+          agent.address, ONE_ETH, 0, 0, [], [],
         ])
       );
     });
@@ -115,7 +116,7 @@ describe("AgentScopeModule", function () {
       await mockSafe.callModule(
         await module.getAddress(),
         module.interface.encodeFunctionData("setAgentPolicy", [
-          agent.address, HALF_ETH, 0, [], [],
+          agent.address, HALF_ETH, 0, 0, [], [],
         ])
       );
 
@@ -137,7 +138,7 @@ describe("AgentScopeModule", function () {
       await mockSafe.callModule(
         await module.getAddress(),
         module.interface.encodeFunctionData("setAgentPolicy", [
-          agent.address, ONE_ETH, expiry, [], [],
+          agent.address, ONE_ETH, 0, expiry, [], [],
         ])
       );
 
@@ -159,7 +160,7 @@ describe("AgentScopeModule", function () {
       await mockSafe.callModule(
         await module.getAddress(),
         module.interface.encodeFunctionData("setAgentPolicy", [
-          agent.address, ONE_ETH, 0, [allowedAddr], [],
+          agent.address, ONE_ETH, 0, 0, [allowedAddr], [],
         ])
       );
 
@@ -176,7 +177,7 @@ describe("AgentScopeModule", function () {
       await mockSafe.callModule(
         await module.getAddress(),
         module.interface.encodeFunctionData("setAgentPolicy", [
-          agent.address, ONE_ETH, 0, [], [swapSelector],
+          agent.address, ONE_ETH, 0, 0, [], [swapSelector],
         ])
       );
 
@@ -193,7 +194,7 @@ describe("AgentScopeModule", function () {
       await mockSafe.callModule(
         await module.getAddress(),
         module.interface.encodeFunctionData("setAgentPolicy", [
-          agent.address, HALF_ETH, 0, [], [],
+          agent.address, HALF_ETH, 0, 0, [], [],
         ])
       );
 
@@ -221,7 +222,7 @@ describe("AgentScopeModule", function () {
       await mockSafe.callModule(
         await module.getAddress(),
         module.interface.encodeFunctionData("setAgentPolicy", [
-          agent.address, ONE_ETH, 0, [], [], // empty whitelists = allow all
+          agent.address, ONE_ETH, 0, 0, [], [], // empty whitelists = allow all
         ])
       );
     });
@@ -231,6 +232,7 @@ describe("AgentScopeModule", function () {
       const escalationData = module.interface.encodeFunctionData("setAgentPolicy", [
         agent.address,
         ethers.MaxUint256, // unlimited spend
+        0,                 // no per-tx limit
         0,                 // no expiry
         [],
         [],
@@ -266,7 +268,7 @@ describe("AgentScopeModule", function () {
       await mockSafe.callModule(
         await module.getAddress(),
         module.interface.encodeFunctionData("setAgentPolicy", [
-          agent.address, ONE_ETH, 0, [], [],
+          agent.address, ONE_ETH, 0, 0, [], [],
         ])
       );
     });
@@ -333,6 +335,132 @@ describe("AgentScopeModule", function () {
     });
   });
 
+  describe("Per-Transaction Limit", function () {
+    it("should enforce per-tx limit", async function () {
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, QUARTER_ETH, 0, [], [], // 0.25 ETH per tx, 1 ETH daily
+        ])
+      );
+
+      // 0.25 ETH — exactly at limit, should succeed
+      await module.connect(agent).executeAsAgent(randomContract.address, QUARTER_ETH, "0x");
+
+      // 0.5 ETH — exceeds per-tx limit
+      await expect(
+        module.connect(agent).executeAsAgent(randomContract.address, HALF_ETH, "0x")
+      ).to.be.revertedWithCustomError(module, "PerTxLimitExceeded");
+    });
+
+    it("should allow multiple txs within per-tx limit up to daily", async function () {
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, HALF_ETH, QUARTER_ETH, 0, [], [], // 0.25/tx, 0.5/day
+        ])
+      );
+
+      // Two txs of 0.25 each = 0.5 daily limit
+      await module.connect(agent).executeAsAgent(randomContract.address, QUARTER_ETH, "0x");
+      await module.connect(agent).executeAsAgent(randomContract.address, QUARTER_ETH, "0x");
+
+      // Third tx hits daily limit
+      await expect(
+        module.connect(agent).executeAsAgent(randomContract.address, QUARTER_ETH, "0x")
+      ).to.be.revertedWithCustomError(module, "DailyLimitExceeded");
+    });
+  });
+
+  describe("Emergency Pause", function () {
+    beforeEach(async function () {
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0, [], [],
+        ])
+      );
+    });
+
+    it("should block all execution when paused", async function () {
+      // Pause
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setPaused", [true])
+      );
+
+      await expect(
+        module.connect(agent).executeAsAgent(randomContract.address, QUARTER_ETH, "0x")
+      ).to.be.revertedWithCustomError(module, "ModulePaused");
+    });
+
+    it("should resume after unpause", async function () {
+      // Pause then unpause
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setPaused", [true])
+      );
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setPaused", [false])
+      );
+
+      // Should work again
+      await expect(
+        module.connect(agent).executeAsAgent(randomContract.address, QUARTER_ETH, "0x")
+      ).to.emit(module, "AgentExecuted");
+    });
+
+    it("should reflect pause in checkPermission", async function () {
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setPaused", [true])
+      );
+
+      const [allowed, reason] = await module.checkPermission(
+        agent.address, randomContract.address, QUARTER_ETH, "0x"
+      );
+      expect(allowed).to.be.false;
+      expect(reason).to.equal("module_paused");
+    });
+  });
+
+  describe("TransferFrom Enforcement", function () {
+    const TRANSFER_FROM_SELECTOR = "0x23b872dd";
+
+    beforeEach(async function () {
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0, [], [],
+        ])
+      );
+    });
+
+    it("should enforce token limits on transferFrom", async function () {
+      const tokenAddr = randomContract.address;
+      const allowance = ethers.parseEther("100");
+
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setTokenAllowance", [
+          agent.address, tokenAddr, allowance,
+        ])
+      );
+
+      // transferFrom(address from, address to, uint256 amount) — 200 tokens exceeds
+      const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+      const transferFromData = TRANSFER_FROM_SELECTOR + abiCoder.encode(
+        ["address", "address", "uint256"],
+        [owner.address, agent.address, ethers.parseEther("200")]
+      ).slice(2);
+
+      await expect(
+        module.connect(agent).executeAsAgent(tokenAddr, 0, transferFromData)
+      ).to.be.revertedWithCustomError(module, "TokenLimitExceeded");
+    });
+  });
+
   describe("Proof of Scope", function () {
     it("should return accurate scope for verification", async function () {
       const expiry = (await time.latest()) + 86400;
@@ -342,6 +470,7 @@ describe("AgentScopeModule", function () {
         module.interface.encodeFunctionData("setAgentPolicy", [
           agent.address,
           ONE_ETH,
+          0,
           expiry,
           [randomContract.address],
           ["0x38ed1739"],
@@ -361,7 +490,7 @@ describe("AgentScopeModule", function () {
       await mockSafe.callModule(
         await module.getAddress(),
         module.interface.encodeFunctionData("setAgentPolicy", [
-          agent.address, HALF_ETH, 0, [], [],
+          agent.address, HALF_ETH, 0, 0, [], [],
         ])
       );
 

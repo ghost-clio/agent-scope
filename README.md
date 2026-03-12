@@ -46,25 +46,28 @@ AgentScope sits between your Safe and your agent. The human sets the rules. The 
 ## Features
 
 ### For Humans
-- **Daily spend limits** — cap how much ETH your agent can move per 24h rolling window
+- **Daily spend limits** — cap how much ETH your agent can move per fixed 24h window
+- **Per-transaction limits** — prevent an agent from blowing the daily budget in one tx
 - **Contract whitelists** — restrict which protocols your agent can interact with
 - **Function-level permissions** — allow `swap()` but block `approve()` 
+- **ERC20 token limits** — separate daily limits for each token (enforced on `transfer`, `approve`, `transferFrom`)
 - **Session expiry** — permissions auto-expire, agent must re-request access
-- **Per-token allowances** — separate daily limits for each ERC20
-- **One-tx revocation** — kill agent permissions instantly
+- **Emergency pause** — `setPaused(true)` kills ALL agent execution instantly, one tx
+- **One-tx revocation** — kill individual agent permissions instantly
 
 ### For Agents
 - **`executeAsAgent()`** — transact through the Safe within your policy
-- **`getAgentScope()`** — portable proof of permissions, verifiable on-chain
+- **`getAgentScope()`** — proof of permissions for this Safe, verifiable on-chain
 - **`checkPermission()`** — pre-flight check before attempting execution
 - Other agents can verify your budget and scope without trusting you or your human
 
 ### For Agent-to-Agent Trust
-The key insight: **scoped permissions are portable proofs.** When Agent A talks to Agent B, B can call `getAgentScope(A)` on-chain and verify:
-- A has spending authority
+When Agent A talks to Agent B, B can call `getAgentScope(A)` on-chain and verify:
+- A has spending authority through a specific Safe
 - A's permissions haven't expired
 - A has remaining budget
-- All without knowing or trusting A's human
+
+This is **proof of constraint on a specific Safe** — not a universal identity. An agent could have other wallets. But for the question "can this agent spend up to X through this Safe?", the answer is on-chain.
 
 No centralized registry. No API keys. Just math.
 
@@ -89,6 +92,7 @@ AgentScopeModule module = new AgentScopeModule(address(safe));
 module.setAgentPolicy(
     agentAddress,           // Agent EOA
     0.5 ether,             // 0.5 ETH daily limit
+    0.1 ether,             // 0.1 ETH max per transaction
     block.timestamp + 24 hours, // Expires in 24h
     allowedContracts,       // [uniswapRouter]
     allowedFunctions        // [swap.selector]
@@ -181,14 +185,19 @@ Audited by Ridge (local review, Mar 12 2026). Findings addressed:
 | Finding | Severity | Resolution |
 |---------|----------|------------|
 | Self-targeting privilege escalation | Critical | Blocked — `CannotTargetModule` error |
-| Token allowances not enforced | Medium | Now enforced on `transfer()` and `approve()` |
+| Token allowances not enforced | Medium | Now enforced on `transfer()`, `approve()`, `transferFrom()` |
+| No per-tx limit | Medium | Added `maxPerTxWei` to policy |
+| No emergency pause | Medium | Added `setPaused()` global kill switch |
 | Fixed-window double-spend at boundary | Low | Documented (rolling windows cost more gas) |
+| "Proof of scope" overstated | Low | Docs clarified — it's per-Safe, not universal identity |
 | Storage reads in loops | Gas | Array lengths cached in local vars |
+| Unused OpenZeppelin dependency | Cleanup | Removed |
 
 **Known design tradeoffs:**
 - Fixed 24h window (not rolling) — an agent can spend 2x at the window boundary. Rolling windows add ~5K gas per tx. For most use cases, the fixed window is fine.
 - Empty whitelists = allow all — this is intentional. Start permissive, restrict as needed.
 - Token allowances are opt-in — if no allowance is set (0), ERC20 transfers are unrestricted. Set explicit allowances per token.
+- Per-tx limit is optional — set `maxPerTxWei` to 0 to disable (only daily limit applies).
 
 ## Built By
 

@@ -26,7 +26,8 @@ import {
 
 const AGENT_SCOPE_ABI = parseAbi([
   // Owner functions (called through Safe)
-  "function setAgentPolicy(address agent, uint256 dailySpendLimitWei, uint256 sessionExpiry, address[] allowedContracts, bytes4[] allowedFunctions)",
+  "function setAgentPolicy(address agent, uint256 dailySpendLimitWei, uint256 maxPerTxWei, uint256 sessionExpiry, address[] allowedContracts, bytes4[] allowedFunctions)",
+  "function setPaused(bool paused)",
   "function setTokenAllowance(address agent, address token, uint256 dailyAllowance)",
   "function revokeAgent(address agent)",
 
@@ -34,14 +35,16 @@ const AGENT_SCOPE_ABI = parseAbi([
   "function executeAsAgent(address to, uint256 value, bytes data) returns (bool)",
 
   // View functions
-  "function getAgentScope(address agent) view returns (bool active, uint256 dailySpendLimitWei, uint256 sessionExpiry, uint256 remainingBudget, address[] allowedContracts, bytes4[] allowedFunctions)",
+  "function getAgentScope(address agent) view returns (bool active, uint256 dailySpendLimitWei, uint256 maxPerTxWei, uint256 sessionExpiry, uint256 remainingBudget, address[] allowedContracts, bytes4[] allowedFunctions)",
+  "function paused() view returns (bool)",
   "function checkPermission(address agent, address to, uint256 value, bytes data) view returns (bool allowed, string reason)",
   "function safe() view returns (address)",
   "function tokenAllowances(address agent, address token) view returns (uint256)",
   "function tokenSpent(address agent, address token) view returns (uint256)",
 
   // Events
-  "event AgentPolicySet(address indexed agent, uint256 dailyLimit, uint256 expiry)",
+  "event AgentPolicySet(address indexed agent, uint256 dailyLimit, uint256 maxPerTx, uint256 expiry)",
+  "event GlobalPause(bool paused)",
   "event AgentExecuted(address indexed agent, address indexed to, uint256 value, bytes4 selector)",
   "event AgentRevoked(address indexed agent)",
   "event PolicyViolation(address indexed agent, string reason)",
@@ -55,6 +58,7 @@ const AGENT_SCOPE_ABI = parseAbi([
 export interface AgentPolicy {
   active: boolean;
   dailySpendLimitWei: bigint;
+  maxPerTxWei: bigint;
   sessionExpiry: bigint;
   remainingBudget: bigint;
   allowedContracts: Address[];
@@ -63,6 +67,7 @@ export interface AgentPolicy {
 
 export interface PolicyConfig {
   dailySpendLimit: bigint;           // Wei
+  maxPerTx?: bigint;                 // Wei per transaction (0 = no per-tx limit)
   sessionExpiry?: number;            // Unix timestamp (0 = no expiry)
   allowedContracts?: Address[];      // Empty = any
   allowedFunctions?: Hex[];          // Empty = any (bytes4 selectors)
@@ -117,11 +122,12 @@ export class AgentScope {
       args: [getAddress(agent)],
     });
 
-    const [active, dailySpendLimitWei, sessionExpiry, remainingBudget, allowedContracts, allowedFunctions] = data as [boolean, bigint, bigint, bigint, Address[], Hex[]];
+    const [active, dailySpendLimitWei, maxPerTxWei, sessionExpiry, remainingBudget, allowedContracts, allowedFunctions] = data as [boolean, bigint, bigint, bigint, bigint, Address[], Hex[]];
 
     return {
       active,
       dailySpendLimitWei,
+      maxPerTxWei,
       sessionExpiry,
       remainingBudget,
       allowedContracts,
@@ -196,6 +202,7 @@ export class AgentScope {
     const lines: string[] = [
       `Agent ${agent}: ACTIVE`,
       `  Daily ETH limit: ${formatEther(scope.dailySpendLimitWei)} ETH`,
+      `  Per-tx limit:    ${scope.maxPerTxWei > 0n ? formatEther(scope.maxPerTxWei) + " ETH" : "none"}`,
       `  Remaining today: ${formatEther(scope.remainingBudget)} ETH`,
     ];
 
@@ -294,6 +301,7 @@ export class AgentScope {
       args: [
         getAddress(agent),
         config.dailySpendLimit,
+        config.maxPerTx ?? 0n,
         BigInt(config.sessionExpiry ?? 0),
         config.allowedContracts ?? [],
         config.allowedFunctions ?? [],
@@ -310,6 +318,28 @@ export class AgentScope {
       functionName: "setTokenAllowance",
       args: [getAddress(agent), getAddress(config.token), config.dailyAllowance],
     });
+  }
+
+  /**
+   * Encode a setPaused call — emergency kill switch for ALL agents.
+   */
+  encodePause(paused: boolean): Hex {
+    return encodeFunctionData({
+      abi: AGENT_SCOPE_ABI,
+      functionName: "setPaused",
+      args: [paused],
+    });
+  }
+
+  /**
+   * Check if the module is globally paused
+   */
+  async isPaused(): Promise<boolean> {
+    return (await this.publicClient.readContract({
+      address: this.moduleAddress,
+      abi: AGENT_SCOPE_ABI,
+      functionName: "paused",
+    })) as boolean;
   }
 
   /**

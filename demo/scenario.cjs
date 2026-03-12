@@ -72,15 +72,17 @@ async function main() {
     await module.getAddress(),
     module.interface.encodeFunctionData("setAgentPolicy", [
       agentAlice.address,
-      ethers.parseEther("0.5"),
-      oneDay,
-      [uniswap.address],
-      ["0x38ed1739"],
+      ethers.parseEther("0.5"),      // 0.5 ETH/day
+      ethers.parseEther("0.2"),      // 0.2 ETH max per tx
+      oneDay,                         // Expires in 24h
+      [uniswap.address],             // Only Uniswap
+      ["0x38ed1739"],                // Only swap
     ])
   );
 
   log(`✅ Policy set for Alice:`);
   log(`   Daily limit:  0.5 ETH`);
+  log(`   Per-tx limit: 0.2 ETH`);
   log(`   Expires:      ${new Date(oneDay * 1000).toISOString()}`);
   log(`   Contracts:    [Uniswap only]`);
   log(`   Functions:    [swap only]`);
@@ -151,17 +153,37 @@ async function main() {
 
   header("5. VIOLATIONS — Alice Goes Rogue (Gets Blocked)");
 
+  section("Attempt: Exceed per-tx limit (0.3 ETH > 0.2 max)");
+  try {
+    await module.connect(agentAlice).executeAsAgent(
+      uniswap.address,
+      ethers.parseEther("0.3"),
+      swapData
+    );
+    log(`❌ Should not succeed`);
+  } catch (e) {
+    log(`🛡️  BLOCKED: PerTxLimitExceeded`);
+    log(`   Requested 0.3 ETH — max per tx is 0.2 ETH`);
+  }
+
   section("Attempt: Exceed daily limit");
   try {
     await module.connect(agentAlice).executeAsAgent(
       uniswap.address,
-      ethers.parseEther("0.5"),
+      ethers.parseEther("0.2"),
+      swapData
+    );
+    // This would push total to 0.5 (0.1 + 0.2 + 0.2) = at limit, should succeed
+    // Try one more to bust the limit
+    await module.connect(agentAlice).executeAsAgent(
+      uniswap.address,
+      ethers.parseEther("0.1"),
       swapData
     );
     log(`❌ Should not succeed`);
   } catch (e) {
     log(`🛡️  BLOCKED: DailyLimitExceeded`);
-    log(`   Requested 0.5 ETH — only 0.2 remaining`);
+    log(`   Already spent 0.5 ETH today — budget exhausted`);
   }
 
   section("Attempt: Unauthorized contract (Aave)");
@@ -194,8 +216,9 @@ async function main() {
   section("Attempt: Privilege escalation (self-target module)");
   const escalationData = module.interface.encodeFunctionData("setAgentPolicy", [
     agentAlice.address,
-    ethers.MaxUint256,
-    0,
+    ethers.MaxUint256, // unlimited daily
+    0,                 // no per-tx limit
+    0,                 // no expiry
     [],
     [],
   ]);
@@ -243,26 +266,49 @@ async function main() {
   await safe.callModule(
     await module.getAddress(),
     module.interface.encodeFunctionData("setAgentPolicy", [
-      agentAlice.address, ethers.parseEther("1"), 0, [], [],
+      agentAlice.address, ethers.parseEther("1"), 0, 0, [], [],
     ])
   );
   log(`Alice re-authorized (for demo)`);
 
   await module.connect(agentAlice).executeAsAgent(uniswap.address, ethers.parseEther("0.01"), "0x");
-  log(`✅ Alice executed successfully\n`);
+  log(`✅ Alice executed successfully`);
 
+  section("Emergency Pause — kill ALL agents at once");
+  await safe.callModule(
+    await module.getAddress(),
+    module.interface.encodeFunctionData("setPaused", [true])
+  );
+  log(`🔴 GLOBAL PAUSE activated\n`);
+
+  try {
+    await module.connect(agentAlice).executeAsAgent(uniswap.address, ethers.parseEther("0.01"), "0x");
+    log(`❌ Should not succeed`);
+  } catch (e) {
+    log(`🛡️  BLOCKED: ModulePaused`);
+    log(`   ALL agents frozen — one tx, instant`);
+  }
+
+  // Unpause and revoke individually
+  await safe.callModule(
+    await module.getAddress(),
+    module.interface.encodeFunctionData("setPaused", [false])
+  );
+  log(`\n  ✅ Unpaused — agents can operate again`);
+
+  section("Individual Revocation");
   await safe.callModule(
     await module.getAddress(),
     module.interface.encodeFunctionData("revokeAgent", [agentAlice.address])
   );
-  log(`🔴 Human revoked Alice's access\n`);
+  log(`🔴 Human revoked Alice specifically\n`);
 
   try {
     await module.connect(agentAlice).executeAsAgent(uniswap.address, ethers.parseEther("0.01"), "0x");
     log(`❌ Should not succeed`);
   } catch (e) {
     log(`🛡️  BLOCKED: AgentNotActive`);
-    log(`   Alice is locked out — immediately, on-chain`);
+    log(`   Alice is locked out — other agents unaffected`);
   }
 
   // ══════════════════════════════════════════════════════
@@ -275,11 +321,13 @@ async function main() {
   Every constraint enforced:
 
   ✅ Daily spend limits          — capped at 0.5 ETH/day
+  ✅ Per-transaction limits      — max 0.2 ETH per tx
   ✅ Contract whitelisting       — Uniswap only
   ✅ Function permissions        — swap() yes, approve() no
   ✅ Session expiry              — auto-expired after 24h
   ✅ Privilege escalation guard  — can't modify own permissions
-  ✅ Instant revocation          — killed in one tx
+  ✅ Emergency pause             — froze ALL agents in one tx
+  ✅ Individual revocation       — killed Alice specifically
   ✅ Agent-to-agent verification — Bob verified Alice on-chain
 
   The agent operated freely within scope.
