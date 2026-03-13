@@ -5,3 +5,4 @@ typechain-types/
 coverage/
 .env
 .synthesis
+dashboard/node_modules
