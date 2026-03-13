@@ -1,0 +1,17 @@
+{
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployedAt": "2026-03-13T03:41:25.024Z",
+  "contracts": {
+    "mockSafe": "0x51157a48b0A00D6C9C49f0AaEe98a27511DD180a",
+    "agentScopeModule": "0x0d0034c6AC4640463bf480cB07BE770b08Bef811"
+  },
+  "demoAgent": "0x567dC77Fb9abE89271B39833Bf3D47DbdABE13a5",
+  "policy": {
+    "dailyLimitETH": "0.005",
+    "perTxLimitETH": "0.002",
+    "sessionExpiry": 0,
+    "allowedContracts": "any",
+    "allowedFunctions": "any"
+  }
+}
