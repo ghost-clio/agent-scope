@@ -2,7 +2,9 @@
 
 **Your agent can't rug you even if it wants to.**
 
-A Safe Module that enforces granular, on-chain spending policies for AI agent delegates. Built for the [Synthesis hackathon](https://synthesis.md) — the first builder event you can enter without a body.
+A Gnosis Safe Module that enforces granular, on-chain spending policies for AI agent wallets. Built for the [Synthesis hackathon](https://synthesis.md).
+
+> **Live on Sepolia:** [`0x0d0034c6AC4640463bf480cB07BE770b08Bef811`](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811)
 
 ## The Problem
 
@@ -71,13 +73,31 @@ This is **proof of constraint on a specific Safe** — not a universal identity.
 
 No centralized registry. No API keys. Just math.
 
+## Live Deployment
+
+| Component | Address | Network |
+|-----------|---------|---------|
+| AgentScopeModule | [`0x0d0034c6AC4640463bf480cB07BE770b08Bef811`](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) | Sepolia |
+| MockSafe | [`0x51157a48b0A00D6C9C49f0AaEe98a27511DD180a`](https://sepolia.etherscan.io/address/0x51157a48b0A00D6C9C49f0AaEe98a27511DD180a) | Sepolia |
+| Demo Agent | `0x567dC77Fb9abE89271B39833Bf3D47DbdABE13a5` | Sepolia |
+
 ## Quick Start
 
 ```bash
 npm install
 npx hardhat compile
-npx hardhat test
+npx hardhat test          # 50 tests — all passing
 ```
+
+### Run the Dashboard
+
+```bash
+cd dashboard
+npm install
+npm run dev               # opens at http://localhost:5173
+```
+
+Connect MetaMask to Sepolia to view agent scopes, set policies, and monitor transactions in real-time.
 
 ## Usage
 
@@ -115,6 +135,10 @@ module.executeAsAgent(
     module.getAgentScope(agentAddress);
 // Now you know exactly what this agent can do
 ```
+
+## ERC-8004 Integration
+
+AgentScope includes an **ERC8004ENSBridge** contract that links ERC-8004 agent identities to ENS names, enabling human-readable identity resolution for scoped agents. When verifying an agent's scope, you can resolve their on-chain identity — not just "0x1234 has 0.5 ETH/day" but "Agent Clio (verified) has 0.5 ETH/day through Safe 0xABCD."
 
 ## Why Ethereum?
 
@@ -172,7 +196,19 @@ scope.watchViolations(({ agent, reason }) => {
 
 ## Demo
 
-Run the full end-to-end scenario (deploys, executes, violates, expires, revokes):
+### Interactive Dashboard
+The AgentScope Dashboard provides a real-time mission control for managing agent permissions:
+- Connect wallet and view all agent scopes
+- Set/update policies with guided forms
+- Live transaction feed with violation alerts
+- Emergency pause button — one click to freeze all agents
+
+```bash
+cd dashboard && npm run dev
+```
+
+### CLI Scenario
+Run the full end-to-end scenario (deploys, sets policies, executes, violates limits, expires, revokes):
 
 ```bash
 npx hardhat run demo/scenario.cjs
