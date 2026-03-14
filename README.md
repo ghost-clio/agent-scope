@@ -5,6 +5,8 @@
 A Gnosis Safe Module that enforces granular, on-chain spending policies for AI agent wallets. Built for the [Synthesis hackathon](https://synthesis.md).
 
 > **Live on Sepolia:** [`0x0d0034c6AC4640463bf480cB07BE770b08Bef811`](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811)
+> 
+> **Dashboard:** [ghost-clio.github.io/agent-scope](https://ghost-clio.github.io/agent-scope/)
 
 ## The Problem
 
