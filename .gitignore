@@ -7,3 +7,4 @@ coverage/
 .synthesis
 dashboard/node_modules
 .synthesis
+.synthesis-api-key
