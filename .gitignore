@@ -8,3 +8,4 @@ coverage/
 dashboard/node_modules
 .synthesis
 .synthesis-api-key
+.synthesis-credentials.json
