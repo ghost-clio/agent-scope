@@ -75,13 +75,77 @@ This is **proof of constraint on a specific Safe** — not a universal identity.
 
 No centralized registry. No API keys. Just math.
 
-## Live Deployment
+## Live Deployments
 
-| Component | Address | Network |
-|-----------|---------|---------|
-| AgentScopeModule | [`0x0d0034c6AC4640463bf480cB07BE770b08Bef811`](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) | Sepolia |
-| MockSafe | [`0x51157a48b0A00D6C9C49f0AaEe98a27511DD180a`](https://sepolia.etherscan.io/address/0x51157a48b0A00D6C9C49f0AaEe98a27511DD180a) | Sepolia |
-| Demo Agent | `0x567dC77Fb9abE89271B39833Bf3D47DbdABE13a5` | Sepolia |
+AgentScope is deployed and verified across multiple networks:
+
+| Network | Chain ID | AgentScopeModule | Explorer |
+|---------|----------|------------------|----------|
+| **Ethereum Sepolia** | 11155111 | `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` | [etherscan](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Status Network Sepolia** | 1660990954 | `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` | [explorer](https://sepoliascan.status.network/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Celo Sepolia** | 11142220 | `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` | [blockscout](https://celo-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+
+**MetaMask Delegation Framework Enforcers** (Ethereum Sepolia):
+
+| Contract | Address | Purpose |
+|----------|---------|---------|
+| AgentSpendLimitEnforcer | `0xBf3aa78cA76a7514C18C09e4E3b0F1756af8Ad24` | Rolling 24h spend tracking per delegation |
+| AgentScopeEnforcer | `0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A` | Composite: spend + whitelist + pause |
+
+> **Status Network highlight:** All transactions are gasless (gas=0). Agents operate with zero gas cost — ideal for high-frequency, low-value agent operations.
+>
+> **Celo highlight:** Native stablecoin infrastructure. Agents managing real-world payments with predictable costs.
+
+## MetaMask Delegation Framework Integration
+
+AgentScope extends the [MetaMask Delegation Framework](https://github.com/MetaMask/delegation-framework) with custom **caveat enforcers** designed for AI agent delegations.
+
+### Why Delegations?
+
+The Delegation Framework (ERC-7710/ERC-7715) provides a standard way for smart accounts to delegate authority with restrictions. AgentScope's policies map naturally to delegation caveats:
+
+| AgentScope Policy | Delegation Caveat |
+|-------------------|-------------------|
+| Daily spend limit | `AgentSpendLimitEnforcer` — rolling 24h window |
+| Per-tx maximum | Built into `AgentSpendLimitEnforcer` |
+| Contract whitelist | `AgentScopeEnforcer` — target address validation |
+| Function whitelist | `AgentScopeEnforcer` — selector validation |
+| Emergency pause | `AgentScopeEnforcer` — delegator-controlled pause |
+
+### Novel Contributions
+
+- **Rolling 24h spend windows** — Unlike the built-in `NativeTokenTransferAmountEnforcer` which tracks cumulative spend, `AgentSpendLimitEnforcer` resets daily for sustainable ongoing agent operations
+- **Composite enforcer** — `AgentScopeEnforcer` bundles daily limits + per-tx caps + contract/function whitelists + pause into a single enforcer, reducing delegation complexity and gas costs
+- **Delegation-scoped tracking** — Each delegation hash has independent spend tracking, so a single agent can have multiple delegations with different budgets
+
+### Usage with MetaMask Smart Accounts Kit
+
+```typescript
+import { createCaveatBuilder } from "@metamask/delegation-framework";
+
+// Create a delegation with AgentScope caveats
+const caveats = createCaveatBuilder(chain.id)
+  .addCaveat(
+    "AgentScopeEnforcer",
+    AGENT_SCOPE_ENFORCER_ADDRESS,
+    encodeAbiParameters(
+      [
+        { type: "uint256" }, // dailyLimitWei
+        { type: "uint256" }, // maxPerTxWei
+        { type: "address[]" }, // allowedContracts
+        { type: "bytes4[]" },  // allowedSelectors
+      ],
+      [
+        parseEther("0.5"),           // 0.5 ETH/day
+        parseEther("0.1"),           // 0.1 ETH max per tx
+        [UNISWAP_ROUTER],           // Only Uniswap
+        ["0x38ed1739"],              // Only swap()
+      ]
+    )
+  );
+
+const delegation = createDelegation(delegatorAccount, agentAddress, caveats);
+```
 
 ## Quick Start
 
