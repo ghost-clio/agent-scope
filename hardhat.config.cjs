@@ -16,6 +16,12 @@ module.exports = {
       url: "https://sepolia.base.org",
       accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
     },
+    statusSepolia: {
+      url: "https://public.sepolia.rpc.status.network",
+      chainId: 1660990954,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+      gasPrice: 0,
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY || "",
