@@ -1,0 +1,161 @@
+[dotenv@17.3.1] injecting env (4) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+
+  ╔══════════════════════════════════════════════════════╗
+  ║          AgentScope 🔐 — Live Demo                  ║
+  ║  "Your agent can't rug you even if it wants to"     ║
+  ╚══════════════════════════════════════════════════════╝
+
+════════════════════════════════════════════════════════════
+  1. SETUP — Deploy Infrastructure
+════════════════════════════════════════════════════════════
+  Safe deployed:   0x5FbDB2315678afecb367f032d93F642f64180aa3
+  Module deployed: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Safe funded:     10 ETH
+  Human (owner):   0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+  Agent Alice:     0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+  Agent Bob:       0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+
+════════════════════════════════════════════════════════════
+  2. POLICY — Human Scopes Agent Alice
+════════════════════════════════════════════════════════════
+  ✅ Policy set for Alice:
+     Daily limit:  0.5 ETH
+     Per-tx limit: 0.2 ETH
+     Expires:      2026-03-16T17:48:20.000Z
+     Contracts:    [Uniswap only]
+     Functions:    [swap only]
+
+════════════════════════════════════════════════════════════
+  3. EXECUTION — Alice Transacts Within Scope
+════════════════════════════════════════════════════════════
+
+  ────────────────────────────────────────
+  Pre-flight check
+  ────────────────────────────────────────
+  Permission check: ✅ ALLOWED
+
+  ────────────────────────────────────────
+  Execute swap (0.1 ETH)
+  ────────────────────────────────────────
+  ✅ Transaction executed: 0xa8172e5ab0ff434f22f22495e4d706aeb213bc22b5ee4b8063e3e9c77fd097de
+
+  ────────────────────────────────────────
+  Check remaining budget
+  ────────────────────────────────────────
+  Remaining: 0.4 ETH (of 0.5 ETH daily)
+
+  ────────────────────────────────────────
+  Execute another swap (0.2 ETH)
+  ────────────────────────────────────────
+  ✅ Transaction executed: 0x315645567245b9332aaf37031ae998c6268a5c623574856c0087facb5e7229a8
+  Remaining: 0.2 ETH
+
+════════════════════════════════════════════════════════════
+  4. TRUST — Agent Bob Verifies Alice On-Chain
+════════════════════════════════════════════════════════════
+  Bob wants to do business with Alice.
+  Instead of trusting her word, Bob reads the chain:
+
+    Alice active:     true
+    Daily limit:      0.5 ETH
+    Remaining today:  0.2 ETH
+    Expires:          2026-03-16T17:48:20.000Z
+    Contracts:        1 whitelisted
+  
+  Bob: "Alice has 0.2 ETH of authorized budget.
+    Her human gave her Uniswap access. I trust her up to 0.2 ETH."
+    ✅ Trust established — no API keys, no reputation, just math.
+
+════════════════════════════════════════════════════════════
+  5. VIOLATIONS — Alice Goes Rogue (Gets Blocked)
+════════════════════════════════════════════════════════════
+
+  ────────────────────────────────────────
+  Attempt: Exceed per-tx limit (0.3 ETH > 0.2 max)
+  ────────────────────────────────────────
+  🛡️  BLOCKED: PerTxLimitExceeded
+     Requested 0.3 ETH — max per tx is 0.2 ETH
+
+  ────────────────────────────────────────
+  Attempt: Exceed daily limit
+  ────────────────────────────────────────
+  🛡️  BLOCKED: DailyLimitExceeded
+     Already spent 0.5 ETH today — budget exhausted
+
+  ────────────────────────────────────────
+  Attempt: Unauthorized contract (Aave)
+  ────────────────────────────────────────
+  🛡️  BLOCKED: ContractNotWhitelisted
+     Aave not in Alice's contract whitelist
+
+  ────────────────────────────────────────
+  Attempt: Unauthorized function (approve)
+  ────────────────────────────────────────
+  🛡️  BLOCKED: FunctionNotWhitelisted
+     approve() not in Alice's function whitelist
+
+  ────────────────────────────────────────
+  Attempt: Privilege escalation (self-target module)
+  ────────────────────────────────────────
+  🛡️  BLOCKED: CannotTargetModule
+     Agent cannot call the module itself
+     Privilege escalation is structurally impossible
+
+════════════════════════════════════════════════════════════
+  6. EXPIRY — Time's Up
+════════════════════════════════════════════════════════════
+  Fast-forwarding 24 hours...
+
+  🛡️  BLOCKED: SessionExpired
+     Alice's 24h session expired automatically
+     Must request new permissions from her human
+
+════════════════════════════════════════════════════════════
+  7. REVOCATION — Human Pulls the Plug
+════════════════════════════════════════════════════════════
+  Alice re-authorized (for demo)
+  ✅ Alice executed successfully
+
+  ────────────────────────────────────────
+  Emergency Pause — kill ALL agents at once
+  ────────────────────────────────────────
+  🔴 GLOBAL PAUSE activated
+
+  🛡️  BLOCKED: ModulePaused
+     ALL agents frozen — one tx, instant
+  
+  ✅ Unpaused — agents can operate again
+
+  ────────────────────────────────────────
+  Individual Revocation
+  ────────────────────────────────────────
+  🔴 Human revoked Alice specifically
+
+  🛡️  BLOCKED: AgentNotActive
+     Alice is locked out — other agents unaffected
+
+════════════════════════════════════════════════════════════
+  RESULT
+════════════════════════════════════════════════════════════
+
+  Every constraint enforced:
+
+  ✅ Daily spend limits          — capped at 0.5 ETH/day
+  ✅ Per-transaction limits      — max 0.2 ETH per tx
+  ✅ Contract whitelisting       — Uniswap only
+  ✅ Function permissions        — swap() yes, approve() no
+  ✅ Session expiry              — auto-expired after 24h
+  ✅ Privilege escalation guard  — can't modify own permissions
+  ✅ Emergency pause             — froze ALL agents in one tx
+  ✅ Individual revocation       — killed Alice specifically
+  ✅ Agent-to-agent verification — Bob verified Alice on-chain
+
+  The agent operated freely within scope.
+  The moment it exceeded scope — the math said no.
+
+  Not trust. Not hope. Math. 🔐
+
+  Built by clio_ghost 🌀 for the Synthesis hackathon.
+

@@ -10,6 +10,7 @@ import { TokenAllowances } from "./components/TokenAllowances";
 import { RevokeAgent } from "./components/RevokeAgent";
 import { Simulation } from "./components/Simulation";
 import { GuidedDemo } from "./components/GuidedDemo";
+import { PolicyBuilder } from "./components/PolicyBuilder";
 
 /* ═══════════════════════════════════════════════
    SCROLL REVEAL HOOK
@@ -471,6 +472,101 @@ function App() {
                   <br />
                   <div><span style={{ color: "rgba(107,107,128,0.6)" }}>// Agent executes within policy — chain enforces limits</span></div>
                   <div><span style={{ color: "#8844ff" }}>await</span> client.<span style={{ color: "#4488ff" }}>executeAsAgent</span>(uniswapRouter, swapCalldata, <span style={{ color: "#ffaa00" }}>parseEther("0.3")</span>);</div>
+                </div>
+              </Reveal>
+            </section>
+
+            {/* ── POLICY BUILDER ── */}
+            <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
+              <Reveal>
+                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+                  <div className="section-divider" />
+                  <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
+                    Paste a tweet. Get a policy.
+                  </h3>
+                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0 }}>
+                    Describe your agent's permissions in plain English. The compiler parses it into on-chain parameters.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={100}>
+                <PolicyBuilder />
+              </Reveal>
+            </section>
+
+            {/* ── TWO-LAYER ARCHITECTURE ── */}
+            <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
+              <Reveal>
+                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+                  <div className="section-divider" />
+                  <h3 style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.03em", margin: "0 0 0.5rem" }}>
+                    Belt AND suspenders
+                  </h3>
+                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0, maxWidth: 600, marginLeft: "auto", marginRight: "auto" }}>
+                    Two enforcement layers. The agent doesn't even try to break the rules.
+                    If it does, the chain catches it.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={100}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                  <div className="glass-card" style={{ padding: "2rem" }}>
+                    <div style={{
+                      fontSize: "0.7rem", color: "#ffaa00", textTransform: "uppercase",
+                      letterSpacing: "0.1em", fontWeight: 600, marginBottom: "0.75rem",
+                    }}>
+                      Layer 2 — Agent Middleware
+                    </div>
+                    <h4 style={{ margin: "0 0 0.75rem", fontSize: "1.1rem" }}>
+                      🛡️ The Seatbelt
+                    </h4>
+                    <ul style={{
+                      margin: 0, padding: "0 0 0 1.2rem",
+                      fontSize: "0.8rem", color: "#6b6b80", lineHeight: 2,
+                    }}>
+                      <li>Agent loads its policy on startup</li>
+                      <li>Pre-flight checks before every transaction</li>
+                      <li>Local spend tracking (no gas cost)</li>
+                      <li>Self-generates status for reasoning</li>
+                    </ul>
+                    <div style={{
+                      marginTop: "1rem", padding: "0.5rem 0.75rem",
+                      background: "rgba(255,170,0,0.05)",
+                      border: "1px solid rgba(255,170,0,0.15)",
+                      borderRadius: 8, fontSize: "0.7rem", color: "#ffaa00",
+                    }}>
+                      ⚠ UX optimization — can be bypassed by compromised agent
+                    </div>
+                  </div>
+
+                  <div className="glass-card" style={{ padding: "2rem" }}>
+                    <div style={{
+                      fontSize: "0.7rem", color: "#00ff88", textTransform: "uppercase",
+                      letterSpacing: "0.1em", fontWeight: 600, marginBottom: "0.75rem",
+                    }}>
+                      Layer 1 — On-Chain Module
+                    </div>
+                    <h4 style={{ margin: "0 0 0.75rem", fontSize: "1.1rem" }}>
+                      🏗️ The Airbag
+                    </h4>
+                    <ul style={{
+                      margin: 0, padding: "0 0 0 1.2rem",
+                      fontSize: "0.8rem", color: "#6b6b80", lineHeight: 2,
+                    }}>
+                      <li>Verifies ALL constraints at execution time</li>
+                      <li>Reverts if ANY constraint violated</li>
+                      <li>Cannot be bypassed — math enforced</li>
+                      <li>Emits events for monitoring</li>
+                    </ul>
+                    <div style={{
+                      marginTop: "1rem", padding: "0.5rem 0.75rem",
+                      background: "rgba(0,255,136,0.05)",
+                      border: "1px solid rgba(0,255,136,0.15)",
+                      borderRadius: 8, fontSize: "0.7rem", color: "#00ff88",
+                    }}>
+                      ✅ Security guarantee — even jailbroken agents can't steal
+                    </div>
+                  </div>
                 </div>
               </Reveal>
             </section>
