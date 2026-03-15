@@ -22,7 +22,7 @@ AgentScope sits between your Safe and your agent. The human sets the rules. The 
 
 ```
 ┌──────────────┐     ┌─────────────────────┐     ┌──────────────┐
-│    HUMAN     │────▸│   AgentScopeModule   │────▸│  GNOSIS SAFE │
+│    HUMAN     │────▸│   AgentScopeModule   │────▸│     SAFE     │
 │  (Safe Owner)│     │                       │     │   (Funds)    │
 │              │     │  ┌─────────────────┐ │     │              │
 │ Sets policy: │     │  │  Policy Engine   │ │     │  Executes    │
