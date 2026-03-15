@@ -326,3 +326,106 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+
+/* ── Responsive grid classes ── */
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.grid-5col {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+  .grid-2col {
+    grid-template-columns: 1fr !important;
+  }
+  .grid-5col {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  /* Header */
+  header {
+    padding: 0.75rem 1rem !important;
+    gap: 0.5rem !important;
+  }
+  header h1 {
+    font-size: 0.95rem !important;
+  }
+  header p {
+    display: none !important;
+  }
+  header a[href*="github"],
+  header a[href*="etherscan"] {
+    display: none !important;
+  }
+
+  /* Hero */
+  section {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Stats grid: 4 cols → 2 cols */
+  .stats-grid,
+  #stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+    padding-bottom: 5rem !important;
+  }
+
+  /* Code blocks overflow */
+  .code-block {
+    padding: 1rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Terminal */
+  .terminal {
+    font-size: 0.7rem;
+  }
+  .terminal-bar span {
+    display: none;
+  }
+
+  /* Glass cards padding */
+  .glass-card {
+    padding: 1.5rem !important;
+  }
+
+  /* SVG architecture diagram */
+  svg[viewBox="0 0 760 220"] {
+    display: none;
+  }
+
+  /* Buttons */
+  .btn-glow, .btn-ghost {
+    padding: 0.6rem 1.25rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Footer */
+  footer {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    text-align: center !important;
+  }
+
+  /* Hero section reduce top padding */
+  section:first-of-type {
+    padding-top: 6rem !important;
+    padding-bottom: 4rem !important;
+  }
+
+  /* Event feed items */
+  .font-mono div[style*="display: flex"] {
+    flex-wrap: wrap;
+    gap: 0.25rem !important;
+  }
+  .font-mono div[style*="display: flex"] span[style*="minWidth: 90"] {
+    display: none;
+  }
+}

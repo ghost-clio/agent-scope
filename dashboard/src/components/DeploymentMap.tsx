@@ -63,10 +63,7 @@ export function DeploymentMap() {
       </div>
 
       {/* Chain grid */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(5, 1fr)",
-        gap: "0.75rem",
+      <div className="grid-5col" style={{
         marginBottom: "2rem",
       }}>
         {chains.map((chain, i) => (
