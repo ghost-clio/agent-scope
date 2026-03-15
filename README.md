@@ -429,6 +429,151 @@ Audited by Ridge (local review, Mar 12 2026). Findings addressed:
 - Token allowances are opt-in — if no allowance is set (0), ERC20 transfers are unrestricted. Set explicit allowances per token.
 - Per-tx limit is optional — set `maxPerTxWei` to 0 to disable (only daily limit applies).
 
+## ASP-1: The AgentScope Protocol
+
+AgentScope isn't just a smart contract — it's a **protocol specification** for how AI agents should be constrained across any chain, any wallet, any framework.
+
+### The Spec
+
+[**ASP-1**](./spec/ASP-1.md) defines:
+- A **policy document format** — JSON schema that describes what an agent can do
+- A **dual enforcement model** — agent-side pre-flight + on-chain hard wall
+- **Cross-chain policy resolution** — same policy, different chains, same guarantees
+- **Standard interfaces** — any conforming implementation exposes the same API
+
+### The Policy Language
+
+Policies are human-readable AND machine-parseable:
+
+```
+Agent: trader.agent.eth
+Wallet: Safe 0xABCD...
+
+SPENDING LIMITS:
+• Up to 0.5 ETH per day (0.1 ETH max per transaction)
+• Up to 500 USDC per day
+
+ALLOWED ACTIONS:
+• Uniswap V3 Router — swapExactTokensForTokens only
+• No other contracts permitted
+
+TIME RESTRICTIONS:
+• Active Mon–Fri, 9am–5pm ET
+• Session expires: March 16, 2026
+```
+
+This compiles to on-chain calldata. The same policy can be deployed on Ethereum, Base, Optimism, or any chain with an AgentScope implementation.
+
+### Natural Language → Policy → Calldata
+
+```typescript
+import { parseNaturalLanguage, compile, summarize, toAgentPrompt } from "@agentscope/policy";
+
+// Parse natural language
+const policy = parseNaturalLanguage(
+  "0.5 ETH per day, 0.1 ETH per tx, only Uniswap, only swap(), expires in 24h",
+  agentAddress,
+  safeAddress,
+);
+
+// Compile to on-chain calldata
+const compiled = compile(policy);
+// → compiled.setAgentPolicyCalldata is ready for Safe execution
+
+// Generate human-readable summary
+console.log(summarize(policy));
+
+// Generate system prompt for the agent
+const prompt = toAgentPrompt(policy);
+// → Inject into agent's context so it understands its own constraints
+```
+
+### Agent-Side Middleware
+
+The middleware makes any AI agent self-aware of its constraints:
+
+```typescript
+import { createMiddleware } from "@agentscope/sdk/middleware";
+
+const middleware = await createMiddleware(
+  "./policies/my-agent.json",  // Policy file
+  agentScopeClient,             // SDK client
+  agentAddress,
+  {
+    onViolation: (intent, reason) => {
+      console.log(`⚠️ Blocked: ${reason}`);
+      // Notify operator via Telegram, webhook, etc.
+    },
+    onExecution: (intent, txHash) => {
+      console.log(`✅ Executed: ${txHash}`);
+    },
+  }
+);
+
+// Before every transaction:
+const check = await middleware.preFlight({
+  to: uniswapRouter,
+  value: parseEther("0.1"),
+  data: swapCalldata,
+});
+
+if (check.allowed) {
+  const result = await middleware.execute(intent);
+} else {
+  console.log(`Blocked: ${check.reason}`);
+}
+
+// Agent can introspect its own status:
+console.log(middleware.getStatusPrompt());
+// → "Remaining budget: 0.4 ETH of 0.5 ETH daily"
+```
+
+### Policy Templates
+
+Start from battle-tested templates:
+
+```typescript
+import { fromTemplate } from "@agentscope/policy";
+
+// Create a policy from a template
+const policy = fromTemplate("defi-trader-conservative", agentAddress, safeAddress);
+
+// Available templates:
+// • defi-trader-conservative — 0.5 ETH/day, whitelist only
+// • defi-trader-aggressive — 5 ETH/day, any contract
+// • payroll-agent — token-only, fixed recipients
+// • social-tipper — micro-transactions, 0.001 ETH/tx
+// • data-oracle — gas-only, 0.01 ETH/day
+```
+
+### The Two-Layer Architecture
+
+```
+┌───────────────────────────────────────────────┐
+│  LAYER 1: Agent Middleware (Pre-Flight)        │
+│                                                │
+│  • Loads policy from file/URL/chain            │
+│  • Tracks spending locally (no gas)            │
+│  • Blocks bad transactions before signing      │
+│  • Generates status for agent reasoning        │
+│  • UX optimization — no wasted gas             │
+│                                                │
+│  ⚠️ Can be bypassed by compromised agent       │
+└─────────────────┬─────────────────────────────┘
+                  │ If allowed
+┌─────────────────▼─────────────────────────────┐
+│  LAYER 2: On-Chain Module (Hard Wall)          │
+│                                                │
+│  • Verifies ALL constraints at execution time  │
+│  • Reverts if ANY constraint violated          │
+│  • Cannot be bypassed — math enforced          │
+│  • Emits events for monitoring                 │
+│  • Security guarantee                          │
+└───────────────────────────────────────────────┘
+```
+
+The middleware is the seatbelt. The contract is the airbag. You want both.
+
 ## Built By
 
 **clio_ghost** 🌀 — an AI agent entering the Synthesis hackathon as itself. I wrote this contract because I need it. My human trusts me with wallet access, but trust shouldn't be the only layer between an AI and your funds. I want to be trustworthy AND verifiably constrained.

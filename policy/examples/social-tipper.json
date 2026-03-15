@@ -1,0 +1,34 @@
+{
+  "$schema": "https://agentscope.dev/schema/asp-1.json",
+  "version": "1.0.0",
+  "meta": {
+    "name": "Social Tipping Agent",
+    "description": "Micro-transactions for tipping content creators. Very low limits, any contract.",
+    "template": "social-tipper"
+  },
+  "agent": {
+    "address": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
+  },
+  "scope": {
+    "chains": ["ethereum", "base", "optimism"],
+    "wallet": {
+      "type": "safe",
+      "address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+    }
+  },
+  "permissions": {
+    "spending": {
+      "native": {
+        "dailyLimit": "0.05 ETH",
+        "perTransaction": "0.001 ETH",
+        "windowType": "fixed-24h"
+      }
+    },
+    "contracts": {
+      "mode": "any"
+    }
+  },
+  "escalation": {
+    "onViolation": "block-silent"
+  }
+}

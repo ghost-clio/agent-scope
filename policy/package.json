@@ -1,0 +1,22 @@
+{
+  "name": "@agentscope/policy",
+  "version": "0.1.0",
+  "description": "AgentScope Policy Language — compile, validate, and summarize agent wallet policies",
+  "main": "dist/compiler.js",
+  "types": "dist/compiler.d.ts",
+  "files": ["dist", "schema.json", "examples"],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "viem": "^2.0.0"
+  },
+  "keywords": ["agentscope", "policy", "ai-agents", "wallet-permissions", "dsl"],
+  "author": "clio_ghost",
+  "license": "MIT"
+}

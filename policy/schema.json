@@ -1,0 +1,180 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentscope.dev/schema/asp-1.json",
+  "title": "AgentScope Policy",
+  "description": "A declarative policy document for constraining AI agent wallet permissions",
+  "type": "object",
+  "required": ["version", "agent", "scope", "permissions"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "type": "string",
+      "enum": ["1.0.0"],
+      "description": "ASP specification version"
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Human-readable policy name" },
+        "description": { "type": "string", "description": "What this policy allows" },
+        "author": { "type": "string", "description": "Policy creator address or name" },
+        "created": { "type": "string", "format": "date-time" },
+        "template": { "type": "string", "description": "Base template this extends" }
+      }
+    },
+    "agent": {
+      "type": "object",
+      "required": ["address"],
+      "properties": {
+        "address": { "type": "string", "description": "Agent wallet address" },
+        "identity": {
+          "type": "object",
+          "properties": {
+            "ens": { "type": "string", "description": "ENS name" },
+            "erc8004": { "type": "string", "description": "ERC-8004 participant ID" }
+          }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "required": ["chains", "wallet"],
+      "properties": {
+        "chains": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Chains this policy applies to"
+        },
+        "wallet": {
+          "type": "object",
+          "required": ["type", "address"],
+          "properties": {
+            "type": { "type": "string", "enum": ["safe", "eoa", "multisig", "program"] },
+            "address": { "type": "string" },
+            "moduleAddress": { "type": "string" }
+          }
+        }
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "properties": {
+        "spending": {
+          "type": "object",
+          "properties": {
+            "native": {
+              "type": "object",
+              "properties": {
+                "dailyLimit": { "type": "string", "description": "e.g. '0.5 ETH'" },
+                "perTransaction": { "type": "string", "description": "e.g. '0.1 ETH'" },
+                "windowType": { "type": "string", "enum": ["fixed-24h", "rolling-24h"] }
+              }
+            },
+            "tokens": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["address", "dailyLimit"],
+                "properties": {
+                  "address": { "type": "string" },
+                  "symbol": { "type": "string" },
+                  "dailyLimit": { "type": "string" },
+                  "decimals": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "contracts": {
+          "type": "object",
+          "properties": {
+            "mode": { "type": "string", "enum": ["whitelist", "blacklist", "any"] },
+            "allowed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["address"],
+                "properties": {
+                  "address": { "type": "string" },
+                  "name": { "type": "string" },
+                  "functions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["selector"],
+                      "properties": {
+                        "selector": { "type": "string" },
+                        "name": { "type": "string" },
+                        "humanDescription": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "temporal": {
+          "type": "object",
+          "properties": {
+            "sessionExpiry": { "type": "string", "format": "date-time" },
+            "activeHours": {
+              "type": "object",
+              "properties": {
+                "timezone": { "type": "string" },
+                "windows": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "start": { "type": "string" },
+                      "end": { "type": "string" },
+                      "days": { "type": "array", "items": { "type": "string" } }
+                    }
+                  }
+                }
+              }
+            },
+            "cooldown": {
+              "type": "object",
+              "properties": {
+                "afterViolation": { "type": "string" },
+                "afterLargeTransaction": { "type": "string" },
+                "largeTransactionThreshold": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "escalation": {
+      "type": "object",
+      "properties": {
+        "onViolation": { "type": "string", "enum": ["block-and-notify", "block-silent", "warn-and-allow", "notify-only"] },
+        "onLargeTransaction": { "type": "string", "enum": ["block-and-notify", "notify", "allow"] },
+        "onNewContract": { "type": "string", "enum": ["block-and-request-approval", "block-and-notify", "warn-and-allow", "allow"] },
+        "notificationChannels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": { "type": "string", "enum": ["webhook", "telegram", "email", "discord", "slack"] },
+              "url": { "type": "string" },
+              "chatId": { "type": "string" },
+              "address": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "delegation": {
+      "type": "object",
+      "properties": {
+        "canDelegate": { "type": "boolean", "default": false },
+        "maxDelegationDepth": { "type": "integer", "default": 0 },
+        "delegationBudgetFraction": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}

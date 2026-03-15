@@ -46,10 +46,21 @@ The "holy shit" moment: a live demo where an AI agent autonomously executes a sw
 Mar 22, 2026. Judging feedback starts Mar 18.
 
 ## Status
-Last updated: 2026-03-15 01:00 ET
-- Contract: ✅ Deployed Sepolia, audited, 50 tests passing, reentrancy guard + O(1) whitelists
-- Dashboard: ✅ Live on GitHub Pages with guided interactive demo (6-step walkthrough)
+Last updated: 2026-03-15 14:30 ET
+- Contract: ✅ Deployed on 8 chains (same address), 67 tests passing, reentrancy guard + O(1) whitelists
+- Dashboard: ✅ Live on GitHub Pages with guided interactive demo (6-step walkthrough), visual overhaul
 - SDK: ✅ npm-ready structure (package.json, tsconfig, README)
 - Demo script: ✅ `npx hardhat run demo/scenario.cjs` — full 7-act E2E demo, all constraints verified
+- MetaMask: ✅ 2 custom caveat enforcers deployed (AgentSpendLimitEnforcer + AgentScopeEnforcer)
+- Venice: ✅ SDK + demo built, need API credits for live calls
+- ENS: ✅ ERC8004ENSBridge deployed on Sepolia, README section complete
 - CI/CD: ✅ gh-pages deployment working
-- Submission: ⬜ Waiting for Synthesis submission portal to open
+- Submission draft: ✅ SUBMISSION.md with all 6 track pitches
+- **ASP-1 Spec: ✅ Protocol specification draft (spec/ASP-1.md) — chain-agnostic standard**
+- **Policy Language: ✅ Compiler + validator + NL parser + templates (policy/compiler.ts)**
+- **Agent Middleware: ✅ Self-enforcing agent wrapper with spending tracker (sdk/middleware.ts)**
+- **Policy Schema: ✅ JSON Schema for policy documents (policy/schema.json)**
+- **Example Policies: ✅ DeFi trader + social tipper templates (policy/examples/)**
+- Demo video: ⬜ Need to record (screen capture of guided demo + scenario.cjs output)
+- Submission: ⬜ Waiting for portal to open (deadline Mar 22)
+- Solana program: ⬜ Planned after ETH version is finalized
