@@ -1,0 +1,10 @@
+node_modules/
+artifacts/
+cache/
+typechain-types/
+coverage/
+.env
+.synthesis
+dashboard/node_modules
+.synthesis
+.synthesis-api-key
