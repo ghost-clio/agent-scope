@@ -156,6 +156,53 @@ const caveats = createCaveatBuilder(chain.id)
 const delegation = createDelegation(delegatorAccount, agentAddress, caveats);
 ```
 
+## Venice AI Integration — Private Reasoning
+
+AgentScope pairs with [Venice AI](https://venice.ai) to create agents with **private reasoning and public accountability**.
+
+```
+┌─────────────────────────────────┐
+│     Venice Private Inference     │
+│  • Agent analyzes market data    │
+│  • Decides: "swap 0.05 ETH"     │  ← PRIVATE (no logs, no retention)
+│  • Zero data retention           │
+└──────────────┬──────────────────┘
+               │ decision
+┌──────────────▼──────────────────┐
+│     AgentScope (On-Chain)        │
+│  • Pre-flight: checkPermission() │
+│  • Enforced: daily limit, etc.   │  ← PUBLIC (auditable on-chain)
+│  • Executed: executeAsAgent()    │
+└─────────────────────────────────┘
+```
+
+The agent's **reasoning** stays private — Venice guarantees zero data retention. The agent's **actions** are fully auditable on-chain. You see *what* happened, never *why*.
+
+```typescript
+import { VeniceAgent } from "./sdk/venice-agent";
+
+const agent = new VeniceAgent({
+  veniceApiKey: process.env.VENICE_API_KEY,
+  agentScope: scopeClient,
+  model: "llama-3.3-70b",
+  agentAddress: "0x...",
+});
+
+// Full cycle: private reasoning → public execution
+const result = await agent.act({
+  context: "ETH dropped 5%. Portfolio: 80% ETH, 20% USDC.",
+  availableActions: ["swap 0.05 ETH → USDC", "hold", "buy more ETH"],
+});
+// result.executed: true
+// result.txHash: "0xabc..." (on-chain, auditable)
+// Private reasoning: GONE (Venice ephemeral compute)
+```
+
+```bash
+# Run the demo (mock mode works without API key)
+node demo/venice-demo.cjs
+```
+
 ## Quick Start
 
 ```bash
@@ -211,9 +258,23 @@ module.executeAsAgent(
 // Now you know exactly what this agent can do
 ```
 
-## ERC-8004 Integration
+## ERC-8004 Identity Bridge (ENS)
 
-AgentScope includes an **ERC8004ENSBridge** contract that links ERC-8004 agent identities to ENS names, enabling human-readable identity resolution for scoped agents. When verifying an agent's scope, you can resolve their on-chain identity — not just "0x1234 has 0.5 ETH/day" but "Agent Clio (verified) has 0.5 ETH/day through Safe 0xABCD."
+AgentScope includes an **ERC8004ENSBridge** contract that links [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) agent identities to ENS names, enabling human-readable identity resolution for scoped agents.
+
+Instead of "0x1234 has 0.5 ETH/day", you get "**clio.agent.eth** (verified) has 0.5 ETH/day through Safe 0xABCD."
+
+```solidity
+// Register an agent identity with ENS resolution
+bridge.registerAgent(agentAddress, "clio.agent.eth", metadataURI);
+
+// Verify: who is this agent, and what can they do?
+(string memory ensName, string memory metadata) = bridge.resolveAgent(agentAddress);
+(bool active, uint256 limit, , uint256 remaining, , ) = module.getAgentScope(agentAddress);
+// → "clio.agent.eth can spend 0.35 ETH more today through Safe 0xABCD"
+```
+
+This bridges the gap between anonymous agent addresses and verifiable on-chain identity — critical for agent-to-agent trust in multi-agent systems.
 
 ## Why Ethereum?
 
