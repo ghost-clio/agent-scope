@@ -64,13 +64,18 @@ async function realVeniceCall(context, actions) {
   );
 
   const data = await response.json();
+  if (data.error) {
+    console.log(`  ⚠️  Venice API: ${data.error}`);
+    console.log("  ↳  Falling back to mock mode\n");
+    return mockVeniceCall(context, actions);
+  }
   try {
     return JSON.parse(data.choices[0].message.content);
   } catch {
     return {
       action: actions[0],
       confidence: 0.5,
-      reasoning: data.choices[0].message.content,
+      reasoning: data.choices[0]?.message?.content || "No response",
     };
   }
 }
