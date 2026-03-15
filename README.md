@@ -81,9 +81,16 @@ AgentScope is deployed and verified across multiple networks:
 
 | Network | Chain ID | AgentScopeModule | Explorer |
 |---------|----------|------------------|----------|
-| **Ethereum Sepolia** | 11155111 | `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` | [etherscan](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Status Network Sepolia** | 1660990954 | `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` | [explorer](https://sepoliascan.status.network/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Celo Sepolia** | 11142220 | `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` | [blockscout](https://celo-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Ethereum Sepolia** | 11155111 | `0x0d00...Bef811` | [etherscan](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **OP Sepolia** | 11155420 | `0x0d00...Bef811` | [blockscout](https://optimism-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Base Sepolia** | 84532 | `0x0d00...Bef811` | [blockscout](https://base-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Unichain Sepolia** | 1301 | `0x0d00...Bef811` | [blockscout](https://unichain-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Celo Sepolia** | 11142220 | `0x0d00...Bef811` | [blockscout](https://celo-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Worldchain Sepolia** | 4801 | `0x0d00...Bef811` | [blockscout](https://worldchain-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Ink Sepolia** | 763373 | `0x0d00...Bef811` | — |
+| **Status Network Sepolia** | 1660990954 | `0x0d00...Bef811` | [explorer](https://sepoliascan.status.network/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+
+> **Same address on every chain:** `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` — deterministic deployment via same deployer + nonce.
 
 **MetaMask Delegation Framework Enforcers** (Ethereum Sepolia):
 
@@ -92,9 +99,11 @@ AgentScope is deployed and verified across multiple networks:
 | AgentSpendLimitEnforcer | `0xBf3aa78cA76a7514C18C09e4E3b0F1756af8Ad24` | Rolling 24h spend tracking per delegation |
 | AgentScopeEnforcer | `0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A` | Composite: spend + whitelist + pause |
 
-> **Status Network highlight:** All transactions are gasless (gas=0). Agents operate with zero gas cost — ideal for high-frequency, low-value agent operations.
+> **Status Network:** All transactions are gasless (gas=0) — ideal for high-frequency agent operations.
 >
-> **Celo highlight:** Native stablecoin infrastructure. Agents managing real-world payments with predictable costs.
+> **Unichain:** Native Uniswap L2 — agents constrained to `swap()` only, operating on Uniswap's home chain.
+>
+> **Celo:** Native stablecoin infrastructure — agents managing real-world payments with predictable costs.
 
 ## MetaMask Delegation Framework Integration
 
