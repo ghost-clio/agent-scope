@@ -7,6 +7,7 @@ import { ModuleStatus } from "./components/ModuleStatus";
 import { SetPolicy } from "./components/SetPolicy";
 import { TokenAllowances } from "./components/TokenAllowances";
 import { RevokeAgent } from "./components/RevokeAgent";
+import { Simulation } from "./components/Simulation";
 
 function App() {
   const { isConnected } = useAccount();
@@ -199,6 +200,7 @@ function App() {
                 <SetPolicy />
                 <TokenAllowances />
                 <RevokeAgent />
+                <Simulation />
               </div>
               <EventFeed />
             </div>
