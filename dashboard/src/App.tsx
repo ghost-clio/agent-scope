@@ -11,6 +11,8 @@ import { RevokeAgent } from "./components/RevokeAgent";
 import { Simulation } from "./components/Simulation";
 import { GuidedDemo } from "./components/GuidedDemo";
 import { PolicyBuilder } from "./components/PolicyBuilder";
+import { DeploymentMap } from "./components/DeploymentMap";
+import { JailbreakDemo } from "./components/JailbreakDemo";
 
 /* ═══════════════════════════════════════════════
    SCROLL REVEAL HOOK
@@ -379,7 +381,7 @@ function App() {
               {[
                 { label: "Policy checks", value: 8420, suffix: "+" },
                 { label: "Lines of Solidity", value: 847 },
-                { label: "Unit tests", value: 50 },
+                { label: "Unit tests", value: 96 },
                 { label: "Violations caught", value: 312 },
               ].map((s, i) => (
                 <Reveal key={s.label} delay={i * 100}>
@@ -567,6 +569,45 @@ function App() {
                       ✅ Security guarantee — even jailbroken agents can't steal
                     </div>
                   </div>
+                </div>
+              </Reveal>
+            </section>
+
+            {/* ── JAILBREAK DEMO ── */}
+            <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
+              <Reveal>
+                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+                  <div className="section-divider" />
+                  <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
+                    What happens when an agent<br />
+                    <span style={{ color: "#ff3366" }}>gets jailbroken?</span>
+                  </h3>
+                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0, maxWidth: 550, marginLeft: "auto", marginRight: "auto" }}>
+                    A prompt injection attack hijacks an AI agent's reasoning. Watch AgentScope stop it cold.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={100}>
+                <JailbreakDemo />
+              </Reveal>
+            </section>
+
+            {/* ── DEPLOYMENT MAP ── */}
+            <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
+              <Reveal>
+                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+                  <div className="section-divider" />
+                  <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
+                    Deployed everywhere
+                  </h3>
+                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0 }}>
+                    One contract address. Every chain. Deterministic deployment.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={100}>
+                <div className="glass-card" style={{ padding: "2.5rem" }}>
+                  <DeploymentMap />
                 </div>
               </Reveal>
             </section>
