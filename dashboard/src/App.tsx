@@ -484,10 +484,11 @@ function App() {
                 <div style={{ textAlign: "center", marginBottom: "3rem" }}>
                   <div className="section-divider" />
                   <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
-                    Paste a tweet. Get a policy.
+                    Say it in English.<br />
+                    <span style={{ color: "#00ff88" }}>Get on-chain policy.</span>
                   </h3>
                   <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0 }}>
-                    Describe your agent's permissions in plain English. The compiler parses it into on-chain parameters.
+                    Describe your agent's permissions in plain language. The compiler turns it into enforceable contract parameters.
                   </p>
                 </div>
               </Reveal>
