@@ -1,7 +1,7 @@
 {
-  "network": "sepolia",
-  "chainId": 11155111,
-  "deployedAt": "2026-03-13T03:41:25.024Z",
+  "network": "polygonAmoy",
+  "chainId": 80002,
+  "deployedAt": "2026-03-15T20:15:15.922Z",
   "contracts": {
     "mockSafe": "0x51157a48b0A00D6C9C49f0AaEe98a27511DD180a",
     "agentScopeModule": "0x0d0034c6AC4640463bf480cB07BE770b08Bef811"
