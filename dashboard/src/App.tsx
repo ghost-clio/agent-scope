@@ -502,11 +502,11 @@ function App() {
                 <div style={{ textAlign: "center", marginBottom: "3rem" }}>
                   <div className="section-divider" />
                   <h3 style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.03em", margin: "0 0 0.5rem" }}>
-                    Belt AND suspenders
+                    Seatbelt + Airbag
                   </h3>
                   <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0, maxWidth: 600, marginLeft: "auto", marginRight: "auto" }}>
-                    Two enforcement layers. The agent doesn't even try to break the rules.
-                    If it does, the chain catches it.
+                    The seatbelt keeps you in place. The airbag deploys when everything else fails.
+                    Two layers. Different jobs.
                   </p>
                 </div>
               </Reveal>
