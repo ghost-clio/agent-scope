@@ -484,11 +484,12 @@ function App() {
                 <div style={{ textAlign: "center", marginBottom: "3rem" }}>
                   <div className="section-divider" />
                   <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
-                    Say it in English.<br />
-                    <span style={{ color: "#00ff88" }}>Get on-chain policy.</span>
+                    Tell your agent what it can do.
                   </h3>
-                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0 }}>
-                    Describe your agent's permissions in plain language. The compiler turns it into enforceable contract parameters.
+                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0, maxWidth: 580, marginLeft: "auto", marginRight: "auto" }}>
+                    Write your rules in plain English. AgentScope compiles them into 
+                    on-chain parameters — the same ones the smart contract enforces.
+                    No Solidity required.
                   </p>
                 </div>
               </Reveal>
