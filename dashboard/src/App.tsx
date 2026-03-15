@@ -9,6 +9,7 @@ import { SetPolicy } from "./components/SetPolicy";
 import { TokenAllowances } from "./components/TokenAllowances";
 import { RevokeAgent } from "./components/RevokeAgent";
 import { Simulation } from "./components/Simulation";
+import { GuidedDemo } from "./components/GuidedDemo";
 
 /* ── Architecture SVG (inline) ── */
 function ArchDiagram() {
@@ -189,7 +190,32 @@ function App() {
       </header>
 
       <main>
-        {!isConnected && !demoMode ? (
+        {demoMode && !isConnected ? (
+          /* ═══════════════ GUIDED DEMO ═══════════════ */
+          <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem" }}>
+            <div style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              marginBottom: "2rem",
+            }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 700 }}>
+                  🔐 AgentScope — Interactive Demo
+                </h2>
+                <p style={{ margin: "0.25rem 0 0", color: "#a1a1aa", fontSize: "0.85rem" }}>
+                  Watch an AI agent operate within on-chain spending policies
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: "0.75rem" }}>
+                <ConnectButton />
+                <button onClick={() => setDemoMode(false)} style={{
+                  background: "transparent", border: "1px solid #2a2a3e", color: "#a1a1aa",
+                  borderRadius: 8, padding: "0.5rem 1rem", cursor: "pointer", fontSize: "0.8rem",
+                }}>← Back</button>
+              </div>
+            </div>
+            <GuidedDemo />
+          </div>
+        ) : !isConnected ? (
           /* ═══════════════ LANDING PAGE ═══════════════ */
           <>
             {/* Hero */}
