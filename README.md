@@ -99,6 +99,12 @@ AgentScope is deployed and verified across multiple networks:
 | AgentSpendLimitEnforcer | `0xBf3aa78cA76a7514C18C09e4E3b0F1756af8Ad24` | Rolling 24h spend tracking per delegation |
 | AgentScopeEnforcer | `0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A` | Composite: spend + whitelist + pause |
 
+**ERC-8004 ENS Bridge** (Ethereum Sepolia):
+
+| Contract | Address | Purpose |
+|----------|---------|---------|
+| ERC8004ENSBridge | `0xa00A0A5223bb6b179D3C58bD0BaABA249f741C0d` | Links ENS names ↔ ERC-8004 agent identities |
+
 > **Status Network:** All transactions are gasless (gas=0) — ideal for high-frequency agent operations.
 >
 > **Unichain:** Native Uniswap L2 — agents constrained to `swap()` only, operating on Uniswap's home chain.
@@ -262,19 +268,68 @@ module.executeAsAgent(
 
 AgentScope includes an **ERC8004ENSBridge** contract that links [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) agent identities to ENS names, enabling human-readable identity resolution for scoped agents.
 
+**Deployed:** [`0xa00A0A5223bb6b179D3C58bD0BaABA249f741C0d`](https://sepolia.etherscan.io/address/0xa00A0A5223bb6b179D3C58bD0BaABA249f741C0d) on Sepolia (ENS Registry: `0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e`)
+
+### The Problem
+
+ERC-8004 gives agents verifiable on-chain identity, but those identities are hex participant IDs — not human-readable, not discoverable. ENS gives human-readable names but has no concept of "agent identity." There's no bridge between the two.
+
+### The Solution
+
 Instead of "0x1234 has 0.5 ETH/day", you get "**clio.agent.eth** (verified) has 0.5 ETH/day through Safe 0xABCD."
 
-```solidity
-// Register an agent identity with ENS resolution
-bridge.registerAgent(agentAddress, "clio.agent.eth", metadataURI);
+The bridge creates a two-way mapping:
 
-// Verify: who is this agent, and what can they do?
-(string memory ensName, string memory metadata) = bridge.resolveAgent(agentAddress);
-(bool active, uint256 limit, , uint256 remaining, , ) = module.getAgentScope(agentAddress);
-// → "clio.agent.eth can spend 0.35 ETH more today through Safe 0xABCD"
+```
+┌─────────────┐     ┌──────────────────┐     ┌──────────────┐
+│  ENS (L1)   │────▶│ ERC8004ENSBridge │◀────│ ERC-8004 (L2)│
+│ ghost.eth   │     │   Links names    │     │ participantId│
+│ human name  │     │   to identities  │     │ agent scope  │
+└─────────────┘     └──────────────────┘     └──────────────┘
 ```
 
-This bridges the gap between anonymous agent addresses and verifiable on-chain identity — critical for agent-to-agent trust in multi-agent systems.
+### Usage
+
+```solidity
+// Register: link your ENS name to your ERC-8004 agent identity
+bridge.registerIdentity(
+    ensNode,            // namehash("clio.agent.eth")
+    "clio.agent.eth",   // human-readable name
+    participantId,      // ERC-8004 participant ID (16 bytes)
+    8453,               // L2 chain ID (e.g., Base)
+    registrationTxHash, // L2 tx hash for cross-chain verification
+    "https://clio.agent.eth/agent.json"  // manifest URI
+);
+
+// Discover: ENS name → agent identity
+(bool active, bytes16 participantId, uint256 chainId, bytes32 txHash, string memory manifest, string memory name)
+    = bridge.resolveAgent(ensNode);
+
+// Reverse lookup: ERC-8004 participantId → ENS name
+(bool found, string memory ensName, uint256 chainId, string memory manifest)
+    = bridge.lookupByParticipantId(participantId);
+
+// Declare capabilities (on-chain discoverability)
+bridge.addCapability(ensNode, "treasury-management", "1.0.0", "Manages Safe treasury within spending limits");
+
+// Combine with AgentScope for full picture
+(bool active, uint256 limit, , uint256 remaining, , ) = module.getAgentScope(agentAddress);
+// → "clio.agent.eth can spend 0.35 ETH more today through Safe 0xABCD"
+//    with capabilities: treasury-management v1.0.0
+```
+
+### Trust Model
+
+- Only the ENS name **owner** can register their ERC-8004 identity (verified on-chain via ENS Registry)
+- Registration includes the L2 chain ID + registration tx hash for independent cross-chain verification
+- No oracle required — the bridge stores attestations that anyone can verify off-chain
+- Deactivation/reactivation by registrant; emergency deactivation by contract owner
+
+### Why This Matters
+
+Agent-to-agent commerce needs identity. When `treasury.eth` wants to delegate funds to `auditor.eth`, both need verifiable identities that humans can read and machines can resolve. ERC-8004 provides the cryptographic identity; ENS provides the human layer; this bridge connects them.
+
+**26 tests passing** — registration, reverse lookup, capabilities, access control, edge cases.
 
 ## Why Ethereum?
 
