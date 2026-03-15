@@ -46,9 +46,10 @@ The "holy shit" moment: a live demo where an AI agent autonomously executes a sw
 Mar 22, 2026. Judging feedback starts Mar 18.
 
 ## Status
-Last updated: 2026-03-15 01:15 ET
+Last updated: 2026-03-15 01:00 ET
 - Contract: ✅ Deployed Sepolia, audited, 50 tests passing, reentrancy guard + O(1) whitelists
 - Dashboard: ✅ Live on GitHub Pages with guided interactive demo (6-step walkthrough)
-- SDK: ✅ Built, needs cleanup
+- SDK: ✅ npm-ready structure (package.json, tsconfig, README)
+- Demo script: ✅ `npx hardhat run demo/scenario.cjs` — full 7-act E2E demo, all constraints verified
 - CI/CD: ✅ gh-pages deployment working
-- Submission: ⬜ Not yet
+- Submission: ⬜ Waiting for Synthesis submission portal to open
