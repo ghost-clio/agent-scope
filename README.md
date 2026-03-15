@@ -574,31 +574,28 @@ const policy = fromTemplate("defi-trader-conservative", agentAddress, safeAddres
 
 The middleware is the seatbelt. The contract is the airbag. You want both.
 
-## Ghost Protocol — The Living Demo
+## Integrations
 
-[`agent/`](./agent/) contains **Ghost Protocol** — the first autonomous agent built on AgentScope. It's a treasury management agent that:
+AgentScope is designed to plug into any wallet or agent framework:
 
-1. **Discovers** market data from CoinGecko
-2. **Reasons** privately via Venice.ai (zero data retention)
-3. **Validates** against AgentScope policy (on-chain or local)
-4. **Executes** swaps via Uniswap through the Safe
-5. **Logs** everything to an audit trail
+| Integration | How |
+|-------------|-----|
+| **MetaMask** | Custom caveat enforcers for the Delegation Framework (ERC-7715) |
+| **Safe** | Native Safe Module — attach to any Safe |
+| **Any agent framework** | SDK + middleware wraps any TypeScript agent |
+| **Any wallet provider** | ASP-1 spec defines the standard interface |
+| **Venice.ai** | Private reasoning + public accountability pattern |
 
-Ghost Protocol proves AgentScope works in production. The agent's reasoning is private. Its actions are auditable. Its constraints are enforced by math, not trust.
-
-```bash
-cd agent && npm install && DRY_RUN=true npm start
-```
+> **Example agent:** [Ghost Protocol](https://github.com/ghost-clio/ghost-protocol) — an autonomous treasury agent built on AgentScope with Venice.ai private inference and Uniswap execution.
 
 ## Project Structure
 
 ```
 agent-scope/
 ├── contracts/          # Solidity — AgentScopeModule, enforcers, ENS bridge
-├── sdk/                # TypeScript SDK — client, middleware, Venice integration
+├── sdk/                # TypeScript SDK — client, middleware, Venice agent
 ├── policy/             # ASP-1 policy language — compiler, schema, templates
 ├── spec/               # Protocol specification (ASP-1)
-├── agent/              # Ghost Protocol — autonomous agent demo
 ├── dashboard/          # React dashboard — live on GitHub Pages
 ├── demo/               # CLI demos — jailbreak, tweet-to-policy
 └── test/               # 67 tests — contract, enforcers, ENS bridge
