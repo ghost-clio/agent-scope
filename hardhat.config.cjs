@@ -63,7 +63,17 @@ module.exports = {
       chainId: 534351,
       accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
     },
+    polygonAmoy: {
+      url: "https://rpc-amoy.polygon.technology",
+      chainId: 80002,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
     // ── L2 Mainnets (deploy last — contract must be final) ──
+    polygon: {
+      url: "https://polygon-rpc.com",
+      chainId: 137,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
     arbitrum: {
       url: "https://arb1.arbitrum.io/rpc",
       chainId: 42161,
