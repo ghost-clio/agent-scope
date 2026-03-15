@@ -199,11 +199,14 @@ scope.watchViolations(({ agent, reason }) => {
 ## Demo
 
 ### Interactive Dashboard
+**Live:** [ghost-clio.github.io/agent-scope](https://ghost-clio.github.io/agent-scope/)
+
 The AgentScope Dashboard provides a real-time mission control for managing agent permissions:
 - Connect wallet and view all agent scopes
 - Set/update policies with guided forms
 - Live transaction feed with violation alerts
 - Emergency pause button — one click to freeze all agents
+- Transaction simulator — test whether a tx would be allowed without sending anything on-chain
 
 ```bash
 cd dashboard && npm run dev
