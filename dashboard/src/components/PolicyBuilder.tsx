@@ -171,15 +171,24 @@ export function PolicyBuilder() {
       }}>
         <div style={{
           display: "flex", alignItems: "center", gap: "0.5rem",
-          marginBottom: "1rem",
+          marginBottom: "0.5rem",
         }}>
-          <span style={{ fontSize: "1.2rem" }}>📝</span>
+          <span style={{ fontSize: "1.2rem" }}>👤</span>
           <span style={{
-            fontSize: "0.75rem", color: "#6b6b80",
-            textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 500,
+            fontSize: "0.85rem", color: "#f0f0f5",
+            fontWeight: 600,
           }}>
-            Describe your agent's permissions in plain English
+            You
           </span>
+          <span style={{ fontSize: "0.75rem", color: "#6b6b80", marginLeft: "0.25rem" }}>
+            — set the rules for your AI agent
+          </span>
+        </div>
+        <div style={{
+          fontSize: "0.7rem", color: "#6b6b80",
+          marginBottom: "0.75rem", lineHeight: 1.6,
+        }}>
+          How much can it spend? Which contracts can it touch? When do permissions expire?
         </div>
 
         <textarea
@@ -256,6 +265,21 @@ export function PolicyBuilder() {
           </button>
         </div>
       </div>
+
+      {/* Flow arrow */}
+      {parsed && (
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "center",
+          gap: "0.75rem", margin: "0.5rem 0",
+          color: "#00ff88", fontSize: "0.7rem", fontWeight: 600,
+          fontFamily: "'JetBrains Mono', monospace",
+          letterSpacing: "0.05em",
+        }}>
+          <div style={{ width: 40, height: 1, background: "rgba(0,255,136,0.2)" }} />
+          COMPILED ↓
+          <div style={{ width: 40, height: 1, background: "rgba(0,255,136,0.2)" }} />
+        </div>
+      )}
 
       {/* Output */}
       {parsed && (
