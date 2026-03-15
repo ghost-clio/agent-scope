@@ -1,0 +1,101 @@
+{
+  "$schema": "https://agentscope.dev/schema/asp-1.json",
+  "version": "1.0.0",
+  "meta": {
+    "name": "DeFi Trading Agent — Conservative",
+    "description": "Limited Uniswap trading with daily caps and session expiry",
+    "template": "defi-trader-conservative"
+  },
+  "agent": {
+    "address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "identity": {
+      "ens": "trader.agent.eth"
+    }
+  },
+  "scope": {
+    "chains": ["ethereum", "base"],
+    "wallet": {
+      "type": "safe",
+      "address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "moduleAddress": "0x0d0034c6AC4640463bf480cB07BE770b08Bef811"
+    }
+  },
+  "permissions": {
+    "spending": {
+      "native": {
+        "dailyLimit": "0.5 ETH",
+        "perTransaction": "0.1 ETH",
+        "windowType": "fixed-24h"
+      },
+      "tokens": [
+        {
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
+          "dailyLimit": "500",
+          "decimals": 6
+        },
+        {
+          "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "symbol": "USDT",
+          "dailyLimit": "500",
+          "decimals": 6
+        }
+      ]
+    },
+    "contracts": {
+      "mode": "whitelist",
+      "allowed": [
+        {
+          "address": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+          "name": "Uniswap V3 Router",
+          "functions": [
+            {
+              "selector": "0x38ed1739",
+              "name": "swapExactTokensForTokens",
+              "humanDescription": "Swap tokens at exact input amount"
+            },
+            {
+              "selector": "0x8803dbee",
+              "name": "swapTokensForExactTokens",
+              "humanDescription": "Swap tokens for exact output amount"
+            }
+          ]
+        }
+      ]
+    },
+    "temporal": {
+      "sessionExpiry": "2026-03-16T00:00:00Z",
+      "activeHours": {
+        "timezone": "America/New_York",
+        "windows": [
+          {
+            "start": "09:00",
+            "end": "17:00",
+            "days": ["mon", "tue", "wed", "thu", "fri"]
+          }
+        ]
+      },
+      "cooldown": {
+        "afterViolation": "1h",
+        "afterLargeTransaction": "15m",
+        "largeTransactionThreshold": "0.25 ETH"
+      }
+    }
+  },
+  "escalation": {
+    "onViolation": "block-and-notify",
+    "onLargeTransaction": "notify",
+    "onNewContract": "block-and-request-approval",
+    "notificationChannels": [
+      {
+        "type": "telegram",
+        "chatId": "owner-chat-id"
+      }
+    ]
+  },
+  "delegation": {
+    "canDelegate": false,
+    "maxDelegationDepth": 0,
+    "delegationBudgetFraction": 0
+  }
+}
