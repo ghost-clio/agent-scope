@@ -21,8 +21,6 @@ contract AgentScopeModule {
         uint256 dailySpendLimitWei;    // Max ETH (in wei) per fixed 24h window
         uint256 maxPerTxWei;           // Max ETH per single transaction (0 = use daily limit)
         uint256 sessionExpiry;          // Unix timestamp — permissions die after this
-        address[] allowedContracts;     // Whitelist of contracts the agent can touch
-        bytes4[] allowedFunctions;      // Whitelist of function selectors
     }
 
     struct SpendState {
@@ -40,11 +38,32 @@ contract AgentScopeModule {
     /// @notice Global pause — kills all agent execution instantly
     bool public paused;
 
+    /// @notice Reentrancy lock
+    uint256 private _locked = 1;
+
     /// @notice Agent address => their spending policy
     mapping(address => Policy) private _policies;
 
     /// @notice Agent address => their current spend tracking
     mapping(address => SpendState) private _spendState;
+
+    /// @notice Agent => contract address => whitelisted (O(1) lookup)
+    mapping(address => mapping(address => bool)) private _contractWhitelist;
+
+    /// @notice Agent => list of whitelisted contracts (for enumeration/view)
+    mapping(address => address[]) private _contractList;
+
+    /// @notice Agent => whether contract whitelist is enabled (empty = any contract allowed)
+    mapping(address => bool) private _contractWhitelistEnabled;
+
+    /// @notice Agent => function selector => whitelisted (O(1) lookup)
+    mapping(address => mapping(bytes4 => bool)) private _functionWhitelist;
+
+    /// @notice Agent => list of whitelisted selectors (for enumeration/view)
+    mapping(address => bytes4[]) private _functionList;
+
+    /// @notice Agent => whether function whitelist is enabled
+    mapping(address => bool) private _functionWhitelistEnabled;
 
     /// @notice Agent address => token address => daily allowance in token units
     mapping(address => mapping(address => uint256)) public tokenAllowances;
@@ -81,6 +100,7 @@ contract AgentScopeModule {
     error TokenLimitExceeded(address token, uint256 requested, uint256 remaining);
     error CannotTargetModule();
     error ModulePaused();
+    error ReentrancyGuard();
 
     // ═══════════════════════════════════════════════════════
     //  MODIFIERS
@@ -94,6 +114,14 @@ contract AgentScopeModule {
     modifier whenNotPaused() {
         if (paused) revert ModulePaused();
         _;
+    }
+
+    /// @dev Prevents reentrancy. Lighter than OZ's ReentrancyGuard.
+    modifier nonReentrant() {
+        if (_locked == 2) revert ReentrancyGuard();
+        _locked = 2;
+        _;
+        _locked = 1;
     }
 
     // ═══════════════════════════════════════════════════════
@@ -128,10 +156,30 @@ contract AgentScopeModule {
             active: true,
             dailySpendLimitWei: dailySpendLimitWei,
             maxPerTxWei: maxPerTxWei,
-            sessionExpiry: sessionExpiry,
-            allowedContracts: allowedContracts,
-            allowedFunctions: allowedFunctions
+            sessionExpiry: sessionExpiry
         });
+
+        // ── Clear old whitelists ──
+        _clearContractWhitelist(agent);
+        _clearFunctionWhitelist(agent);
+
+        // ── Set new contract whitelist ──
+        if (allowedContracts.length > 0) {
+            _contractWhitelistEnabled[agent] = true;
+            for (uint256 i = 0; i < allowedContracts.length; i++) {
+                _contractWhitelist[agent][allowedContracts[i]] = true;
+            }
+            _contractList[agent] = allowedContracts;
+        }
+
+        // ── Set new function whitelist ──
+        if (allowedFunctions.length > 0) {
+            _functionWhitelistEnabled[agent] = true;
+            for (uint256 i = 0; i < allowedFunctions.length; i++) {
+                _functionWhitelist[agent][allowedFunctions[i]] = true;
+            }
+            _functionList[agent] = allowedFunctions;
+        }
 
         // Reset spend tracking on policy update
         _spendState[agent] = SpendState({
@@ -162,6 +210,8 @@ contract AgentScopeModule {
     /// @param agent The agent to revoke
     function revokeAgent(address agent) external onlySafe {
         _policies[agent].active = false;
+        _clearContractWhitelist(agent);
+        _clearFunctionWhitelist(agent);
         emit AgentRevoked(agent);
     }
 
@@ -177,6 +227,7 @@ contract AgentScopeModule {
     // ═══════════════════════════════════════════════════════
 
     /// @notice Execute a transaction through the Safe, subject to policy constraints
+    /// @dev Protected against reentrancy — external calls happen AFTER all state updates
     /// @param to Target address
     /// @param value ETH value in wei
     /// @param data Calldata for the transaction
@@ -185,7 +236,7 @@ contract AgentScopeModule {
         address to,
         uint256 value,
         bytes calldata data
-    ) external whenNotPaused returns (bool success) {
+    ) external whenNotPaused nonReentrant returns (bool success) {
         // ── Check 0: Cannot target this module (prevents privilege escalation) ──
         if (to == address(this)) revert CannotTargetModule();
 
@@ -200,40 +251,20 @@ contract AgentScopeModule {
             revert SessionExpired();
         }
 
-        // ── Check 3: Contract whitelist ──
-        {
-            uint256 len = policy.allowedContracts.length;
-            if (len > 0) {
-                bool allowed = false;
-                for (uint256 i = 0; i < len; i++) {
-                    if (policy.allowedContracts[i] == to) {
-                        allowed = true;
-                        break;
-                    }
-                }
-                if (!allowed) {
-                    emit PolicyViolation(msg.sender, "contract_not_whitelisted");
-                    revert ContractNotWhitelisted(to);
-                }
+        // ── Check 3: Contract whitelist (O(1) mapping lookup) ──
+        if (_contractWhitelistEnabled[msg.sender]) {
+            if (!_contractWhitelist[msg.sender][to]) {
+                emit PolicyViolation(msg.sender, "contract_not_whitelisted");
+                revert ContractNotWhitelisted(to);
             }
         }
 
-        // ── Check 4: Function selector whitelist ──
-        if (data.length >= 4) {
-            uint256 len = policy.allowedFunctions.length;
-            if (len > 0) {
-                bytes4 selector = bytes4(data[:4]);
-                bool allowed = false;
-                for (uint256 i = 0; i < len; i++) {
-                    if (policy.allowedFunctions[i] == selector) {
-                        allowed = true;
-                        break;
-                    }
-                }
-                if (!allowed) {
-                    emit PolicyViolation(msg.sender, "function_not_whitelisted");
-                    revert FunctionNotWhitelisted(selector);
-                }
+        // ── Check 4: Function selector whitelist (O(1) mapping lookup) ──
+        if (data.length >= 4 && _functionWhitelistEnabled[msg.sender]) {
+            bytes4 selector = bytes4(data[:4]);
+            if (!_functionWhitelist[msg.sender][selector]) {
+                emit PolicyViolation(msg.sender, "function_not_whitelisted");
+                revert FunctionNotWhitelisted(selector);
             }
         }
 
@@ -246,7 +277,6 @@ contract AgentScopeModule {
             if (selector == 0xa9059cbb || selector == 0x095ea7b3) {
                 _enforceTokenLimit(msg.sender, to, abi.decode(data[36:68], (uint256)));
             } else if (selector == 0x23b872dd && data.length >= 100) {
-                // transferFrom: amount is the third arg (bytes 68-100)
                 _enforceTokenLimit(msg.sender, to, abi.decode(data[68:100], (uint256)));
             }
         }
@@ -260,6 +290,7 @@ contract AgentScopeModule {
         }
 
         // ── Check 7: Daily ETH spend limit ──
+        // State updates happen BEFORE external call (checks-effects-interactions)
         if (value > 0) {
             SpendState storage state = _spendState[msg.sender];
 
@@ -275,10 +306,11 @@ contract AgentScopeModule {
                 revert DailyLimitExceeded(value, remaining);
             }
 
+            // Effect: update spend BEFORE interaction
             state.spent += value;
         }
 
-        // ── Execute through Safe ──
+        // ── Interaction: Execute through Safe ──
         success = IExecutor(safe).execTransactionFromModule(
             to,
             value,
@@ -320,6 +352,26 @@ contract AgentScopeModule {
         tokenSpent[agent][token] += amount;
     }
 
+    /// @dev Clear all contract whitelist entries for an agent
+    function _clearContractWhitelist(address agent) internal {
+        address[] storage list = _contractList[agent];
+        for (uint256 i = 0; i < list.length; i++) {
+            _contractWhitelist[agent][list[i]] = false;
+        }
+        delete _contractList[agent];
+        _contractWhitelistEnabled[agent] = false;
+    }
+
+    /// @dev Clear all function whitelist entries for an agent
+    function _clearFunctionWhitelist(address agent) internal {
+        bytes4[] storage list = _functionList[agent];
+        for (uint256 i = 0; i < list.length; i++) {
+            _functionWhitelist[agent][list[i]] = false;
+        }
+        delete _functionList[agent];
+        _functionWhitelistEnabled[agent] = false;
+    }
+
     // ═══════════════════════════════════════════════════════
     //  VIEW FUNCTIONS — Proof of Scope
     // ═══════════════════════════════════════════════════════
@@ -351,8 +403,8 @@ contract AgentScopeModule {
         dailySpendLimitWei = policy.dailySpendLimitWei;
         maxPerTxWei = policy.maxPerTxWei;
         sessionExpiry = policy.sessionExpiry;
-        allowedContracts = policy.allowedContracts;
-        allowedFunctions = policy.allowedFunctions;
+        allowedContracts = _contractList[agent];
+        allowedFunctions = _functionList[agent];
 
         // Calculate remaining budget
         if (block.timestamp >= state.windowStart + 24 hours) {
@@ -384,29 +436,15 @@ contract AgentScopeModule {
         if (policy.sessionExpiry != 0 && block.timestamp > policy.sessionExpiry)
             return (false, "session_expired");
 
-        // Contract whitelist check
-        {
-            uint256 len = policy.allowedContracts.length;
-            if (len > 0) {
-                bool found = false;
-                for (uint256 i = 0; i < len; i++) {
-                    if (policy.allowedContracts[i] == to) { found = true; break; }
-                }
-                if (!found) return (false, "contract_not_whitelisted");
-            }
+        // Contract whitelist check (O(1))
+        if (_contractWhitelistEnabled[agent]) {
+            if (!_contractWhitelist[agent][to]) return (false, "contract_not_whitelisted");
         }
 
-        // Function selector check
-        if (data.length >= 4) {
-            uint256 len = policy.allowedFunctions.length;
-            if (len > 0) {
-                bytes4 selector = bytes4(data[:4]);
-                bool found = false;
-                for (uint256 i = 0; i < len; i++) {
-                    if (policy.allowedFunctions[i] == selector) { found = true; break; }
-                }
-                if (!found) return (false, "function_not_whitelisted");
-            }
+        // Function selector check (O(1))
+        if (data.length >= 4 && _functionWhitelistEnabled[agent]) {
+            bytes4 selector = bytes4(data[:4]);
+            if (!_functionWhitelist[agent][selector]) return (false, "function_not_whitelisted");
         }
 
         // Per-tx limit check
