@@ -283,10 +283,7 @@ export function PolicyBuilder() {
 
       {/* Output */}
       {parsed && (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "1rem",
+        <div className="grid-2col" style={{
           animation: "fadeIn 0.5s ease",
         }}>
           {/* Left: Human-readable summary */}

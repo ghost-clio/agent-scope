@@ -374,7 +374,7 @@ function App() {
             </section>
 
             {/* ── STATS ── */}
-            <section id="stats" style={{
+            <section id="stats" className="stats-grid" style={{
               maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem",
               display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "2rem",
             }}>
@@ -513,7 +513,7 @@ function App() {
                 </div>
               </Reveal>
               <Reveal delay={100}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div className="grid-2col">
                   <div className="glass-card" style={{ padding: "2rem" }}>
                     <div style={{
                       fontSize: "0.7rem", color: "#ffaa00", textTransform: "uppercase",
