@@ -22,6 +22,11 @@ module.exports = {
       accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
       gasPrice: 0,
     },
+    celoSepolia: {
+      url: "https://forno.celo-sepolia.celo-testnet.org",
+      chainId: 11142220,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY || "",
