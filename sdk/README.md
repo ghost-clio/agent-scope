@@ -59,6 +59,64 @@ if (verified) console.log(`Verified: ${verified.remainingBudget} budget remainin
 - `watchExecutions(callback)` — Watch for agent executions
 - `watchViolations(callback)` — Watch for policy violations
 
+## Agent Middleware
+
+The middleware wraps any AI agent's transaction pipeline with automatic policy awareness. Two-layer enforcement: the agent self-enforces (pre-flight) AND the chain enforces (hard wall).
+
+```typescript
+import { createMiddleware } from "@ghost-clio/agent-scope-sdk/middleware";
+
+const middleware = await createMiddleware(
+  "./policies/my-agent.json",  // ASP-1 policy document
+  agentScopeClient,
+  agentAddress,
+  {
+    onViolation: (intent, reason) => console.log(`⚠️ ${reason}`),
+    onExecution: (intent, txHash) => console.log(`✅ ${txHash}`),
+  }
+);
+
+// Pre-flight check (free, no gas)
+const check = await middleware.preFlight({
+  to: uniswapRouter,
+  value: parseEther("0.1"),
+  data: swapCalldata,
+});
+
+// Execute with full enforcement
+if (check.allowed) {
+  const result = await middleware.execute(intent);
+}
+
+// Agent introspection
+console.log(middleware.getStatusPrompt());
+// → "Remaining budget: 0.4 ETH of 0.5 ETH daily"
+```
+
+### Middleware Features
+- **Local spend tracking** — no gas cost for pre-flight checks
+- **8-point pre-flight** — session expiry, cooldowns, contract/function whitelists, spending limits, active hours, on-chain verification
+- **Status prompts** — inject into agent's context so it understands its own constraints
+- **Execution logging** — full audit trail of all attempts (allowed + blocked)
+- **Chain sync** — `syncWithChain()` keeps local state aligned with on-chain reality
+- **Violation callbacks** — notify owner via webhook, Telegram, etc.
+
+## Policy Language
+
+See [`@agentscope/policy`](../policy/) for the natural language parser, JSON schema, and compiler that converts policies to on-chain calldata.
+
+```typescript
+import { parseNaturalLanguage, compile, summarize } from "@agentscope/policy";
+
+const policy = parseNaturalLanguage(
+  "0.5 ETH per day, only Uniswap, only swap(), expires in 24h",
+  agentAddress, safeAddress,
+);
+
+const compiled = compile(policy);        // → on-chain calldata
+console.log(summarize(policy));          // → human-readable summary
+```
+
 ## License
 
 MIT
