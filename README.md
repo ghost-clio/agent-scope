@@ -2,7 +2,7 @@
 
 **Your agent can't rug you even if it wants to.**
 
-A Gnosis Safe Module that enforces granular, on-chain spending policies for AI agent wallets. Built for the [Synthesis hackathon](https://synthesis.md).
+A Safe Module that enforces granular, on-chain spending policies for AI agent wallets. Built for the [Synthesis hackathon](https://synthesis.md).
 
 > **Live on Sepolia:** [`0x0d0034c6AC4640463bf480cB07BE770b08Bef811`](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811)
 > 

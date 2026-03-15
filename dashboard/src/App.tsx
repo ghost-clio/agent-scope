@@ -26,7 +26,7 @@ function ArchDiagram() {
       {/* AgentScope Module */}
       <rect x="210" y="30" width="180" height="140" rx="12" fill="#1a1a2e" stroke="#10b981" strokeWidth="2.5" />
       <text x="300" y="58" textAnchor="middle" fill="#10b981" fontSize="14" fontWeight="700">AgentScope</text>
-      <text x="300" y="78" textAnchor="middle" fill="#a1a1aa" fontSize="9">Gnosis Safe Module</text>
+      <text x="300" y="78" textAnchor="middle" fill="#a1a1aa" fontSize="9">Safe Module</text>
       <line x1="230" y1="88" x2="370" y2="88" stroke="#2a2a3e" strokeWidth="1" />
       <text x="300" y="106" textAnchor="middle" fill="#e4e4e7" fontSize="9">✅ Daily Limits</text>
       <text x="300" y="122" textAnchor="middle" fill="#e4e4e7" fontSize="9">✅ Contract Whitelist</text>
@@ -202,7 +202,7 @@ function App() {
                 background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)",
                 fontSize: "0.75rem", color: "#10b981", marginBottom: "1.5rem", fontWeight: 500,
               }}>
-                🟢 Live on Sepolia · Gnosis Safe Module
+                🟢 Live on Sepolia · Safe Module
               </div>
 
               <h2 style={{
@@ -216,7 +216,7 @@ function App() {
                 fontSize: "clamp(1rem, 2.5vw, 1.35rem)", color: "#a1a1aa",
                 maxWidth: 600, margin: "0 auto 2.5rem", lineHeight: 1.6,
               }}>
-                AgentScope is a Gnosis Safe module that enforces spending policies
+                AgentScope is a Safe module that enforces spending policies
                 on-chain. Your agent operates freely within the boundaries you set.
                 The chain enforces them — not trust.
               </p>
