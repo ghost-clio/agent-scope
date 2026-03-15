@@ -46,8 +46,9 @@ The "holy shit" moment: a live demo where an AI agent autonomously executes a sw
 Mar 22, 2026. Judging feedback starts Mar 18.
 
 ## Status
-Last updated: 2026-03-15 00:42 ET
-- Contract: ✅ Deployed Sepolia, audited, 50 tests passing
-- Dashboard: ✅ Live on GitHub Pages, needs polish
+Last updated: 2026-03-15 01:15 ET
+- Contract: ✅ Deployed Sepolia, audited, 50 tests passing, reentrancy guard + O(1) whitelists
+- Dashboard: ✅ Live on GitHub Pages with guided interactive demo (6-step walkthrough)
 - SDK: ✅ Built, needs cleanup
+- CI/CD: ✅ gh-pages deployment working
 - Submission: ⬜ Not yet
