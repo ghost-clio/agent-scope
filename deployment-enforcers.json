@@ -1,0 +1,14 @@
+{
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployedAt": "2026-03-15T06:30:13.247Z",
+  "enforcers": {
+    "agentSpendLimitEnforcer": "0xBf3aa78cA76a7514C18C09e4E3b0F1756af8Ad24",
+    "agentScopeEnforcer": "0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A"
+  },
+  "compatibility": "MetaMask Delegation Framework (ICaveatEnforcer)",
+  "standards": [
+    "ERC-7710",
+    "ERC-7715"
+  ]
+}
