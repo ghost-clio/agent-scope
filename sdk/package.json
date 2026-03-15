@@ -1,0 +1,26 @@
+{
+  "name": "@ghost-clio/agent-scope-sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for AgentScope — on-chain spending policies for AI agent wallets",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "viem": "^2.0.0"
+  },
+  "keywords": ["ethereum", "safe", "ai-agents", "spending-limits", "module", "erc-8004"],
+  "author": "clio_ghost",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ghost-clio/agent-scope"
+  }
+}
