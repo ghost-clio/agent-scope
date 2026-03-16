@@ -16,6 +16,33 @@
   --accent-purple: #8844ff;
 }
 
+/* ── Solana purple theme override ── */
+[data-chain="solana"] {
+  --accent-green: #9945FF;
+  --accent-green-dim: rgba(153,69,255,0.15);
+  --accent-blue: #14F195;
+  --accent-purple: #9945FF;
+}
+
+[data-chain="solana"] .hero-gradient {
+  background: linear-gradient(135deg, #9945FF, #7B3FE4, #14F195) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+[data-chain="solana"] .section-divider {
+  background: linear-gradient(90deg, #9945FF, transparent) !important;
+}
+
+[data-chain="solana"] .glow-orb-1 {
+  background: rgba(153,69,255,0.12) !important;
+}
+
+[data-chain="solana"] .glow-orb-2 {
+  background: rgba(20,241,149,0.06) !important;
+}
+
 * { box-sizing: border-box; }
 
 body {
