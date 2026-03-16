@@ -6,8 +6,9 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 
 > [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
 
-[![Tests](https://img.shields.io/badge/tests-165%20passing-brightgreen)](#tests)
-[![Chains](https://img.shields.io/badge/chains-14%20testnets-blue)](#deployments)
+[![Tests](https://img.shields.io/badge/tests-155%20passing-brightgreen)](#tests)
+[![Chains](https://img.shields.io/badge/deployed-14%20testnets%20%2B%202%20mainnets-blue)](#deployments)
+[![Audits](https://img.shields.io/badge/audits-4%20independent-orange)](#security)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 ---
@@ -32,7 +33,7 @@ The contract reverts if any rule is violated. Doesn't matter if the agent is jai
 
 ```bash
 npm install
-npm test                    # 148 EVM tests (contracts + policy compiler)
+npm test                    # 155 tests (112 EVM + 43 policy compiler)
 npm run demo:jailbreak      # Watch a jailbroken agent get stopped
 npm run demo:multi-agent    # Multi-agent coordination with revoke + re-deploy
 npm run demo:vault          # Yield-only spending demo
@@ -92,7 +93,13 @@ Unichain · Celo · Worldchain · Ink ·
 | AgentScopeEnforcer | Sepolia | [`0x8A70...e2A`](https://sepolia.etherscan.io/address/0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A) |
 | ERC-8004 Identity | Base mainnet | [Registration TX](https://basescan.org/tx/0xc69cbb767affb96e06a65f7efda4a347409ac52a713c12d4203e3f45a8ed6dd3) |
 
-L2 mainnet deployments scheduled for March 20.
+### Mainnets
+
+| Chain | Address | Explorer |
+|-------|---------|----------|
+| **Arbitrum** | `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` | [arbiscan](https://arbiscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Optimism** | `0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA` | [optimistic.etherscan](https://optimistic.etherscan.io/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
+| **Base** | Deploying... | — |
 
 ## Demos
 
@@ -109,13 +116,13 @@ L2 mainnet deployments scheduled for March 20.
 
 | Suite | Tests | Run |
 |-------|-------|-----|
-| AgentScopeModule | 35 | `npx hardhat test test/AgentScopeModule.test.cjs` |
+| AgentScopeModule | 40 | `npx hardhat test test/AgentScopeModule.test.cjs` |
 | AgentYieldVault | 27 | `npx hardhat test test/AgentYieldVault.test.cjs` |
-| CaveatEnforcers | 17 | `npx hardhat test test/CaveatEnforcers.test.cjs` |
+| CaveatEnforcers | 19 | `npx hardhat test test/CaveatEnforcers.test.cjs` |
 | ERC8004ENSBridge | 26 | `npx hardhat test test/ERC8004ENSBridge.test.cjs` |
 | PolicyCompiler | 43 | `node --test test/PolicyCompiler.test.cjs` |
 | Solana Program | 17 | `cd solana/agent-scope-solana && anchor test` |
-| **Total** | **165** | `npm test` (+Solana) |
+| **Total** | **172** | `npm test` (155 EVM) + Solana |
 
 ## Integrations
 
@@ -143,7 +150,25 @@ test/               165 tests (148 via npm test + 17 Solana)
 
 ## Security
 
-Reviewed by Ridge (Mar 12). Critical finding (self-targeting escalation) patched. Full audit notes in [SECURITY.md](./docs/SECURITY.md).
+Four independent audits completed:
+
+| Audit | Findings | Status |
+|-------|----------|--------|
+| **Slither** (automated) | 0 production issues | ✅ Clean |
+| **Opus manual review** | 3 critical, 5 high, 7 medium | ✅ All patched |
+| **External review** (Flip) | 12 findings, 0 critical | ✅ All addressed |
+| **Independent review** (Ridge) | 8 medium, 7 low | ✅ All addressed |
+
+All critical findings (Safe self-targeting, yield vault logic, enforcer byte offset) patched and verified. Full audit notes in [SECURITY.md](./docs/SECURITY.md).
+
+## Ecosystem
+
+AgentScope is designed to work alongside emerging agent standards:
+
+- **[ERC-8183](https://eips.ethereum.org/EIPS/eip-8183)** (Virtuals / EF) — Commerce layer for agent-to-agent transactions. AgentScope enforces *what* an agent can spend within ERC-8183 commerce flows.
+- **[ERC-8004](https://eips.ethereum.org/EIPS/eip-8004)** — Agent identity standard. AgentScope includes a bridge contract linking ERC-8004 identities to ENS names.
+- **[ERC-7715](https://eips.ethereum.org/EIPS/eip-7715)** — MetaMask delegation framework. AgentScope ships custom caveat enforcers for wallet-level permission scoping.
+- **[Safe{Wallet}](https://safe.global)** — Smart account infrastructure. AgentScope deploys as a Safe module.
 
 ## Built By
 
