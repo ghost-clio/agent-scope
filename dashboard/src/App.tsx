@@ -274,7 +274,7 @@ function App() {
   void _scrollTo; // reserved for nav
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg-primary)", position: "relative" }}>
+    <div data-chain={chainMode} style={{ minHeight: "100vh", background: "var(--bg-primary)", position: "relative" }}>
       {/* Background effects */}
       <div className="grid-bg" />
       <div className="noise" />
@@ -353,11 +353,11 @@ function App() {
                 <div style={{
                   display: "inline-flex", alignItems: "center", gap: "0.5rem",
                   padding: "0.4rem 1rem", borderRadius: 24,
-                  background: "rgba(0,255,136,0.06)", border: "1px solid rgba(0,255,136,0.15)",
-                  fontSize: "0.75rem", color: "#00ff88", marginBottom: "2rem", fontWeight: 500,
+                  background: "var(--accent-green-dim)", border: "1px solid var(--accent-green-dim)",
+                  fontSize: "0.75rem", color: "var(--accent-green)", marginBottom: "2rem", fontWeight: 500,
                 }}>
                   <span className="live-dot" />
-                  Live on Sepolia · Safe Module
+                  {chainMode === "evm" ? "Live on Sepolia · Safe Module" : "Anchor Program · Devnet Soon"}
                 </div>
               </Reveal>
 
@@ -377,9 +377,10 @@ function App() {
                   maxWidth: 520, margin: "0 auto 3rem", lineHeight: 1.7,
                   fontWeight: 400,
                 }}>
-                  AgentScope is a Safe module that enforces spending policies
-                  on-chain. Your agent operates freely within the boundaries you set.
-                  The chain enforces them — not trust.
+                  {chainMode === "evm"
+                    ? "AgentScope is a Safe module that enforces spending policies on-chain. Your agent operates freely within the boundaries you set. The chain enforces them — not trust."
+                    : "AgentScope is a Solana program that enforces spending policies on-chain. PDA vaults, program whitelists, SPL token limits. The chain enforces them — not trust."
+                  }
                 </p>
               </Reveal>
 
@@ -405,7 +406,7 @@ function App() {
                       marginLeft: "auto", fontSize: "0.7rem", color: "rgba(107,107,128,0.5)",
                       fontFamily: "'JetBrains Mono', monospace",
                     }}>
-                      agent-scope-module.eth — live event stream
+                      {chainMode === "evm" ? "agent-scope-module.eth" : "agent-scope.sol"} — live event stream
                     </span>
                     <span className="live-dot" style={{ marginLeft: 8 }} />
                   </div>
@@ -421,12 +422,17 @@ function App() {
               maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem",
               display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "2rem",
             }}>
-              {[
+              {(chainMode === "evm" ? [
                 { label: "Policy checks", value: 8420, suffix: "+" },
                 { label: "Lines of Solidity", value: 847 },
                 { label: "Unit tests", value: 96 },
                 { label: "Violations caught", value: 312 },
-              ].map((s, i) => (
+              ] : [
+                { label: "Instructions", value: 11 },
+                { label: "Lines of Rust", value: 780 },
+                { label: "Account types", value: 3 },
+                { label: "Error codes", value: 12 },
+              ]).map((s, i) => (
                 <Reveal key={s.label} delay={i * 100}>
                   <AnimatedStat {...s} />
                 </Reveal>
