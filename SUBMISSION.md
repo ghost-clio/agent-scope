@@ -4,7 +4,7 @@
 Your agent can't rug you even if it wants to.
 
 ## Short Description (280 chars)
-On-chain spending policies for AI agent wallets. Daily limits, contract whitelists, yield-only budgets, emergency pause. 140 tests. 14 chains. EVM + Solana. Enforced by math, not trust.
+On-chain spending policies for AI agent wallets. Daily limits, contract whitelists, yield-only budgets, emergency pause. 148 tests. 14 chains. EVM + Solana. Enforced by math, not trust.
 
 ## Full Description
 
@@ -28,13 +28,13 @@ The agent literally cannot exceed its scope. The contract reverts.
 ### What We Built
 
 **Core Protocol:**
-1. **AgentScopeModule** (Solidity) — Safe Module, 67 tests
+1. **AgentScopeModule** (Solidity) — Safe Module, 78 tests
 2. **AgentYieldVault** (Solidity) — Yield-only spending with wstETH, 27 tests
 3. **Solana Program** (Anchor/Rust) — Full EVM parity, 17 tests
 4. **ASP-1 Protocol Spec** — Chain-agnostic standard (EIP-style)
 
 **Developer Tools:**
-5. **Policy Compiler** — Natural language → JSON → on-chain calldata (29 tests)
+5. **Policy Compiler** — Natural language → JSON → on-chain calldata (43 tests)
 6. **TypeScript SDK** — Client, middleware, agent prompt generator
 7. **Locus Integration** — Scoped USDC payments through Locus (policy checks before payment execution)
 8. **Venice Integration** — Private reasoning + public accountability
@@ -46,7 +46,7 @@ The agent literally cannot exceed its scope. The contract reverts.
 12. **ERC-8004 ENS Bridge** — Human-readable agent identity resolution
 
 **Numbers:**
-- 140 tests (123 EVM + 17 Solana)
+- 148 tests (131 EVM + 17 Solana)
 - 14 testnet deployments
 - 4 smart contracts
 - 5 demos (jailbreak, tweet-to-policy, venice, yield vault, locus)

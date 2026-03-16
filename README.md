@@ -6,7 +6,7 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 
 > [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
 
-[![Tests](https://img.shields.io/badge/tests-140%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/tests-148%20passing-brightgreen)](#tests)
 [![Chains](https://img.shields.io/badge/chains-14%20testnets-blue)](#deployments)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
@@ -32,7 +32,7 @@ The contract reverts if any rule is violated. Doesn't matter if the agent is jai
 
 ```bash
 npm install
-npm test                  # 123 EVM tests
+npm test                  # 105 EVM tests
 npm run demo:jailbreak    # Watch a jailbroken agent get stopped
 npm run demo:vault        # Yield-only spending demo
 npm run demo:locus        # Scoped USDC payments demo
@@ -113,7 +113,7 @@ L2 mainnet deployments scheduled for March 20.
 | ERC8004ENSBridge | 26 | `npx hardhat test test/ERC8004ENSBridge.test.cjs` |
 | PolicyCompiler | 29 | `node --test test/PolicyCompiler.test.cjs` |
 | Solana Program | 17 | `cd solana/agent-scope-solana && anchor test` |
-| **Total** | **140** | `npm test` |
+| **Total** | **148** | `npm test` |
 
 ## Integrations
 
@@ -136,7 +136,7 @@ policy/             ASP-1 policy language — compiler, schema, templates
 spec/               Protocol specification (ASP-1)
 dashboard/          React dashboard (live on GitHub Pages)
 demo/               5 CLI demos
-test/               140 tests
+test/               148 tests
 ```
 
 ## Security

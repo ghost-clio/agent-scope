@@ -261,6 +261,103 @@ test("wei → ETH roundtrip", () => {
   assert.strictEqual(formatEther(wei), "0.123456");
 });
 
+// ── Additional Token Parsing ──
+
+console.log("\n  Additional Token Parsing:");
+
+test("parses USDT token limit", () => {
+  const r = parseNL("500 USDT per day");
+  assert.strictEqual(r.tokens.length, 1);
+  assert.strictEqual(r.tokens[0].symbol, "USDT");
+  assert.strictEqual(r.tokens[0].dailyLimit, "500");
+});
+
+test("parses DAI token limit", () => {
+  const r = parseNL("1000 DAI per day");
+  assert.strictEqual(r.tokens.length, 1);
+  assert.strictEqual(r.tokens[0].symbol, "DAI");
+  assert.strictEqual(r.tokens[0].dailyLimit, "1000");
+});
+
+test("parses decimal token limit", () => {
+  const r = parseNL("100.5 USDC/day");
+  assert.strictEqual(r.tokens.length, 1);
+  assert.strictEqual(r.tokens[0].dailyLimit, "100.5");
+});
+
+test("parses USDC with comma-formatted number", () => {
+  const r = parseNL("1,000 USDC per day");
+  assert.strictEqual(r.tokens[0].dailyLimit, "1000"); // commas stripped
+});
+
+test("parses ETH limit with 'max' prefix", () => {
+  const r = parseNL("max 0.1 ETH per tx, 1 ETH per day");
+  assert.ok(r.native);
+  assert.strictEqual(r.native.dailyLimit, "1 ETH");
+  assert.strictEqual(r.native.perTransaction, "0.1 ETH");
+});
+
+test("parses three tokens simultaneously", () => {
+  const r = parseNL("100 USDC/day, 50 USDT/day, 200 DAI/day");
+  assert.strictEqual(r.tokens.length, 3);
+  const symbols = r.tokens.map(t => t.symbol).sort();
+  assert.deepStrictEqual(symbols, ["DAI", "USDC", "USDT"]);
+});
+
+// ── Wei Conversion Edge Cases ──
+
+console.log("\n  Wei Conversion Edge Cases:");
+
+test("10 ETH → correct wei", () => {
+  const wei = parseEther("10");
+  assert.strictEqual(wei.toString(), "10000000000000000000");
+});
+
+test("very small ETH → correct wei", () => {
+  const wei = parseEther("0.0001");
+  assert.strictEqual(wei.toString(), "100000000000000");
+});
+
+test("formatEther for whole ETH", () => {
+  const eth = formatEther(parseEther("5"));
+  assert.strictEqual(eth, "5.0");
+});
+
+test("zero ETH → zero wei", () => {
+  const wei = parseEther("0");
+  assert.strictEqual(wei.toString(), "0");
+});
+
+// ── Policy Validation Logic ──
+
+console.log("\n  Policy Validation Logic:");
+
+test("native-only policy has no token warnings", () => {
+  const r = parseNL("0.5 ETH per day, only Uniswap, expires 24h");
+  // Should be fully specified — no missing limits for this use case
+  assert.ok(r.native);
+  assert.ok(r.contracts.length > 0);
+  assert.ok(r.expiry > 0);
+});
+
+test("multiple contract parsing: Uniswap and Aave together", () => {
+  const r = parseNL("0.5 ETH/day, only Uniswap and Aave");
+  assert.strictEqual(r.contracts.length, 2);
+  const names = r.contracts.map(c => c.name);
+  assert.ok(names.includes("Uniswap V3 Router"));
+  assert.ok(names.includes("Aave V3 Pool"));
+});
+
+test("expiry in hours produces seconds", () => {
+  const r = parseNL("expires 48h");
+  assert.strictEqual(r.expiry, 48 * 3600);
+});
+
+test("expiry in days produces seconds", () => {
+  const r = parseNL("expires 7d");
+  assert.strictEqual(r.expiry, 7 * 86400);
+});
+
 // ── Summary ──
 
 console.log(`\n  ${passed} passed, ${failed} failed\n`);
