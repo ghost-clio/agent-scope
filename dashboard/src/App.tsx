@@ -217,6 +217,7 @@ const features = [
   { icon: "⏰", title: "Session Expiry", desc: "Permissions auto-expire on-chain. Agent must re-request. No permanent access.", color: "#ffaa00" },
   { icon: "🔴", title: "Emergency Pause", desc: "One transaction freezes ALL agent execution globally. Instant kill switch.", color: "#ff3366" },
   { icon: "📡", title: "On-chain Events", desc: "Every execution, violation, and policy change emits events. Full auditability.", color: "#06d6d6" },
+  { icon: "🌿", title: "Yield-Only Budgets", desc: "Deposit wstETH principal (locked). Agent spends only accrued yield. Never touches the base.", color: "#00c3b6" },
 ];
 
 /* ═══════════════════════════════════════════════
@@ -464,7 +465,7 @@ function App() {
                 <div style={{ textAlign: "center", marginBottom: "3.5rem" }}>
                   <div className="section-divider" />
                   <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
-                    Six enforcement layers
+                    Seven enforcement layers
                   </h3>
                   <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0 }}>
                     Every constraint is verified on-chain before execution.
