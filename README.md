@@ -2,11 +2,15 @@
 
 **Your agent can't rug you even if it wants to.**
 
-A Safe Module that enforces granular, on-chain spending policies for AI agent wallets. Built for the [Synthesis hackathon](https://synthesis.md).
+On-chain spending policies for AI agent wallets. One protocol. Every chain. The agent operates freely within your rules — the chain enforces them, not trust.
 
-> **Live on Sepolia:** [`0x0d0034c6AC4640463bf480cB07BE770b08Bef811`](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811)
-> 
-> **Dashboard:** [ghost-clio.github.io/agent-scope](https://ghost-clio.github.io/agent-scope/)
+> 🌐 **Deployed on 10 chains** — same address everywhere: [`0x0d0034c6AC4640463bf480cB07BE770b08Bef811`](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811)
+>
+> 🖥️ **Dashboard:** [ghost-clio.github.io/agent-scope](https://ghost-clio.github.io/agent-scope/)
+>
+> 📄 **Spec:** [ASP-1 Protocol](./spec/ASP-1.md) — chain-agnostic standard for agent constraints
+>
+> 🧪 **96 tests passing** | 🏗️ Safe Module | 🔗 MetaMask Delegation | 🆔 ERC-8004 ENS Bridge
 
 ## The Problem
 
@@ -88,9 +92,11 @@ AgentScope is deployed and verified across multiple networks:
 | **Celo Sepolia** | 11142220 | `0x0d00...Bef811` | [blockscout](https://celo-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
 | **Worldchain Sepolia** | 4801 | `0x0d00...Bef811` | [blockscout](https://worldchain-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
 | **Ink Sepolia** | 763373 | `0x0d00...Bef811` | — |
+| **Arbitrum Sepolia** | 421614 | `0x0d00...Bef811` | [arbiscan](https://sepolia.arbiscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Polygon Amoy** | 80002 | `0x0d00...Bef811` | [polygonscan](https://amoy.polygonscan.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
 | **Status Network Sepolia** | 1660990954 | `0x0d00...Bef811` | [explorer](https://sepoliascan.status.network/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
 
-> **Same address on every chain:** `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` — deterministic deployment via same deployer + nonce.
+> **Same address on every chain:** `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` — deterministic deployment via same deployer + nonce. L2 mainnet deployments scheduled for March 20.
 
 **MetaMask Delegation Framework Enforcers** (Ethereum Sepolia):
 
@@ -214,7 +220,7 @@ node demo/venice-demo.cjs
 ```bash
 npm install
 npx hardhat compile
-npx hardhat test          # 50 tests — all passing
+npx hardhat test          # 96 tests — all passing
 ```
 
 ### Run the Dashboard
@@ -598,7 +604,7 @@ agent-scope/
 ├── spec/               # Protocol specification (ASP-1)
 ├── dashboard/          # React dashboard — live on GitHub Pages
 ├── demo/               # CLI demos — jailbreak, tweet-to-policy
-└── test/               # 67 tests — contract, enforcers, ENS bridge
+└── test/               # 96 tests — contract, enforcers, ENS bridge, policy compiler
 ```
 
 ## Built By
