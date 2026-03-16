@@ -28,6 +28,9 @@ contract AgentSpendLimitEnforcer is ICaveatEnforcer {
         uint256 spent;
     }
 
+    /// @notice The DelegationManager that is authorized to call hooks
+    address public immutable delegationManager;
+
     /// @notice Tracks spend per delegation hash
     mapping(bytes32 delegationHash => SpendWindow) public spendWindows;
 
@@ -46,6 +49,12 @@ contract AgentSpendLimitEnforcer is ICaveatEnforcer {
     error DailyLimitExceeded(uint256 attempted, uint256 remaining, uint256 dailyLimit);
     error PerTxLimitExceeded(uint256 amount, uint256 maxPerTx);
     error InvalidTerms();
+    error UnauthorizedCaller();
+
+    constructor(address _delegationManager) {
+        require(_delegationManager != address(0), "zero address");
+        delegationManager = _delegationManager;
+    }
 
     /**
      * @notice Enforces spend limits before delegation redemption
@@ -61,6 +70,9 @@ contract AgentSpendLimitEnforcer is ICaveatEnforcer {
         address,
         address _redeemer
     ) external override {
+        // Only the DelegationManager can call hooks
+        if (msg.sender != delegationManager) revert UnauthorizedCaller();
+
         (uint256 dailyLimit, uint256 maxPerTx) = _decodeTerms(_terms);
 
         // Decode execution value from calldata

@@ -43,6 +43,9 @@ contract AgentScopeEnforcer is ICaveatEnforcer {
         uint256 pausedAt;
     }
 
+    /// @notice The DelegationManager that is authorized to call hooks
+    address public immutable delegationManager;
+
     /// @notice Spend tracking per delegation
     mapping(bytes32 => SpendWindow) public spendWindows;
 
@@ -70,6 +73,14 @@ contract AgentScopeEnforcer is ICaveatEnforcer {
     error ContractNotWhitelisted(address target);
     error FunctionNotWhitelisted(bytes4 selector);
     error InvalidTerms();
+    error UnauthorizedCaller();
+
+    // ─── Constructor ─────────────────────────────────────────────
+
+    constructor(address _delegationManager) {
+        require(_delegationManager != address(0), "zero address");
+        delegationManager = _delegationManager;
+    }
 
     // ─── Hooks ───────────────────────────────────────────────────
 
@@ -82,6 +93,9 @@ contract AgentScopeEnforcer is ICaveatEnforcer {
         address _delegator,
         address _redeemer
     ) external override {
+        // 0. Only the DelegationManager can call hooks
+        if (msg.sender != delegationManager) revert UnauthorizedCaller();
+
         // 1. Check pause state
         if (pauseStates[_delegator].paused) {
             revert AgentPaused(_delegator);
@@ -205,9 +219,10 @@ contract AgentScopeEnforcer is ICaveatEnforcer {
         if (_executionCalldata.length < 64) return (address(0), 0, bytes4(0));
         target = address(uint160(uint256(bytes32(_executionCalldata[0:32]))));
         value = uint256(bytes32(_executionCalldata[32:64]));
-        if (_executionCalldata.length >= 100) {
-            // calldata starts at offset 64, first 4 bytes = selector
-            selector = bytes4(_executionCalldata[96:100]);
+        if (_executionCalldata.length >= 132) {
+            // ABI-encoded bytes: offset 64 = bytes offset, offset 96 = bytes length,
+            // offset 128 = start of actual calldata, first 4 bytes = selector
+            selector = bytes4(_executionCalldata[128:132]);
         }
     }
 }

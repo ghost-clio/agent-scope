@@ -29,7 +29,8 @@ describe("AgentScope Caveat Enforcers", function () {
     beforeEach(async function () {
       [owner] = await ethers.getSigners();
       const Factory = await ethers.getContractFactory("AgentSpendLimitEnforcer");
-      enforcer = await Factory.deploy();
+      // Pass owner as the delegationManager for testing (so owner can call beforeHook)
+      enforcer = await Factory.deploy(owner.address);
       await enforcer.waitForDeployment();
     });
 
@@ -154,7 +155,8 @@ describe("AgentScope Caveat Enforcers", function () {
     beforeEach(async function () {
       [owner, agent] = await ethers.getSigners();
       const Factory = await ethers.getContractFactory("AgentScopeEnforcer");
-      enforcer = await Factory.deploy();
+      // Pass owner as the delegationManager for testing (so owner can call beforeHook)
+      enforcer = await Factory.deploy(owner.address);
       await enforcer.waitForDeployment();
     });
 
