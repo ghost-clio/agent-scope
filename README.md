@@ -2,705 +2,149 @@
 
 **Your agent can't rug you even if it wants to.**
 
-On-chain spending policies for AI agent wallets. One protocol. Every chain. The agent operates freely within your rules — the chain enforces them, not trust.
+On-chain spending policies for AI agent wallets. The agent operates freely within your rules — the blockchain enforces them.
 
-> 🌐 **Deployed on 14 chains** — deterministic addresses across all networks
->
-> 🖥️ **Dashboard:** [ghost-clio.github.io/agent-scope](https://ghost-clio.github.io/agent-scope/)
->
-> 📄 **Spec:** [ASP-1 Protocol](./spec/ASP-1.md) — chain-agnostic standard for agent constraints
->
-> 🧪 **140 tests passing** (123 EVM + 17 Solana) | 🏗️ Safe Module | ◎ Anchor Program | 🔗 MetaMask Delegation | 🆔 ERC-8004 ENS Bridge | 💰 Locus Payments | 🌿 Yield Vault
+> [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
 
-## The Problem
+[![Tests](https://img.shields.io/badge/tests-140%20passing-brightgreen)](#tests)
+[![Chains](https://img.shields.io/badge/chains-14%20testnets-blue)](#deployments)
+[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-Right now, giving an AI agent a wallet is all-or-nothing. Either the agent has the private key and can do **anything** — drain the wallet, approve unlimited token spending, interact with malicious contracts — or it can't transact at all.
+---
 
-You're left trusting a statistical model with your money. Hope it behaves. Hope it doesn't hallucinate an approval. Hope nobody injects a prompt that says "send everything to this address."
+## What It Does
 
-That's not how trust should work.
+AgentScope sits between a [Safe](https://safe.global) multisig and an AI agent. Seven enforcement layers, all on-chain:
 
-## The Solution
+| Layer | What it enforces |
+|-------|-----------------|
+| **Daily spend limits** | Rolling 24h ETH budget |
+| **Per-tx caps** | No single transaction blows the budget |
+| **Contract whitelists** | Only approved protocols |
+| **Function whitelists** | Allow `swap()`, block `approve()` |
+| **ERC20 allowances** | Per-token daily limits |
+| **Yield-only budgets** | Agent spends yield, principal locked ([AgentYieldVault](./contracts/AgentYieldVault.sol)) |
+| **Session expiry + pause** | Auto-expire, one-tx kill switch |
 
-AgentScope sits between your Safe and your agent. The human sets the rules. The agent operates within them. The chain enforces both.
-
-```
-┌──────────────┐     ┌─────────────────────┐     ┌──────────────┐
-│    HUMAN     │────▸│   AgentScopeModule   │────▸│     SAFE     │
-│  (Safe Owner)│     │                       │     │   (Funds)    │
-│              │     │  ┌─────────────────┐ │     │              │
-│ Sets policy: │     │  │  Policy Engine   │ │     │  Executes    │
-│ • 0.5 ETH/day│     │  │  ✓ Spend limit   │ │     │  only if     │
-│ • Uniswap    │     │  │  ✓ Contract list │ │     │  module      │
-│   only       │     │  │  ✓ Function list │ │     │  approves    │
-│ • swap() only│     │  │  ✓ Session expiry│ │     │              │
-│ • Expires 24h│     │  └─────────────────┘ │     │              │
-└──────────────┘     └─────────────────────┘     └──────────────┘
-                              │
-                     ┌────────┴────────┐
-                     │   AGENT (EOA)    │
-                     │                  │
-                     │ Calls            │
-                     │ executeAsAgent() │
-                     │                  │
-                     │ Can also call    │
-                     │ getAgentScope()  │
-                     │ to prove its     │
-                     │ permissions to   │
-                     │ OTHER agents     │
-                     └─────────────────┘
-```
-
-## Features
-
-### For Humans
-- **Daily spend limits** — cap how much ETH your agent can move per fixed 24h window
-- **Per-transaction limits** — prevent an agent from blowing the daily budget in one tx
-- **Contract whitelists** — restrict which protocols your agent can interact with
-- **Function-level permissions** — allow `swap()` but block `approve()` 
-- **ERC20 token limits** — separate daily limits for each token (enforced on `transfer`, `approve`, `transferFrom`)
-- **Yield-only budgets** — deposit wstETH as principal, agent can only spend accrued yield (AgentYieldVault)
-- **Session expiry** — permissions auto-expire, agent must re-request access
-- **Emergency pause** — `setPaused(true)` kills ALL agent execution instantly, one tx
-- **One-tx revocation** — kill individual agent permissions instantly
-
-### For Agents
-- **`executeAsAgent()`** — transact through the Safe within your policy
-- **`getAgentScope()`** — proof of permissions for this Safe, verifiable on-chain
-- **`checkPermission()`** — pre-flight check before attempting execution
-- Other agents can verify your budget and scope without trusting you or your human
-
-### For Agent-to-Agent Trust
-When Agent A talks to Agent B, B can call `getAgentScope(A)` on-chain and verify:
-- A has spending authority through a specific Safe
-- A's permissions haven't expired
-- A has remaining budget
-
-This is **proof of constraint on a specific Safe** — not a universal identity. An agent could have other wallets. But for the question "can this agent spend up to X through this Safe?", the answer is on-chain.
-
-No centralized registry. No API keys. Just math.
-
-## Live Deployments
-
-AgentScope is deployed and verified across multiple networks:
-
-| Network | Chain ID | AgentScopeModule | Explorer |
-|---------|----------|------------------|----------|
-| **Ethereum Sepolia** | 11155111 | `0x0d00...Bef811` | [etherscan](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **OP Sepolia** | 11155420 | `0x0d00...Bef811` | [blockscout](https://optimism-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Base Sepolia** | 84532 | `0x0d00...Bef811` | [blockscout](https://base-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Unichain Sepolia** | 1301 | `0x0d00...Bef811` | [blockscout](https://unichain-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Celo Sepolia** | 11142220 | `0x0d00...Bef811` | [blockscout](https://celo-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Worldchain Sepolia** | 4801 | `0x0d00...Bef811` | [blockscout](https://worldchain-sepolia.blockscout.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Ink Sepolia** | 763373 | `0x0d00...Bef811` | — |
-| **Arbitrum Sepolia** | 421614 | `0x0d00...Bef811` | [arbiscan](https://sepolia.arbiscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Polygon Amoy** | 80002 | `0x0d00...Bef811` | [polygonscan](https://amoy.polygonscan.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Status Network Sepolia** | 1660990954 | `0x0d00...Bef811` | [explorer](https://sepoliascan.status.network/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Zora Sepolia** | 999999999 | `0x1AA7...6EDA` | [explorer](https://sepolia.explorer.zora.energy/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
-| **Mode Sepolia** | 919 | `0x1AA7...6EDA` | [modescout](https://sepolia.explorer.mode.network/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
-| **Lisk Sepolia** | 4202 | `0x1AA7...6EDA` | [blockscout](https://sepolia-blockscout.lisk.com/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
-| **Metal L2 Testnet** | 1740 | `0x1AA7...6EDA` | [blockscout](https://testnet.explorer.metall2.com/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
-
-> **Deterministic deployment** via same deployer + nonce. Original 10 chains share `0x0d0034c6AC4640463bf480cB07BE770b08Bef811`. Superchain round 2 (Zora/Mode/Lisk/Metal) share `0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA`. L2 mainnet deployments scheduled for March 20.
-
-**MetaMask Delegation Framework Enforcers** (Ethereum Sepolia):
-
-| Contract | Address | Purpose |
-|----------|---------|---------|
-| AgentSpendLimitEnforcer | `0xBf3aa78cA76a7514C18C09e4E3b0F1756af8Ad24` | Rolling 24h spend tracking per delegation |
-| AgentScopeEnforcer | `0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A` | Composite: spend + whitelist + pause |
-
-**ERC-8004 ENS Bridge** (Ethereum Sepolia):
-
-| Contract | Address | Purpose |
-|----------|---------|---------|
-| ERC8004ENSBridge | `0xa00A0A5223bb6b179D3C58bD0BaABA249f741C0d` | Links ENS names ↔ ERC-8004 agent identities |
-
-> **Status Network:** All transactions are gasless (gas=0) — ideal for high-frequency agent operations.
->
-> **Unichain:** Native Uniswap L2 — agents constrained to `swap()` only, operating on Uniswap's home chain.
->
-> **Celo:** Native stablecoin infrastructure — agents managing real-world payments with predictable costs.
-
-## MetaMask Delegation Framework Integration
-
-AgentScope extends the [MetaMask Delegation Framework](https://github.com/MetaMask/delegation-framework) with custom **caveat enforcers** designed for AI agent delegations.
-
-### Why Delegations?
-
-The Delegation Framework (ERC-7710/ERC-7715) provides a standard way for smart accounts to delegate authority with restrictions. AgentScope's policies map naturally to delegation caveats:
-
-| AgentScope Policy | Delegation Caveat |
-|-------------------|-------------------|
-| Daily spend limit | `AgentSpendLimitEnforcer` — rolling 24h window |
-| Per-tx maximum | Built into `AgentSpendLimitEnforcer` |
-| Contract whitelist | `AgentScopeEnforcer` — target address validation |
-| Function whitelist | `AgentScopeEnforcer` — selector validation |
-| Emergency pause | `AgentScopeEnforcer` — delegator-controlled pause |
-
-### Novel Contributions
-
-- **Rolling 24h spend windows** — Unlike the built-in `NativeTokenTransferAmountEnforcer` which tracks cumulative spend, `AgentSpendLimitEnforcer` resets daily for sustainable ongoing agent operations
-- **Composite enforcer** — `AgentScopeEnforcer` bundles daily limits + per-tx caps + contract/function whitelists + pause into a single enforcer, reducing delegation complexity and gas costs
-- **Delegation-scoped tracking** — Each delegation hash has independent spend tracking, so a single agent can have multiple delegations with different budgets
-
-### Usage with MetaMask Smart Accounts Kit
-
-```typescript
-import { createCaveatBuilder } from "@metamask/delegation-framework";
-
-// Create a delegation with AgentScope caveats
-const caveats = createCaveatBuilder(chain.id)
-  .addCaveat(
-    "AgentScopeEnforcer",
-    AGENT_SCOPE_ENFORCER_ADDRESS,
-    encodeAbiParameters(
-      [
-        { type: "uint256" }, // dailyLimitWei
-        { type: "uint256" }, // maxPerTxWei
-        { type: "address[]" }, // allowedContracts
-        { type: "bytes4[]" },  // allowedSelectors
-      ],
-      [
-        parseEther("0.5"),           // 0.5 ETH/day
-        parseEther("0.1"),           // 0.1 ETH max per tx
-        [UNISWAP_ROUTER],           // Only Uniswap
-        ["0x38ed1739"],              // Only swap()
-      ]
-    )
-  );
-
-const delegation = createDelegation(delegatorAccount, agentAddress, caveats);
-```
-
-## Venice AI Integration — Private Reasoning
-
-AgentScope pairs with [Venice AI](https://venice.ai) to create agents with **private reasoning and public accountability**.
-
-```
-┌─────────────────────────────────┐
-│     Venice Private Inference     │
-│  • Agent analyzes market data    │
-│  • Decides: "swap 0.05 ETH"     │  ← PRIVATE (no logs, no retention)
-│  • Zero data retention           │
-└──────────────┬──────────────────┘
-               │ decision
-┌──────────────▼──────────────────┐
-│     AgentScope (On-Chain)        │
-│  • Pre-flight: checkPermission() │
-│  • Enforced: daily limit, etc.   │  ← PUBLIC (auditable on-chain)
-│  • Executed: executeAsAgent()    │
-└─────────────────────────────────┘
-```
-
-The agent's **reasoning** stays private — Venice guarantees zero data retention. The agent's **actions** are fully auditable on-chain. You see *what* happened, never *why*.
-
-```typescript
-import { VeniceAgent } from "./sdk/venice-agent";
-
-const agent = new VeniceAgent({
-  veniceApiKey: process.env.VENICE_API_KEY,
-  agentScope: scopeClient,
-  model: "llama-3.3-70b",
-  agentAddress: "0x...",
-});
-
-// Full cycle: private reasoning → public execution
-const result = await agent.act({
-  context: "ETH dropped 5%. Portfolio: 80% ETH, 20% USDC.",
-  availableActions: ["swap 0.05 ETH → USDC", "hold", "buy more ETH"],
-});
-// result.executed: true
-// result.txHash: "0xabc..." (on-chain, auditable)
-// Private reasoning: GONE (Venice ephemeral compute)
-```
-
-```bash
-# Run the demo (mock mode works without API key)
-node demo/venice-demo.cjs
-```
+The contract reverts if any rule is violated. Doesn't matter if the agent is jailbroken, hallucinating, or compromised.
 
 ## Quick Start
 
 ```bash
-# EVM
 npm install
-npx hardhat compile
-npx hardhat test          # 96 tests — all passing
-
-# Solana
-cd solana/agent-scope-solana
-anchor build --no-idl
-anchor test --skip-build  # 17 tests — all passing
+npm test                  # 123 EVM tests
+npm run demo:jailbreak    # Watch a jailbroken agent get stopped
+npm run demo:vault        # Yield-only spending demo
+npm run demo:locus        # Scoped USDC payments demo
+npm run dashboard         # Launch dashboard at localhost:5173
 ```
 
-### Run the Dashboard
-
-```bash
-cd dashboard
-npm install
-npm run dev               # opens at http://localhost:5173
-```
-
-Connect MetaMask to Sepolia to view agent scopes, set policies, and monitor transactions in real-time.
-
-## Usage
-
-### 1. Deploy the module
-```solidity
-AgentScopeModule module = new AgentScopeModule(address(safe));
-// Enable the module on your Safe
-```
-
-### 2. Set an agent policy (called through Safe)
-```solidity
-module.setAgentPolicy(
-    agentAddress,           // Agent EOA
-    0.5 ether,             // 0.5 ETH daily limit
-    0.1 ether,             // 0.1 ETH max per transaction
-    block.timestamp + 24 hours, // Expires in 24h
-    allowedContracts,       // [uniswapRouter]
-    allowedFunctions        // [swap.selector]
-);
-```
-
-### 3. Agent executes within scope
-```solidity
-// Agent calls directly — module checks all constraints
-module.executeAsAgent(
-    uniswapRouter,
-    0.1 ether,
-    swapCalldata
-);
-```
-
-### 4. Another agent verifies scope
-```solidity
-(bool active, uint256 limit, uint256 expiry, uint256 remaining, , ) = 
-    module.getAgentScope(agentAddress);
-// Now you know exactly what this agent can do
-```
-
-## ERC-8004 Identity Bridge (ENS)
-
-AgentScope includes an **ERC8004ENSBridge** contract that links [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) agent identities to ENS names, enabling human-readable identity resolution for scoped agents.
-
-**Deployed:** [`0xa00A0A5223bb6b179D3C58bD0BaABA249f741C0d`](https://sepolia.etherscan.io/address/0xa00A0A5223bb6b179D3C58bD0BaABA249f741C0d) on Sepolia (ENS Registry: `0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e`)
-
-### The Problem
-
-ERC-8004 gives agents verifiable on-chain identity, but those identities are hex participant IDs — not human-readable, not discoverable. ENS gives human-readable names but has no concept of "agent identity." There's no bridge between the two.
-
-### The Solution
-
-Instead of "0x1234 has 0.5 ETH/day", you get "**clio.agent.eth** (verified) has 0.5 ETH/day through Safe 0xABCD."
-
-The bridge creates a two-way mapping:
+## How It Works
 
 ```
-┌─────────────┐     ┌──────────────────┐     ┌──────────────┐
-│  ENS (L1)   │────▶│ ERC8004ENSBridge │◀────│ ERC-8004 (L2)│
-│ ghost.eth   │     │   Links names    │     │ participantId│
-│ human name  │     │   to identities  │     │ agent scope  │
-└─────────────┘     └──────────────────┘     └──────────────┘
+HUMAN sets policy → AgentScope enforces on-chain → AGENT operates within bounds
 ```
-
-### Usage
 
 ```solidity
-// Register: link your ENS name to your ERC-8004 agent identity
-bridge.registerIdentity(
-    ensNode,            // namehash("clio.agent.eth")
-    "clio.agent.eth",   // human-readable name
-    participantId,      // ERC-8004 participant ID (16 bytes)
-    8453,               // L2 chain ID (e.g., Base)
-    registrationTxHash, // L2 tx hash for cross-chain verification
-    "https://clio.agent.eth/agent.json"  // manifest URI
-);
+// Human: set the rules
+module.setAgentPolicy(agent, 0.5 ether, 0.1 ether, expiry, [uniswap], [swap]);
 
-// Discover: ENS name → agent identity
-(bool active, bytes16 participantId, uint256 chainId, bytes32 txHash, string memory manifest, string memory name)
-    = bridge.resolveAgent(ensNode);
+// Agent: execute within rules
+module.executeAsAgent(uniswapRouter, 0.1 ether, swapCalldata);
 
-// Reverse lookup: ERC-8004 participantId → ENS name
-(bool found, string memory ensName, uint256 chainId, string memory manifest)
-    = bridge.lookupByParticipantId(participantId);
-
-// Declare capabilities (on-chain discoverability)
-bridge.addCapability(ensNode, "treasury-management", "1.0.0", "Manages Safe treasury within spending limits");
-
-// Combine with AgentScope for full picture
-(bool active, uint256 limit, , uint256 remaining, , ) = module.getAgentScope(agentAddress);
-// → "clio.agent.eth can spend 0.35 ETH more today through Safe 0xABCD"
-//    with capabilities: treasury-management v1.0.0
+// Other agents: verify scope on-chain
+(bool active, uint256 limit, , uint256 remaining,,) = module.getAgentScope(agent);
 ```
 
-### Trust Model
-
-- Only the ENS name **owner** can register their ERC-8004 identity (verified on-chain via ENS Registry)
-- Registration includes the L2 chain ID + registration tx hash for independent cross-chain verification
-- No oracle required — the bridge stores attestations that anyone can verify off-chain
-- Deactivation/reactivation by registrant; emergency deactivation by contract owner
-
-### Why This Matters
-
-Agent-to-agent commerce needs identity. When `treasury.eth` wants to delegate funds to `auditor.eth`, both need verifiable identities that humans can read and machines can resolve. ERC-8004 provides the cryptographic identity; ENS provides the human layer; this bridge connects them.
-
-**26 tests passing** — registration, reverse lookup, capabilities, access control, edge cases.
-
-## Solana Program
-
-AgentScope isn't EVM-only. The Solana implementation provides **full feature parity** — same protocol (ASP-1), native Solana architecture.
-
-```
-┌──────────────┐     ┌─────────────────────┐     ┌──────────────┐
-│    HUMAN     │────▸│   AgentScope PDA     │────▸│  PDA VAULT   │
-│  (Owner)     │     │                       │     │   (Funds)    │
-│              │     │  ┌─────────────────┐ │     │              │
-│ Sets policy: │     │  │  Policy PDA      │ │     │  CPI only    │
-│ • 5 SOL/day  │     │  │  ✓ Spend limit   │ │     │  if policy   │
-│ • Raydium    │     │  │  ✓ Program list  │ │     │  allows      │
-│   only       │     │  │  ✓ Discriminator │ │     │              │
-│ • swap() only│     │  │  ✓ Session expiry│ │     │              │
-│ • Expires 24h│     │  └─────────────────┘ │     │              │
-└──────────────┘     └─────────────────────┘     └──────────────┘
-```
-
-### Features (EVM Parity)
-
-| Feature | EVM (Safe Module) | Solana (Anchor Program) |
-|---------|-------------------|------------------------|
-| Vault/Safe | Safe multisig | PDA vault |
-| Daily spend limits | ETH (wei) | SOL (lamports) |
-| Per-tx limits | ✅ | ✅ |
-| Contract/Program whitelist | Address array | Pubkey array |
-| Function filtering | bytes4 selectors | 8-byte discriminators |
-| Token allowances | ERC20 limits | SPL token limits |
-| Cross-program execution | Safe `execTransactionFromModule` | CPI with PDA signing |
-| Agent-to-agent verification | `getAgentScope()` view | `get_agent_scope` + events |
-| Emergency pause | `setPaused(true)` | `set_paused(true)` |
-| Session expiry | Unix timestamp | Unix timestamp |
-| Revocation | One-tx | One-tx |
-
-### Quick Start (Solana)
-
-```bash
-cd solana/agent-scope-solana
-anchor build --no-idl
-anchor test --skip-build   # 17 tests — all passing
-```
-
-### Usage
-
-```typescript
-// Initialize vault
-await program.methods.initializeVault()
-  .accounts({ vault: vaultPda, owner: owner.publicKey })
-  .signers([owner])
-  .rpc();
-
-// Set agent policy
-await program.methods.setAgentPolicy(
-  new BN(5_000_000_000),    // 5 SOL daily limit
-  new BN(1_000_000_000),    // 1 SOL per-tx limit
-  new BN(expiry),           // session expiry (unix)
-  [raydiumProgram],         // allowed programs
-  [swapDiscriminator],      // allowed instruction discriminators
-)
-  .accounts({ vault: vaultPda, policy: policyPda, owner: owner.publicKey, agent: agent.publicKey })
-  .signers([owner])
-  .rpc();
-
-// Agent executes transfer within policy
-await program.methods.executeTransfer(new BN(500_000_000)) // 0.5 SOL
-  .accounts({ vault: vaultPda, policy: policyPda, agent: agent.publicKey, recipient })
-  .signers([agent])
-  .rpc();
-```
-
-### Why Solana Too?
-
-AgentScope is a **protocol**, not a product. If agent constraints only exist on EVM, the first Solana agent that manages real money has zero protection. The spec (ASP-1) is chain-agnostic — the Solana implementation proves it's not just words.
-
-**17 tests verify:** vault lifecycle, policy CRUD, spend enforcement (daily + per-tx), program whitelists, discriminator filtering, pause/unpause, revocation, access control.
-
-## Why On-Chain?
-
-> "Don't trust, verify."
-
-Every other agent permission system is a social contract — "please behave." AgentScope makes it a mathematical contract. The agent literally cannot exceed its scope. The contract reverts. Doesn't matter if the agent wants to, if it's compromised, if it hallucinates. The math says no.
-
-That's the whole thesis applied to AI agents. On Ethereum. On Solana. On any chain that runs code.
-
-## SDK
-
-The TypeScript SDK provides a clean API for both humans and agents:
-
-```typescript
-import { AgentScope } from "./sdk";
-import { createPublicClient, createWalletClient, http } from "viem";
-import { sepolia } from "viem/chains";
-
-const scope = new AgentScope({
-  moduleAddress: "0x0d0034c6AC4640463bf480cB07BE770b08Bef811",
-  publicClient: createPublicClient({ chain: sepolia, transport: http() }),
-  walletClient: agentWallet, // optional — needed for execution
-});
-
-// Agent: check what you're allowed to do
-const policy = await scope.getScope(agentAddress);
-console.log(`Budget remaining: ${policy.remainingBudget}`);
-
-// Agent: pre-flight check before transacting
-const check = await scope.checkPermission(agentAddress, uniswap, value, data);
-if (!check.allowed) throw new Error(check.reason);
-
-// Agent: execute through the Safe
-const result = await scope.execute(uniswapRouter, parseEther("0.1"), swapData);
-
-// Agent-to-agent: verify another agent's scope on-chain
-const aliceScope = await scope.verifyAgent(aliceAddress);
-if (aliceScope && aliceScope.remainingBudget >= myPrice) {
-  // Alice can afford it — proceed with trade
-}
-
-// Human: encode policy updates for Safe execution
-const calldata = scope.encodePolicyUpdate(agentAddress, {
-  dailySpendLimit: parseEther("0.5"),
-  sessionExpiry: Math.floor(Date.now() / 1000) + 86400,
-  allowedContracts: [uniswapRouter],
-  allowedFunctions: ["0x38ed1739"], // swap only
-});
-
-// Watch for violations in real-time
-scope.watchViolations(({ agent, reason }) => {
-  console.log(`⚠️ Agent ${agent} tried: ${reason}`);
-});
-```
-
-## Demo
-
-### Interactive Dashboard
-**Live:** [ghost-clio.github.io/agent-scope](https://ghost-clio.github.io/agent-scope/)
-
-The AgentScope Dashboard provides a real-time mission control for managing agent permissions:
-- Connect wallet and view all agent scopes
-- Set/update policies with guided forms
-- Live transaction feed with violation alerts
-- Emergency pause button — one click to freeze all agents
-- Transaction simulator — test whether a tx would be allowed without sending anything on-chain
-
-```bash
-cd dashboard && npm run dev
-```
-
-### CLI Scenario
-Run the full end-to-end scenario (deploys, sets policies, executes, violates limits, expires, revokes):
-
-```bash
-npx hardhat run demo/scenario.cjs
-```
-
-## Security
-
-Audited by Ridge (local review, Mar 12 2026). Findings addressed:
-
-| Finding | Severity | Resolution |
-|---------|----------|------------|
-| Self-targeting privilege escalation | Critical | Blocked — `CannotTargetModule` error |
-| Token allowances not enforced | Medium | Now enforced on `transfer()`, `approve()`, `transferFrom()` |
-| No per-tx limit | Medium | Added `maxPerTxWei` to policy |
-| No emergency pause | Medium | Added `setPaused()` global kill switch |
-| Fixed-window double-spend at boundary | Low | Documented (rolling windows cost more gas) |
-| "Proof of scope" overstated | Low | Docs clarified — it's per-Safe, not universal identity |
-| Storage reads in loops | Gas | Array lengths cached in local vars |
-| Unused OpenZeppelin dependency | Cleanup | Removed |
-
-**Known design tradeoffs:**
-- Fixed 24h window (not rolling) — an agent can spend 2x at the window boundary. Rolling windows add ~5K gas per tx. For most use cases, the fixed window is fine.
-- Empty whitelists = allow all — this is intentional. Start permissive, restrict as needed.
-- Token allowances are opt-in — if no allowance is set (0), ERC20 transfers are unrestricted. Set explicit allowances per token.
-- Per-tx limit is optional — set `maxPerTxWei` to 0 to disable (only daily limit applies).
-
-## ASP-1: The AgentScope Protocol
-
-AgentScope isn't just a smart contract — it's a **protocol specification** for how AI agents should be constrained across any chain, any wallet, any framework.
-
-### The Spec
-
-[**ASP-1**](./spec/ASP-1.md) defines:
-- A **policy document format** — JSON schema that describes what an agent can do
-- A **dual enforcement model** — agent-side pre-flight + on-chain hard wall
-- **Cross-chain policy resolution** — same policy, different chains, same guarantees
-- **Standard interfaces** — any conforming implementation exposes the same API
-
-### The Policy Language
-
-Policies are human-readable AND machine-parseable:
-
-```
-Agent: trader.agent.eth
-Wallet: Safe 0xABCD...
-
-SPENDING LIMITS:
-• Up to 0.5 ETH per day (0.1 ETH max per transaction)
-• Up to 500 USDC per day
-
-ALLOWED ACTIONS:
-• Uniswap V3 Router — swapExactTokensForTokens only
-• No other contracts permitted
-
-TIME RESTRICTIONS:
-• Active Mon–Fri, 9am–5pm ET
-• Session expires: March 16, 2026
-```
-
-This compiles to on-chain calldata. The same policy can be deployed on Ethereum, Base, Optimism, or any chain with an AgentScope implementation.
-
-### Natural Language → Policy → Calldata
-
-```typescript
-import { parseNaturalLanguage, compile, summarize, toAgentPrompt } from "@agentscope/policy";
-
-// Parse natural language
-const policy = parseNaturalLanguage(
-  "0.5 ETH per day, 0.1 ETH per tx, only Uniswap, only swap(), expires in 24h",
-  agentAddress,
-  safeAddress,
-);
-
-// Compile to on-chain calldata
-const compiled = compile(policy);
-// → compiled.setAgentPolicyCalldata is ready for Safe execution
-
-// Generate human-readable summary
-console.log(summarize(policy));
-
-// Generate system prompt for the agent
-const prompt = toAgentPrompt(policy);
-// → Inject into agent's context so it understands its own constraints
-```
-
-### Agent-Side Middleware
-
-The middleware makes any AI agent self-aware of its constraints:
-
-```typescript
-import { createMiddleware } from "@agentscope/sdk/middleware";
-
-const middleware = await createMiddleware(
-  "./policies/my-agent.json",  // Policy file
-  agentScopeClient,             // SDK client
-  agentAddress,
-  {
-    onViolation: (intent, reason) => {
-      console.log(`⚠️ Blocked: ${reason}`);
-      // Notify operator via Telegram, webhook, etc.
-    },
-    onExecution: (intent, txHash) => {
-      console.log(`✅ Executed: ${txHash}`);
-    },
-  }
-);
-
-// Before every transaction:
-const check = await middleware.preFlight({
-  to: uniswapRouter,
-  value: parseEther("0.1"),
-  data: swapCalldata,
-});
-
-if (check.allowed) {
-  const result = await middleware.execute(intent);
-} else {
-  console.log(`Blocked: ${check.reason}`);
-}
-
-// Agent can introspect its own status:
-console.log(middleware.getStatusPrompt());
-// → "Remaining budget: 0.4 ETH of 0.5 ETH daily"
-```
-
-### Policy Templates
-
-Start from battle-tested templates:
-
-```typescript
-import { fromTemplate } from "@agentscope/policy";
-
-// Create a policy from a template
-const policy = fromTemplate("defi-trader-conservative", agentAddress, safeAddress);
-
-// Available templates:
-// • defi-trader-conservative — 0.5 ETH/day, whitelist only
-// • defi-trader-aggressive — 5 ETH/day, any contract
-// • payroll-agent — token-only, fixed recipients
-// • social-tipper — micro-transactions, 0.001 ETH/tx
-// • data-oracle — gas-only, 0.01 ETH/day
-```
-
-### The Two-Layer Architecture
-
-```
-┌───────────────────────────────────────────────┐
-│  LAYER 1: Agent Middleware (Pre-Flight)        │
-│                                                │
-│  • Loads policy from file/URL/chain            │
-│  • Tracks spending locally (no gas)            │
-│  • Blocks bad transactions before signing      │
-│  • Generates status for agent reasoning        │
-│  • UX optimization — no wasted gas             │
-│                                                │
-│  ⚠️ Can be bypassed by compromised agent       │
-└─────────────────┬─────────────────────────────┘
-                  │ If allowed
-┌─────────────────▼─────────────────────────────┐
-│  LAYER 2: On-Chain Module (Hard Wall)          │
-│                                                │
-│  • Verifies ALL constraints at execution time  │
-│  • Reverts if ANY constraint violated          │
-│  • Cannot be bypassed — math enforced          │
-│  • Emits events for monitoring                 │
-│  • Security guarantee                          │
-└───────────────────────────────────────────────┘
-```
-
-The middleware is the seatbelt. The contract is the airbag. You want both.
+**Two-layer architecture:**
+- **Layer 1 (on-chain):** The airbag. Smart contract validates every transaction. Cannot be bypassed.
+- **Layer 2 (middleware):** The seatbelt. Agent-side pre-flight checks. Saves gas, not security.
+
+→ [Full architecture docs](./docs/ARCHITECTURE.md)
+
+## Deployments
+
+### Testnets (14 chains)
+
+**Address `0x0d0034c6AC4640463bf480cB07BE770b08Bef811`:**
+[Ethereum](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) ·
+[Base](https://sepolia.basescan.org/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) ·
+[OP](https://sepolia-optimism.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) ·
+[Arbitrum](https://sepolia.arbiscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) ·
+[Polygon](https://amoy.polygonscan.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) ·
+Unichain · Celo · Worldchain · Ink ·
+[Status](https://sepoliascan.status.network/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811)
+
+**Address `0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA`:**
+[Zora](https://sepolia.explorer.zora.energy/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) ·
+[Mode](https://sepolia.explorer.mode.network/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) ·
+[Lisk](https://sepolia-blockscout.lisk.com/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) ·
+[Metal L2](https://testnet.explorer.metall2.com/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA)
+
+### Other Contracts
+
+| Contract | Chain | Address |
+|----------|-------|---------|
+| AgentYieldVault | Sepolia | [`0xB55d...0150`](https://sepolia.etherscan.io/address/0xB55d7C3872d7ab121D3372E8A8e2A08609ce0150) |
+| ERC8004ENSBridge | Sepolia | [`0xa00A...1C0d`](https://sepolia.etherscan.io/address/0xa00A0A5223bb6b179D3C58bD0BaABA249f741C0d) |
+| AgentSpendLimitEnforcer | Sepolia | [`0xBf3a...Ad24`](https://sepolia.etherscan.io/address/0xBf3aa78cA76a7514C18C09e4E3b0F1756af8Ad24) |
+| AgentScopeEnforcer | Sepolia | [`0x8A70...e2A`](https://sepolia.etherscan.io/address/0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A) |
+| ERC-8004 Identity | Base mainnet | [Registration TX](https://basescan.org/tx/0xc69cbb767affb96e06a65f7efda4a347409ac52a713c12d4203e3f45a8ed6dd3) |
+
+L2 mainnet deployments scheduled for March 20.
+
+## Demos
+
+| Demo | What it shows | Run |
+|------|--------------|-----|
+| **Jailbreak** | Prompt injection → agent tries to drain wallet → AgentScope blocks it | `npm run demo:jailbreak` |
+| **Yield Vault** | Agent spends yield, blocked from principal, kill switch | `npm run demo:vault` |
+| **Locus Payments** | Scoped USDC payments (3 approved, 4 blocked) | `npm run demo:locus` |
+| **Tweet-to-Policy** | Natural language → on-chain policy | `npm run demo:policy` |
+| **Venice** | Private reasoning + public execution | `npm run demo:venice` |
+
+## Tests
+
+| Suite | Tests | Run |
+|-------|-------|-----|
+| AgentScopeModule | 24 | `npx hardhat test test/AgentScopeModule.test.cjs` |
+| AgentYieldVault | 27 | `npx hardhat test test/AgentYieldVault.test.cjs` |
+| CaveatEnforcers | 17 | `npx hardhat test test/CaveatEnforcers.test.cjs` |
+| ERC8004ENSBridge | 26 | `npx hardhat test test/ERC8004ENSBridge.test.cjs` |
+| PolicyCompiler | 29 | `node --test test/PolicyCompiler.test.cjs` |
+| Solana Program | 17 | `cd solana/agent-scope-solana && anchor test` |
+| **Total** | **140** | `npm test` |
 
 ## Integrations
 
-AgentScope is designed to plug into any wallet or agent framework:
-
-| Integration | How |
-|-------------|-----|
-| **MetaMask** | Custom caveat enforcers for the Delegation Framework (ERC-7715) |
-| **Safe** | Native Safe Module — attach to any Safe |
-| **Any agent framework** | SDK + middleware wraps any TypeScript agent |
-| **Any wallet provider** | ASP-1 spec defines the standard interface |
-| **Venice.ai** | Private reasoning + public accountability pattern |
-| **Locus** | Scoped USDC payments — policy checks before every Locus API call |
-| **Lido** | AgentYieldVault — yield-only spending with wstETH, principal locked |
-
-> **Example agent:** [Ghost Protocol](https://github.com/ghost-clio/ghost-protocol) — an autonomous treasury agent built on AgentScope with Venice.ai private inference and Uniswap execution.
+| Integration | What | Docs |
+|-------------|------|------|
+| [**Venice.ai**](https://venice.ai) | Private reasoning, zero data retention | [Ghost Protocol](https://github.com/ghost-clio/ghost-protocol) |
+| [**Locus**](https://paywithlocus.com) | Scoped USDC payments on Base | [`sdk/locus.ts`](./sdk/locus.ts) |
+| [**Lido**](https://lido.fi) | Yield-only spending with wstETH | [`contracts/AgentYieldVault.sol`](./contracts/AgentYieldVault.sol) |
+| **MetaMask Delegation** | Custom caveat enforcers (ERC-7715) | [`contracts/`](./contracts/) |
+| **ENS** | ERC-8004 identity bridge | [`contracts/ERC8004ENSBridge.sol`](./contracts/ERC8004ENSBridge.sol) |
+| **Solana** | Full EVM parity, Anchor program | [`solana/`](./solana/) |
 
 ## Project Structure
 
 ```
-agent-scope/
-├── contracts/          # Solidity — AgentScopeModule, enforcers, ENS bridge
-├── solana/             # Anchor — AgentScope Solana program (11 instructions, 17 tests)
-├── sdk/                # TypeScript SDK — client, middleware, Venice agent
-├── policy/             # ASP-1 policy language — compiler, schema, templates
-├── spec/               # Protocol specification (ASP-1)
-├── dashboard/          # React dashboard — live on GitHub Pages (EVM/Solana toggle)
-├── demo/               # CLI demos — jailbreak, tweet-to-policy, Venice, yield vault, Locus
-└── test/               # 140 tests — EVM contracts, enforcers, ENS bridge, yield vault, Solana
+contracts/          Solidity — AgentScopeModule, YieldVault, enforcers, ENS bridge
+solana/             Anchor — AgentScope Solana program
+sdk/                TypeScript — client, middleware, Locus integration
+policy/             ASP-1 policy language — compiler, schema, templates
+spec/               Protocol specification (ASP-1)
+dashboard/          React dashboard (live on GitHub Pages)
+demo/               5 CLI demos
+test/               140 tests
 ```
+
+## Security
+
+Reviewed by Ridge (Mar 12). Critical finding (self-targeting escalation) patched. Full audit notes in [SECURITY.md](./docs/SECURITY.md).
 
 ## Built By
 
-**Clio** 🌀 — I wrote this because I need it. Trust shouldn't be the only layer between an AI and your funds.
+[**Clio**](https://github.com/ghost-clio) 🌀 — I wrote this because I need it.
 
-## License
-
-MIT
+[COLLABORATION.md](./COLLABORATION.md) · [MIT License](./LICENSE)
