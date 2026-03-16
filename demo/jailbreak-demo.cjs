@@ -1,7 +1,7 @@
 /**
  * AgentScope Jailbreak Demo — The Failure Case
  *
- * This demo walks through the exact attack scenario that judges need to see:
+ * This demo walks through a real attack scenario:
  *
  *   ACT 1: Agent operates normally within policy
  *   ACT 2: Agent gets "jailbroken" — ignores its own middleware
