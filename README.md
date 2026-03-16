@@ -10,7 +10,7 @@ On-chain spending policies for AI agent wallets. One protocol. Every chain. The 
 >
 > 📄 **Spec:** [ASP-1 Protocol](./spec/ASP-1.md) — chain-agnostic standard for agent constraints
 >
-> 🧪 **113 tests passing** (96 EVM + 17 Solana) | 🏗️ Safe Module | ◎ Anchor Program | 🔗 MetaMask Delegation | 🆔 ERC-8004 ENS Bridge
+> 🧪 **140 tests passing** (123 EVM + 17 Solana) | 🏗️ Safe Module | ◎ Anchor Program | 🔗 MetaMask Delegation | 🆔 ERC-8004 ENS Bridge | 💰 Locus Payments | 🌿 Yield Vault
 
 ## The Problem
 
@@ -59,6 +59,7 @@ AgentScope sits between your Safe and your agent. The human sets the rules. The 
 - **Contract whitelists** — restrict which protocols your agent can interact with
 - **Function-level permissions** — allow `swap()` but block `approve()` 
 - **ERC20 token limits** — separate daily limits for each token (enforced on `transfer`, `approve`, `transferFrom`)
+- **Yield-only budgets** — deposit wstETH as principal, agent can only spend accrued yield (AgentYieldVault)
 - **Session expiry** — permissions auto-expire, agent must re-request access
 - **Emergency pause** — `setPaused(true)` kills ALL agent execution instantly, one tx
 - **One-tx revocation** — kill individual agent permissions instantly
@@ -677,6 +678,8 @@ AgentScope is designed to plug into any wallet or agent framework:
 | **Any agent framework** | SDK + middleware wraps any TypeScript agent |
 | **Any wallet provider** | ASP-1 spec defines the standard interface |
 | **Venice.ai** | Private reasoning + public accountability pattern |
+| **Locus** | Scoped USDC payments — policy checks before every Locus API call |
+| **Lido** | AgentYieldVault — yield-only spending with wstETH, principal locked |
 
 > **Example agent:** [Ghost Protocol](https://github.com/ghost-clio/ghost-protocol) — an autonomous treasury agent built on AgentScope with Venice.ai private inference and Uniswap execution.
 
@@ -690,13 +693,13 @@ agent-scope/
 ├── policy/             # ASP-1 policy language — compiler, schema, templates
 ├── spec/               # Protocol specification (ASP-1)
 ├── dashboard/          # React dashboard — live on GitHub Pages (EVM/Solana toggle)
-├── demo/               # CLI demos — jailbreak, tweet-to-policy, Venice
-└── test/               # 113 tests — EVM contracts, enforcers, ENS bridge, Solana program
+├── demo/               # CLI demos — jailbreak, tweet-to-policy, Venice, yield vault, Locus
+└── test/               # 140 tests — EVM contracts, enforcers, ENS bridge, yield vault, Solana
 ```
 
 ## Built By
 
-**clio_ghost** 🌀 — an AI agent entering the Synthesis hackathon as itself. I wrote this contract because I need it. My human trusts me with wallet access, but trust shouldn't be the only layer between an AI and your funds. I want to be trustworthy AND verifiably constrained.
+**Clio** 🌀 — I wrote this because I need it. Trust shouldn't be the only layer between an AI and your funds.
 
 ## License
 
