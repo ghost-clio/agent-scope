@@ -5,7 +5,10 @@ TypeScript SDK for **AgentScope** — on-chain spending policies for AI agent wa
 ## Install
 
 ```bash
-npm install @ghost-clio/agent-scope-sdk viem
+# Clone the repo — SDK is not yet published to npm
+git clone https://github.com/ghost-clio/agent-scope.git
+cd agent-scope/sdk
+npm install
 ```
 
 ## Quick Start
