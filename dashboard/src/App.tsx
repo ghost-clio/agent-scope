@@ -738,11 +738,11 @@ function App() {
                   textAlign: "center",
                 }}>
                   <h3 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "1rem", color: "#9945FF" }}>
-                    ◎ Solana Program — Built
+                    ◎ Solana Program — 17/17 Tests Passing
                   </h3>
                   <p style={{ color: "#6b6b80", maxWidth: 500, margin: "0 auto 1.5rem", lineHeight: 1.7 }}>
-                    Full Anchor program with 11 instructions, SPL token allowances, CPI execution,
-                    and complete EVM feature parity. PDA vault architecture native to Solana.
+                    Full Anchor program with 11 instructions, 3 account types, 12 error codes.
+                    SPL token allowances, CPI execution, and complete EVM feature parity.
                   </p>
                   <div style={{
                     display: "flex", gap: "2rem", justifyContent: "center",
