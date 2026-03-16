@@ -6,7 +6,7 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 
 > [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments) · [**For Judges →**](./JUDGES.md)
 
-[![Tests](https://img.shields.io/badge/tests-151%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/tests-165%20passing-brightgreen)](#tests)
 [![Chains](https://img.shields.io/badge/chains-14%20testnets-blue)](#deployments)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
@@ -32,11 +32,12 @@ The contract reverts if any rule is violated. Doesn't matter if the agent is jai
 
 ```bash
 npm install
-npm test                  # 134 EVM tests (contracts + policy compiler)
-npm run demo:jailbreak    # Watch a jailbroken agent get stopped
-npm run demo:vault        # Yield-only spending demo
-npm run demo:locus        # Scoped USDC payments demo
-npm run dashboard         # Launch dashboard at localhost:5173
+npm test                    # 148 EVM tests (contracts + policy compiler)
+npm run demo:jailbreak      # Watch a jailbroken agent get stopped
+npm run demo:multi-agent    # Multi-agent coordination with revoke + re-deploy
+npm run demo:vault          # Yield-only spending demo
+npm run demo:locus          # Scoped USDC payments demo
+npm run dashboard           # Launch dashboard at localhost:5173
 ```
 
 ## How It Works
@@ -102,6 +103,7 @@ L2 mainnet deployments scheduled for March 20.
 | **Locus Payments** | Scoped USDC payments (3 approved, 4 blocked) | `npm run demo:locus` |
 | **Tweet-to-Policy** | Natural language → on-chain policy | `npm run demo:policy` |
 | **Venice** | Private reasoning + public execution | `npm run demo:venice` |
+| **Multi-Agent** | Orchestrator scopes 3 workers, revokes one, re-deploys with tighter limits | `npm run demo:multi-agent` |
 
 ## Tests
 
@@ -111,9 +113,9 @@ L2 mainnet deployments scheduled for March 20.
 | AgentYieldVault | 27 | `npx hardhat test test/AgentYieldVault.test.cjs` |
 | CaveatEnforcers | 17 | `npx hardhat test test/CaveatEnforcers.test.cjs` |
 | ERC8004ENSBridge | 26 | `npx hardhat test test/ERC8004ENSBridge.test.cjs` |
-| PolicyCompiler | 29 | `node --test test/PolicyCompiler.test.cjs` |
+| PolicyCompiler | 43 | `node --test test/PolicyCompiler.test.cjs` |
 | Solana Program | 17 | `cd solana/agent-scope-solana && anchor test` |
-| **Total** | **151** | `npm test` (+Solana) |
+| **Total** | **165** | `npm test` (+Solana) |
 
 ## Integrations
 
@@ -136,7 +138,7 @@ policy/             ASP-1 policy language — compiler, schema, 6 example polici
 spec/               Protocol specification (ASP-1)
 dashboard/          React dashboard (live on GitHub Pages)
 demo/               5 CLI demos
-test/               151 tests (134 via npm test + 17 Solana)
+test/               165 tests (148 via npm test + 17 Solana)
 ```
 
 ## Security
