@@ -1,0 +1,1 @@
+var e={};throw Error(`Could not resolve "@safe-global/safe-apps-sdk" imported by "@wagmi/connectors". Is it installed?`);export{e as default};
