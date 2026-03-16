@@ -508,4 +508,227 @@ describe("AgentScopeModule", function () {
       expect(reason2).to.equal("daily_limit_exceeded");
     });
   });
+
+  describe("Edge Cases — Policy Lifecycle", function () {
+    it("should return inactive scope for unregistered agent", async function () {
+      const [signers] = await ethers.getSigners();
+      const unknownAgent = ethers.Wallet.createRandom();
+
+      const scope = await module.getAgentScope(unknownAgent.address);
+      expect(scope.active).to.be.false;
+      expect(scope.dailySpendLimitWei).to.equal(0);
+      expect(scope.remainingBudget).to.equal(0);
+    });
+
+    it("should allow re-activation after revoke", async function () {
+      // Set policy
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0, [], [],
+        ])
+      );
+      expect((await module.getAgentScope(agent.address)).active).to.be.true;
+
+      // Revoke
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("revokeAgent", [agent.address])
+      );
+      expect((await module.getAgentScope(agent.address)).active).to.be.false;
+
+      // Re-activate
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, HALF_ETH, 0, 0, [], [],
+        ])
+      );
+      const scope = await module.getAgentScope(agent.address);
+      expect(scope.active).to.be.true;
+      expect(scope.dailySpendLimitWei).to.equal(HALF_ETH);
+    });
+
+    it("should emit events for policy set and revoke", async function () {
+      await expect(
+        mockSafe.callModule(
+          await module.getAddress(),
+          module.interface.encodeFunctionData("setAgentPolicy", [
+            agent.address, ONE_ETH, HALF_ETH, 0, [], [],
+          ])
+        )
+      ).to.emit(module, "AgentPolicySet")
+        .withArgs(agent.address, ONE_ETH, HALF_ETH, 0);
+
+      await expect(
+        mockSafe.callModule(
+          await module.getAddress(),
+          module.interface.encodeFunctionData("revokeAgent", [agent.address])
+        )
+      ).to.emit(module, "AgentRevoked")
+        .withArgs(agent.address);
+    });
+
+    it("should emit GlobalPause event when paused", async function () {
+      await expect(
+        mockSafe.callModule(
+          await module.getAddress(),
+          module.interface.encodeFunctionData("setPaused", [true])
+        )
+      ).to.emit(module, "GlobalPause").withArgs(true);
+
+      await expect(
+        mockSafe.callModule(
+          await module.getAddress(),
+          module.interface.encodeFunctionData("setPaused", [false])
+        )
+      ).to.emit(module, "GlobalPause").withArgs(false);
+    });
+
+    it("should allow multiple contracts in whitelist", async function () {
+      const [, , , , c1, c2, c3] = await ethers.getSigners();
+
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0,
+          [c1.address, c2.address, c3.address],
+          [],
+        ])
+      );
+
+      // All three should be allowed
+      const [ok1] = await module.checkPermission(agent.address, c1.address, QUARTER_ETH, "0x");
+      const [ok2] = await module.checkPermission(agent.address, c2.address, QUARTER_ETH, "0x");
+      const [ok3] = await module.checkPermission(agent.address, c3.address, QUARTER_ETH, "0x");
+      expect(ok1).to.be.true;
+      expect(ok2).to.be.true;
+      expect(ok3).to.be.true;
+
+      // Non-whitelisted should fail (use an address not in the whitelist)
+      const unlisted = ethers.Wallet.createRandom();
+      const [ok4] = await module.checkPermission(agent.address, unlisted.address, QUARTER_ETH, "0x");
+      expect(ok4).to.be.false;
+    });
+
+    it("should check expired session in checkPermission", async function () {
+      const expiry = (await time.latest()) + 1; // expires in 1 second
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, expiry, [], [],
+        ])
+      );
+
+      await time.increase(60); // advance 60 seconds past expiry
+
+      const [allowed, reason] = await module.checkPermission(
+        agent.address, randomContract.address, QUARTER_ETH, "0x"
+      );
+      expect(allowed).to.be.false;
+      expect(reason).to.equal("session_expired");
+    });
+
+    it("should accumulate budget correctly across multiple transactions", async function () {
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, QUARTER_ETH, 0, [], [],
+        ])
+      );
+
+      // Execute 3 x 0.25 ETH = 0.75 ETH spent
+      for (let i = 0; i < 3; i++) {
+        await module.connect(agent).executeAsAgent(randomContract.address, QUARTER_ETH, "0x");
+      }
+
+      const scope = await module.getAgentScope(agent.address);
+      const spent = ONE_ETH - scope.remainingBudget;
+      expect(spent).to.equal(QUARTER_ETH * 3n);
+
+      // 4th tx would exceed daily limit (0.75 spent + 0.3 ETH > 1.0 ETH limit)
+      const [allowed] = await module.checkPermission(
+        agent.address, randomContract.address, ethers.parseEther("0.3"), "0x"
+      );
+      expect(allowed).to.be.false;
+    });
+
+    it("should allow any contract when whitelist is empty", async function () {
+      // No contracts in whitelist = any contract allowed
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0, [], [],
+        ])
+      );
+
+      // Should be able to call any contract
+      const [allowed] = await module.checkPermission(
+        agent.address, randomContract.address, QUARTER_ETH, "0x"
+      );
+      expect(allowed).to.be.true;
+    });
+
+    it("should allow any function when function whitelist is empty", async function () {
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0, [], [],
+        ])
+      );
+
+      // Any function selector should work
+      const [allowed] = await module.checkPermission(
+        agent.address, randomContract.address, QUARTER_ETH, "0xdeadbeef"
+      );
+      expect(allowed).to.be.true;
+    });
+
+    it("should block non-whitelisted function when function whitelist is set", async function () {
+      const swapSelector = "0x38ed1739";
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0, [], [swapSelector],
+        ])
+      );
+
+      // Whitelisted selector allowed
+      const [ok1] = await module.checkPermission(
+        agent.address, randomContract.address, QUARTER_ETH, swapSelector
+      );
+      expect(ok1).to.be.true;
+
+      // Non-whitelisted selector blocked
+      const [ok2, reason] = await module.checkPermission(
+        agent.address, randomContract.address, QUARTER_ETH, "0xdeadbeef"
+      );
+      expect(ok2).to.be.false;
+      expect(reason).to.equal("function_not_whitelisted");
+    });
+
+    it("two agents should have independent budgets", async function () {
+      const budget = HALF_ETH;
+
+      // Set same policy for both agents
+      for (const a of [agent, otherAgent]) {
+        await mockSafe.callModule(
+          await module.getAddress(),
+          module.interface.encodeFunctionData("setAgentPolicy", [
+            a.address, budget, 0, 0, [], [],
+          ])
+        );
+      }
+
+      // agent spends 0.25 ETH
+      await module.connect(agent).executeAsAgent(randomContract.address, QUARTER_ETH, "0x");
+
+      // otherAgent should still have full budget
+      const scope1 = await module.getAgentScope(agent.address);
+      const scope2 = await module.getAgentScope(otherAgent.address);
+
+      expect(scope1.remainingBudget).to.equal(QUARTER_ETH); // HALF - QUARTER
+      expect(scope2.remainingBudget).to.equal(HALF_ETH);   // untouched
+    });
+  });
 });
