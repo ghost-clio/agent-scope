@@ -4,7 +4,7 @@
 
 On-chain spending policies for AI agent wallets. One protocol. Every chain. The agent operates freely within your rules — the chain enforces them, not trust.
 
-> 🌐 **Deployed on 10 chains** — same address everywhere: [`0x0d0034c6AC4640463bf480cB07BE770b08Bef811`](https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811)
+> 🌐 **Deployed on 14 chains** — deterministic addresses across all networks
 >
 > 🖥️ **Dashboard:** [ghost-clio.github.io/agent-scope](https://ghost-clio.github.io/agent-scope/)
 >
@@ -95,8 +95,12 @@ AgentScope is deployed and verified across multiple networks:
 | **Arbitrum Sepolia** | 421614 | `0x0d00...Bef811` | [arbiscan](https://sepolia.arbiscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
 | **Polygon Amoy** | 80002 | `0x0d00...Bef811` | [polygonscan](https://amoy.polygonscan.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
 | **Status Network Sepolia** | 1660990954 | `0x0d00...Bef811` | [explorer](https://sepoliascan.status.network/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Zora Sepolia** | 999999999 | `0x1AA7...6EDA` | [explorer](https://sepolia.explorer.zora.energy/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
+| **Mode Sepolia** | 919 | `0x1AA7...6EDA` | [modescout](https://sepolia.explorer.mode.network/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
+| **Lisk Sepolia** | 4202 | `0x1AA7...6EDA` | [blockscout](https://sepolia-blockscout.lisk.com/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
+| **Metal L2 Testnet** | 1740 | `0x1AA7...6EDA` | [blockscout](https://testnet.explorer.metall2.com/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
 
-> **Same address on every chain:** `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` — deterministic deployment via same deployer + nonce. L2 mainnet deployments scheduled for March 20.
+> **Deterministic deployment** via same deployer + nonce. Original 10 chains share `0x0d0034c6AC4640463bf480cB07BE770b08Bef811`. Superchain round 2 (Zora/Mode/Lisk/Metal) share `0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA`. L2 mainnet deployments scheduled for March 20.
 
 **MetaMask Delegation Framework Enforcers** (Ethereum Sepolia):
 

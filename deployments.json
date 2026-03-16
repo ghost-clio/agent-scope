@@ -1,0 +1,34 @@
+[
+  {
+    "network": "zoraSepolia",
+    "chainId": 999999999,
+    "deployedAt": "2026-03-16T07:03:45.539Z",
+    "mockSafe": "0x0d3973FB015cC30A2EB7b06a0C49E1E1925DFd48",
+    "agentScopeModule": "0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA",
+    "deployer": "0x567dC77Fb9abE89271B39833Bf3D47DbdABE13a5"
+  },
+  {
+    "network": "modeSepolia",
+    "chainId": 919,
+    "deployedAt": "2026-03-16T07:03:57.061Z",
+    "mockSafe": "0x0d3973FB015cC30A2EB7b06a0C49E1E1925DFd48",
+    "agentScopeModule": "0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA",
+    "deployer": "0x567dC77Fb9abE89271B39833Bf3D47DbdABE13a5"
+  },
+  {
+    "network": "liskSepolia",
+    "chainId": 4202,
+    "deployedAt": "2026-03-16T07:04:12.514Z",
+    "mockSafe": "0x0d3973FB015cC30A2EB7b06a0C49E1E1925DFd48",
+    "agentScopeModule": "0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA",
+    "deployer": "0x567dC77Fb9abE89271B39833Bf3D47DbdABE13a5"
+  },
+  {
+    "network": "metalL2Testnet",
+    "chainId": 1740,
+    "deployedAt": "2026-03-16T07:04:23.734Z",
+    "mockSafe": "0x0d3973FB015cC30A2EB7b06a0C49E1E1925DFd48",
+    "agentScopeModule": "0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA",
+    "deployer": "0x567dC77Fb9abE89271B39833Bf3D47DbdABE13a5"
+  }
+]
