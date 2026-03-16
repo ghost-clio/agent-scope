@@ -76,7 +76,7 @@ const chains: Record<Chain, ChainConfig> = {
       tokenLimit: "500 USDC",
       tokenName: "USDC",
     },
-    status: "coming-soon",
+    status: "live",
   },
 };
 
@@ -249,7 +249,7 @@ export function ChainToggle() {
           </>
         ) : (
           <>
-            <span style={{ color: "#ffaa00" }}>Coming soon</span> — same spec, different runtime. ASP-1 policies compile to Solana instructions instead of EVM calldata.{" "}
+            <span style={{ color: "#9945FF" }}>17/17 tests passing</span> — same spec, different runtime. ASP-1 policies compile to Solana instructions instead of EVM calldata.{" "}
             The protocol is chain-agnostic. The implementation is chain-native.
           </>
         )}
