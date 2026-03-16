@@ -28,22 +28,23 @@ The agent literally cannot exceed its scope. The contract reverts.
 ### What We Built
 
 **Core Protocol:**
-1. **AgentScopeModule** (Solidity) — Safe Module, 78 tests
+1. **AgentScopeModule** (Solidity) — Safe Module, 35 tests
 2. **AgentYieldVault** (Solidity) — Yield-only spending with wstETH, 27 tests
-3. **Solana Program** (Anchor/Rust) — Full EVM parity, 17 tests
-4. **ASP-1 Protocol Spec** — Chain-agnostic standard (EIP-style)
+3. **Caveat Enforcers** (Solidity) — ERC-7715 MetaMask enforcement, 17 tests
+4. **ERC8004ENSBridge** (Solidity) — Agent identity bridge, 26 tests
+5. **Solana Program** (Anchor/Rust) — Full EVM parity, 17 tests
+6. **ASP-1 Protocol Spec** — Chain-agnostic standard (EIP-style)
 
 **Developer Tools:**
-5. **Policy Compiler** — Natural language → JSON → on-chain calldata (43 tests)
-6. **TypeScript SDK** — Client, middleware, agent prompt generator
-7. **Locus Integration** — Scoped USDC payments through Locus (policy checks before payment execution)
-8. **Venice Integration** — Private reasoning + public accountability
+7. **Policy Compiler** — Natural language → JSON → on-chain calldata (43 tests)
+8. **TypeScript SDK** — Client, middleware, agent prompt generator
+9. **Locus Integration** — Scoped USDC payments through Locus (policy checks before payment execution)
+10. **Venice Integration** — Private reasoning + public accountability
 
 **Infrastructure:**
-9. **14-Chain Deployment** — Ethereum, Base, OP, Arbitrum, Polygon, Unichain, Celo, Worldchain, Ink, Status, Zora, Mode, Lisk, Metal L2
-10. **React Dashboard** — Live on GitHub Pages with interactive demo, deployment map, EVM/Solana toggle
-11. **MetaMask Caveat Enforcers** — AgentSpendLimitEnforcer + AgentScopeEnforcer
-12. **ERC-8004 ENS Bridge** — Human-readable agent identity resolution
+11. **14-Chain Deployment** — Ethereum, Base, OP, Arbitrum, Polygon, Unichain, Celo, Worldchain, Ink, Status, Zora, Mode, Lisk, Metal L2
+12. **React Dashboard** — Live on GitHub Pages with interactive demo, deployment map, EVM/Solana toggle
+13. **MetaMask Caveat Enforcers** — AgentSpendLimitEnforcer + AgentScopeEnforcer
 
 **Numbers:**
 - 165 tests (35 core contract + 27 yield vault + 17 caveat enforcers + 26 ENS bridge + 43 policy compiler + 17 Solana)
