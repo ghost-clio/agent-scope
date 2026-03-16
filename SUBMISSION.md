@@ -4,7 +4,7 @@
 Your agent can't rug you even if it wants to.
 
 ## Short Description (280 chars)
-On-chain spending policies for AI agent wallets. Daily limits, contract whitelists, yield-only budgets, emergency pause. 165 tests. 14 chains. EVM + Solana. Enforced by math, not trust.
+On-chain spending policies for AI agent wallets. Daily limits, contract whitelists, yield-only budgets, emergency pause. 155 tests. 14 testnets + 2 mainnets. 4 audits. Enforced by math, not trust.
 
 ## Full Description
 
@@ -42,16 +42,15 @@ The agent literally cannot exceed its scope. The contract reverts.
 10. **Venice Integration** — Private reasoning + public accountability
 
 **Infrastructure:**
-11. **14-Chain Deployment** — Ethereum, Base, OP, Arbitrum, Polygon, Unichain, Celo, Worldchain, Ink, Status, Zora, Mode, Lisk, Metal L2
+11. **16-Chain Deployment** — 14 testnets (Ethereum, Base, OP, Arbitrum, Polygon, Unichain, Celo, Worldchain, Ink, Status, Zora, Mode, Lisk, Metal L2) + 2 mainnets (Arbitrum, Optimism)
 12. **React Dashboard** — Live on GitHub Pages with interactive demo, deployment map, EVM/Solana toggle
 13. **MetaMask Caveat Enforcers** — AgentSpendLimitEnforcer + AgentScopeEnforcer
 
 **Numbers:**
-- 165 tests (35 core + 27 yield vault + 17 enforcers + 26 ENS bridge + 43 policy compiler + 17 Solana)
-- 14 testnet deployments
-- 4 smart contracts
-- 6 demos (jailbreak, tweet-to-policy, venice, yield vault, locus, multi-agent coordination)
-- 6 policy templates
+- 155 tests passing (40 core + 27 yield vault + 19 enforcers + 26 ENS bridge + 43 policy compiler) + 17 Solana
+- 14 testnet + 2 mainnet deployments (Arbitrum, Optimism)
+- 4 independent security audits (Slither, Opus manual, external review, independent review)
+- 5 smart contracts, 6 demos, 6 policy templates
 
 ### Links
 - **Dashboard**: https://ghost-clio.github.io/agent-scope/
@@ -64,7 +63,9 @@ The agent literally cannot exceed its scope. The contract reverts.
 
 ### Open Track — $14.5K
 
-AgentScope is the permission layer every AI agent wallet needs. Not a product — a protocol. ASP-1 spec, reference implementations on EVM + Solana, policy compiler, middleware, 14 chains. The OpenZeppelin of agent permissions. Nobody else at Synthesis is building at the protocol layer.
+AgentScope is the permission layer every AI agent wallet needs. Not a product — a protocol. ASP-1 spec, reference implementations on EVM + Solana, policy compiler, middleware, 14 testnets + 2 mainnets. 4 independent audits. The OpenZeppelin of agent permissions.
+
+Complements ERC-8183 (commerce layer) — AgentScope enforces *what* agents can spend within any commerce framework. Nobody else at Synthesis is building at the protocol layer.
 
 ### Venice — Private Agents, Trusted Actions — $11.5K
 
