@@ -584,14 +584,24 @@ export class AgentScopeMiddleware {
     const activeHours = this.policy.permissions.temporal?.activeHours;
     if (!activeHours) return true;
 
+    const tz = activeHours.timezone || 'UTC';
     const now = new Date();
-    // Simple day-of-week check
-    const dayNames = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-    const currentDay = dayNames[now.getDay()];
-    const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      weekday: 'short',
+    });
+    const parts = formatter.formatToParts(now);
+    const hourPart = parts.find(p => p.type === 'hour')?.value || '00';
+    const minutePart = parts.find(p => p.type === 'minute')?.value || '00';
+    const dayPart = (parts.find(p => p.type === 'weekday')?.value || 'Mon').toLowerCase().slice(0, 3);
+    const currentTime = `${hourPart}:${minutePart}`;
+    const currentDay = dayPart;
 
     for (const window of activeHours.windows) {
-      const days = window.days || dayNames;
+      const days = window.days || ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
       if (days.includes(currentDay)) {
         if (currentTime >= window.start && currentTime <= window.end) {
           return true;
