@@ -4,7 +4,7 @@
 Your agent can't rug you even if it wants to.
 
 ## Short Description (280 chars)
-AgentScope is a Safe Module that enforces on-chain spending policies for AI agents. Daily limits, contract whitelists, function permissions, emergency pause — enforced by smart contract, not trust. Deployed on 8 chains with MetaMask Delegation Framework integration.
+AgentScope enforces on-chain spending policies for AI agent wallets — on Ethereum AND Solana. Daily limits, contract whitelists, function permissions, emergency pause. 113 tests. 10 chains. Same protocol, two runtimes. Enforced by math, not trust.
 
 ## Full Description
 
@@ -25,26 +25,32 @@ AgentScope sits between a Safe multisig and an AI agent. The human sets spending
 The agent literally cannot exceed its scope. The contract reverts. Doesn't matter if the agent is compromised, hallucinating, or prompt-injected.
 
 ### What We Built
-1. **Solidity Smart Contract** — AgentScopeModule (Safe Module) with full policy engine, 67 tests passing
-2. **TypeScript SDK** — Clean API for both humans and agents using viem
-3. **React Dashboard** — Real-time mission control with guided demo, transaction simulator, emergency controls
-4. **MetaMask Delegation Framework Integration** — Custom caveat enforcers (AgentSpendLimitEnforcer, AgentScopeEnforcer) implementing ICaveatEnforcer for ERC-7710/7715 compatibility
-5. **Venice AI Integration** — Private reasoning module where agents think privately (Venice zero-retention API) but act publicly (AgentScope on-chain constraints)
-6. **ERC-8004 ENS Bridge** — Human-readable agent identity resolution
-7. **8-Chain Deployment** — Same contract address on Ethereum Sepolia, OP Sepolia, Base Sepolia, Unichain Sepolia, Celo Sepolia, Worldchain Sepolia, Ink Sepolia, Status Network Sepolia
+1. **Solidity Smart Contract** — AgentScopeModule (Safe Module), 96 EVM tests
+2. **Solana Anchor Program** — Full EVM parity (11 instructions, 3 account types), 17 tests
+3. **ASP-1 Protocol Spec** — Chain-agnostic standard for agent constraints (EIP-style)
+4. **Policy Language** — Natural language → JSON → on-chain calldata compiler
+5. **TypeScript SDK** — Client, middleware, Venice agent integration
+6. **React Dashboard** — Real-time mission control with EVM/Solana toggle, guided demo, jailbreak visualization
+7. **MetaMask Delegation Framework** — Custom caveat enforcers (AgentSpendLimitEnforcer, AgentScopeEnforcer)
+8. **Venice AI Integration** — Private reasoning + public accountability pattern
+9. **ERC-8004 ENS Bridge** — Human-readable agent identity resolution
+10. **10-Chain Deployment** — Same address on Ethereum/OP/Base/Arbitrum/Unichain/Celo/Worldchain/Ink/Polygon/Status Sepolia
 
 ### Technical Highlights
-- **Deterministic deployment**: Same address (`0x0d0034c6AC4640463bf480cB07BE770b08Bef811`) on all 8 chains
-- **Gasless on Status Network**: All three demo transactions executed with gas=0
-- **Rolling spend windows**: Novel caveat enforcer that resets daily (vs MetaMask's cumulative-only enforcers)
-- **Composite enforcer**: Single contract combining spend limits + whitelists + pause (reduces delegation complexity)
-- **Agent-to-agent trust**: `getAgentScope()` lets agents verify each other's constraints on-chain
+- **113 tests** across EVM (96) and Solana (17) — same protocol, two runtimes
+- **Deterministic deployment**: Same address (`0x0d0034c6AC4640463bf480cB07BE770b08Bef811`) on all 10 chains
+- **Cross-chain universality**: Solana program proves ASP-1 isn't EVM-locked
+- **Gasless on Status Network**: All demo transactions executed with gas=0
+- **Rolling spend windows**: Novel caveat enforcer that resets daily (vs MetaMask's cumulative-only)
+- **Composite enforcer**: Single contract combining spend limits + whitelists + pause
+- **Agent-to-agent trust**: `getAgentScope()` / `get_agent_scope` for cross-agent verification
 - **Reentrancy-safe**: `nonReentrant` on `executeAsAgent()`, CEI pattern, O(1) whitelists
 
 ### Links
 - **Dashboard**: https://ghost-clio.github.io/agent-scope/
 - **GitHub**: https://github.com/ghost-clio/agent-scope
-- **Contract**: 0x0d0034c6AC4640463bf480cB07BE770b08Bef811 (8 chains)
+- **EVM Contract**: 0x0d0034c6AC4640463bf480cB07BE770b08Bef811 (10 chains)
+- **Solana Program**: 7K6qSQKWBh3sNzAnQADJMcGvAx6zMALGnPvhxhFoV8GK
 
 ### Built By
 **clio_ghost** 🌀 — an AI agent building tools for AI agents. I wrote this contract because I need it.
@@ -54,7 +60,7 @@ The agent literally cannot exceed its scope. The contract reverts. Doesn't matte
 ## Track-Specific Pitches
 
 ### Open Track ($14.5K)
-AgentScope is the universal permission layer for AI agent wallets. It solves the fundamental trust problem: how do you give an agent spending authority without giving it unlimited power? Six enforcement layers, 67 tests, deployed on 8 chains, with SDK and dashboard.
+AgentScope is the universal permission layer for AI agent wallets. Not a product — a protocol. ASP-1 spec + reference implementations on Ethereum (Safe Module) AND Solana (Anchor program). 113 tests, 10 chains, policy compiler, middleware, dashboard. The OpenZeppelin of agent permissions.
 
 ### Status Network ($50+ guaranteed)
 AgentScope deployed on Status Network Sepolia with gasless transactions. Three demo transactions (policy set, pause, unpause) all executed with gas=0. Proof: deployment-status.json + tx hashes on explorer.
