@@ -13,6 +13,7 @@ import { GuidedDemo } from "./components/GuidedDemo";
 import { PolicyBuilder } from "./components/PolicyBuilder";
 import { DeploymentMap } from "./components/DeploymentMap";
 import { JailbreakDemo } from "./components/JailbreakDemo";
+import { ChainToggle } from "./components/ChainToggle";
 
 /* ═══════════════════════════════════════════════
    SCROLL REVEAL HOOK
@@ -610,6 +611,28 @@ function App() {
               <Reveal delay={100}>
                 <div className="glass-card" style={{ padding: "2.5rem" }}>
                   <DeploymentMap />
+                </div>
+              </Reveal>
+            </section>
+
+            {/* ── CHAIN AGNOSTIC ── */}
+            <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
+              <Reveal>
+                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+                  <div className="section-divider" />
+                  <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
+                    One protocol.<br />
+                    <span style={{ color: "#9945FF" }}>Any chain.</span>
+                  </h3>
+                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0, maxWidth: 550, marginLeft: "auto", marginRight: "auto" }}>
+                    ASP-1 defines the concepts. Each chain gets a native implementation.
+                    Same policy, different runtime.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={100}>
+                <div className="glass-card" style={{ padding: "2.5rem" }}>
+                  <ChainToggle />
                 </div>
               </Reveal>
             </section>
