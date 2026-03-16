@@ -342,22 +342,54 @@ function App() {
               </div>
             )}
 
-            {/* Welcome header for connected users */}
-            {!dashPreview && isConnected && !deployed && (
+            {/* ── SETUP PHASE: deploy card + context panels side by side ── */}
+            {!deployed && !dashPreview && isConnected && (
               <div style={{
-                textAlign: "center", padding: "2rem 0 1rem",
+                display: "grid", gridTemplateColumns: "1fr 1fr",
+                gap: "1.5rem", marginBottom: "1.5rem", alignItems: "start",
               }}>
-                <h2 style={{ margin: "0 0 0.25rem", fontSize: "1.5rem", fontWeight: 700 }}>
-                  Welcome to AgentScope 👋
-                </h2>
-                <p style={{ color: "#6b6b80", fontSize: "0.9rem", margin: 0 }}>
-                  Set up your agent's on-chain permission system in under a minute.
-                </p>
+                {/* Left: Deploy flow */}
+                <div>
+                  <DeployModule onDeploy={({ safeAddress, moduleAddress }) => {
+                    setSafeAddr(safeAddress);
+                    setModuleAddr(moduleAddress);
+                    setDeployed(true);
+                  }} />
+                </div>
+                {/* Right: Live contract status so there's context */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  <ModuleStatus moduleAddress={moduleAddr} safeAddress={safeAddr} />
+                  <div className="card" style={{ padding: "1.25rem" }}>
+                    <h3 style={{ margin: "0 0 0.75rem", fontSize: "0.9rem", fontWeight: 600, color: "#6b6b80" }}>
+                      What you'll be able to do
+                    </h3>
+                    <div style={{ display: "grid", gap: "0.5rem", fontSize: "0.8rem" }}>
+                      {[
+                        { icon: "💰", text: "Set daily spending limits" },
+                        { icon: "📋", text: "Whitelist specific contracts" },
+                        { icon: "⏰", text: "Auto-expire permissions" },
+                        { icon: "🔴", text: "Emergency pause — one click" },
+                        { icon: "🪙", text: "Per-token allowances (USDC, DAI...)" },
+                        { icon: "📡", text: "Monitor all agent activity live" },
+                      ].map(item => (
+                        <div key={item.text} style={{
+                          display: "flex", alignItems: "center", gap: "0.6rem",
+                          padding: "0.4rem 0.6rem", borderRadius: 8,
+                          background: "rgba(255,255,255,0.02)",
+                        }}>
+                          <span>{item.icon}</span>
+                          <span style={{ color: "rgba(240,240,245,0.8)" }}>{item.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
-            {!deployed && (
-              <div style={{ marginBottom: "1rem", maxWidth: deployed ? undefined : 520, marginLeft: "auto", marginRight: "auto" }}>
+            {/* ── SETUP PHASE: preview mode (no wallet) ── */}
+            {!deployed && dashPreview && (
+              <div style={{ marginBottom: "1rem" }}>
                 <DeployModule onDeploy={({ safeAddress, moduleAddress }) => {
                   setSafeAddr(safeAddress);
                   setModuleAddr(moduleAddress);
@@ -366,27 +398,32 @@ function App() {
               </div>
             )}
 
-            <div style={{
-              display: "grid", gridTemplateColumns: "1fr 1fr",
-              gap: "1rem", marginBottom: "1rem",
-            }}>
-              <ModuleStatus moduleAddress={moduleAddr} safeAddress={safeAddr} />
-              <PauseButton moduleAddress={moduleAddr} safeAddress={safeAddr} />
-            </div>
+            {/* ── MAIN DASHBOARD: status bar + panels ── */}
+            {(deployed || dashPreview) && (
+              <>
+                <div style={{
+                  display: "grid", gridTemplateColumns: "1fr 1fr",
+                  gap: "1rem", marginBottom: "1rem",
+                }}>
+                  <ModuleStatus moduleAddress={moduleAddr} safeAddress={safeAddr} />
+                  <PauseButton moduleAddress={moduleAddr} safeAddress={safeAddr} />
+                </div>
 
-            <div style={{
-              display: "grid", gridTemplateColumns: "1fr 1fr",
-              gap: "1rem", marginBottom: "1rem",
-            }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <AgentLookup moduleAddress={moduleAddr} />
-                <SetPolicy moduleAddress={moduleAddr} safeAddress={safeAddr} />
-                <TokenAllowances />
-                <RevokeAgent moduleAddress={moduleAddr} safeAddress={safeAddr} />
-                <Simulation />
-              </div>
-              <EventFeed />
-            </div>
+                <div style={{
+                  display: "grid", gridTemplateColumns: "1fr 1fr",
+                  gap: "1rem", marginBottom: "1rem",
+                }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    <AgentLookup moduleAddress={moduleAddr} />
+                    <SetPolicy moduleAddress={moduleAddr} safeAddress={safeAddr} />
+                    <TokenAllowances />
+                    <RevokeAgent moduleAddress={moduleAddr} safeAddress={safeAddr} />
+                    <Simulation />
+                  </div>
+                  <EventFeed />
+                </div>
+              </>
+            )}
 
             <div style={{
               marginTop: "2rem", padding: "1rem",
