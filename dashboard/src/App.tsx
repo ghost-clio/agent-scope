@@ -23,6 +23,8 @@ function useReveal() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Hide element (ready for scroll animation) only after JS loads
+    el.classList.add("reveal-ready");
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) el.classList.add("visible"); },
       { threshold: 0.15 }

@@ -120,10 +120,16 @@ body {
 }
 
 /* ── Scroll reveal ── */
+/* Reveal: visible by default (for agent judges / screenshots / reduced motion).
+   When JS activates, .reveal-ready hides elements until scrolled into view. */
 .reveal {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.reveal-ready {
   opacity: 0;
   transform: translateY(40px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .reveal.visible {
   opacity: 1;

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://agentscope.dev/schema/asp-1.json",
+  "version": "1.0.0",
+  "meta": {
+    "name": "DAO Governance Agent",
+    "description": "Autonomous voting delegate with strict governance-only permissions. Can vote, create proposals, and manage delegation — cannot move funds. The agent acts as a trusted on-chain steward with zero treasury access.",
+    "template": "dao-governance-delegate",
+    "useCase": "AI delegate that votes according to stated principles, explains reasoning publicly (Venice), logs every vote with rationale"
+  },
+  "agent": {
+    "address": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+    "identity": {
+      "ens": "govbot.agent.eth",
+      "erc8004": "0x00000000000000000000000000000003",
+      "description": "On-chain AI delegate — votes according to stated principles, reasoning logged"
+    }
+  },
+  "scope": {
+    "chains": ["ethereum", "optimism", "base"],
+    "wallet": {
+      "type": "safe",
+      "address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "moduleAddress": "0x0d0034c6AC4640463bf480cB07BE770b08Bef811"
+    }
+  },
+  "permissions": {
+    "spending": {
+      "native": {
+        "dailyLimit": "0.01 ETH",
+        "perTransaction": "0.002 ETH",
+        "windowType": "fixed-24h",
+        "note": "Gas only — agent cannot move meaningful ETH under any circumstances"
+      },
+      "tokens": []
+    },
+    "contracts": {
+      "mode": "whitelist",
+      "allowed": [
+        {
+          "address": "0x408ED6354d4973f66138C91495F2f2FCbd8724C3",
+          "name": "Compound Governor Bravo",
+          "description": "DAO governance contract — voting and proposal creation only",
+          "chain": "ethereum"
+        },
+        {
+          "address": "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10",
+          "name": "Uniswap Governor",
+          "description": "Uniswap DAO governance",
+          "chain": "ethereum"
+        },
+        {
+          "address": "0x77f5bB9a788B1b3c84b04Ac0F6b22E1D3b9A0000",
+          "name": "Optimism Governor",
+          "description": "Optimism DAO governance on OP Mainnet",
+          "chain": "optimism"
+        }
+      ]
+    },
+    "functions": {
+      "mode": "whitelist",
+      "allowed": [
+        {
+          "selector": "0x56781388",
+          "name": "castVote(uint256,uint8)",
+          "description": "Vote on a proposal: 0=against, 1=for, 2=abstain"
+        },
+        {
+          "selector": "0x7b3c71d3",
+          "name": "castVoteWithReason(uint256,uint8,string)",
+          "description": "Vote with public reasoning — preferred method for accountability"
+        },
+        {
+          "selector": "0xda09e2b2",
+          "name": "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)",
+          "description": "Meta-transaction voting with signature"
+        },
+        {
+          "selector": "0xd8bc7900",
+          "name": "delegate(address)",
+          "description": "Re-delegate voting power"
+        }
+      ],
+      "blocked": [
+        {
+          "selector": "0x095ea7b3",
+          "name": "approve(address,uint256)",
+          "reason": "Token approvals not permitted — governance delegate has no treasury mandate"
+        },
+        {
+          "selector": "0xa9059cbb",
+          "name": "transfer(address,uint256)",
+          "reason": "Fund transfers not permitted under any circumstances"
+        }
+      ]
+    }
+  },
+  "session": {
+    "expiry": "7d",
+    "renewalRequiresHumanApproval": true,
+    "maxConsecutiveVotes": 50,
+    "cooldownAfterMax": "24h"
+  },
+  "escalation": {
+    "onViolation": "block-and-notify",
+    "onSuspiciousProposal": "abstain-and-flag",
+    "humanReviewRequired": [
+      "treasury_transfers_over_1M_USD",
+      "protocol_upgrade_proposals",
+      "delegate_key_rotation"
+    ]
+  },
+  "transparency": {
+    "reasoningProvider": "venice",
+    "reasoningStoragePolicy": "zero-retention",
+    "publicLog": true,
+    "logFields": ["proposalId", "vote", "reason_summary", "timestamp", "txHash"]
+  },
+  "useCases": [
+    "DAO member who wants AI to vote on their behalf according to stated principles (e.g., 'prioritize decentralization, vote no on treasury grants > $500k without milestones')",
+    "Multi-DAO delegate — same agent covers 10 DAOs, human sets principles once",
+    "Composable with Ghost Protocol: Venice provides confidential reasoning, AgentScope blocks any non-governance transaction, on-chain log proves the agent voted correctly"
+  ]
+}
