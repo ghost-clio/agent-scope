@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { parseEther, isAddress } from "viem";
+import { parseEther, isAddress, encodeFunctionData } from "viem";
 import abi from "../abi.json";
-import { MODULE_ADDRESS } from "../config";
+import mockSafeAbi from "../abi-mocksafe.json";
 
-export function SetPolicy() {
+export function SetPolicy({ moduleAddress, safeAddress }: { moduleAddress: `0x${string}`; safeAddress: `0x${string}` }) {
   const [agent, setAgent] = useState("");
   const [dailyLimit, setDailyLimit] = useState("0.5");
   const [perTxLimit, setPerTxLimit] = useState("0.1");
@@ -33,8 +33,8 @@ export function SetPolicy() {
       .map((s) => s.trim())
       .filter((s) => s.startsWith("0x") && s.length === 10) as `0x${string}`[];
 
-    writeContract({
-      address: MODULE_ADDRESS,
+    // Encode the setAgentPolicy call, then route through Safe.callModule
+    const policyCalldata = encodeFunctionData({
       abi,
       functionName: "setAgentPolicy",
       args: [
@@ -45,6 +45,13 @@ export function SetPolicy() {
         contractList,
         fnList,
       ],
+    });
+
+    writeContract({
+      address: safeAddress,
+      abi: mockSafeAbi.abi,
+      functionName: "callModule",
+      args: [moduleAddress, policyCalldata],
     });
   };
 

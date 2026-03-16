@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { isAddress } from "viem";
+import { isAddress, encodeFunctionData } from "viem";
 import abi from "../abi.json";
-import { MODULE_ADDRESS } from "../config";
+import mockSafeAbi from "../abi-mocksafe.json";
 
-export function RevokeAgent() {
+export function RevokeAgent({ moduleAddress, safeAddress }: { moduleAddress: `0x${string}`; safeAddress: `0x${string}` }) {
   const [agent, setAgent] = useState("");
   const [confirmed, setConfirmed] = useState(false);
 
@@ -13,11 +13,16 @@ export function RevokeAgent() {
 
   const handleRevoke = () => {
     if (!isAddress(agent) || !confirmed) return;
-    writeContract({
-      address: MODULE_ADDRESS,
+    const revokeCalldata = encodeFunctionData({
       abi,
       functionName: "revokeAgent",
       args: [agent as `0x${string}`],
+    });
+    writeContract({
+      address: safeAddress,
+      abi: mockSafeAbi.abi,
+      functionName: "callModule",
+      args: [moduleAddress, revokeCalldata],
     });
     setConfirmed(false);
   };

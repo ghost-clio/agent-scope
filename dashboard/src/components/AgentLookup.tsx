@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useReadContract } from "wagmi";
 import { formatEther, isAddress } from "viem";
 import abi from "../abi.json";
-import { MODULE_ADDRESS } from "../config";
 
-export function AgentLookup() {
+
+export function AgentLookup({ moduleAddress }: { moduleAddress: `0x${string}` }) {
   const [agentAddress, setAgentAddress] = useState("");
   const [query, setQuery] = useState("");
 
   const { data: scope, isLoading, error } = useReadContract({
-    address: MODULE_ADDRESS,
+    address: moduleAddress,
     abi,
     functionName: "getAgentScope",
     args: query ? [query as `0x${string}`] : undefined,
