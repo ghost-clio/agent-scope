@@ -1,0 +1,52 @@
+{
+  "$schema": "../schema.json",
+  "name": "Celo Stablecoin Agent",
+  "description": "Mobile-first agent operating on Celo with cUSD stablecoin limits. Designed for MiniPay-compatible wallets — low-cost global payments within strict daily budgets.",
+  "version": "1.0.0",
+  "chain": "celo",
+  "policy": {
+    "spendingLimits": {
+      "dailyLimit": "50 cUSD",
+      "perTransactionLimit": "10 cUSD",
+      "tokenAllowances": [
+        {
+          "token": "cUSD",
+          "address": "0x765DE816845861e75A25fCA122bb6898B8B1282a",
+          "dailyLimit": "50000000000000000000"
+        },
+        {
+          "token": "cEUR",
+          "address": "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73",
+          "dailyLimit": "45000000000000000000"
+        }
+      ]
+    },
+    "contractWhitelist": [
+      {
+        "name": "Ubeswap Router",
+        "address": "0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121",
+        "description": "Celo-native DEX for stablecoin swaps"
+      },
+      {
+        "name": "Mento Broker",
+        "address": "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a",
+        "description": "Celo stablecoin exchange protocol"
+      }
+    ],
+    "functionWhitelist": [
+      "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)",
+      "swapIn(address,address,uint256,uint256)",
+      "transfer(address,uint256)"
+    ],
+    "sessionExpiry": "24h",
+    "activeHours": {
+      "timezone": "UTC",
+      "windows": [{ "start": "06:00", "end": "22:00" }]
+    }
+  },
+  "useCases": [
+    "Mobile payment agent on MiniPay — sends cUSD to vendors within daily limits",
+    "Remittance agent — converts between cUSD/cEUR at Mento rates, capped per day",
+    "DeFi yield agent — swaps stablecoins on Ubeswap within strict bounds"
+  ]
+}
