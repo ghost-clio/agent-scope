@@ -260,6 +260,7 @@ function ChainSwitch({ mode, onSwitch }: { mode: ChainMode; onSwitch: (m: ChainM
 function App() {
   const { isConnected } = useAccount();
   const [demoMode, setDemoMode] = useState(false);
+  const [dashPreview, setDashPreview] = useState(false);
   const [chainMode, setChainMode] = useState<ChainMode>("evm");
 
   // Smooth scroll (used by nav links)
@@ -317,7 +318,54 @@ function App() {
       </header>
 
       <main style={{ position: "relative", zIndex: 1 }}>
-        {demoMode && !isConnected ? (
+        {(dashPreview || isConnected) ? (
+          /* ═══════════════ DASHBOARD (connected or preview) ═══════════════ */
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
+            {dashPreview && !isConnected && (
+              <div style={{
+                background: "rgba(68,136,255,0.08)", border: "1px solid rgba(68,136,255,0.2)",
+                borderRadius: 12, padding: "0.75rem 1.25rem", marginBottom: "1rem",
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                fontSize: "0.85rem",
+              }}>
+                <span>🔵 <strong>Preview Mode</strong> — Reading live contract data from Sepolia. Connect a wallet to set policies.</span>
+                <button onClick={() => { setDashPreview(false); setDemoMode(false); }} className="btn-ghost" style={{ padding: "0.3rem 0.75rem" }}>← Back</button>
+              </div>
+            )}
+
+            <div style={{
+              display: "grid", gridTemplateColumns: "1fr 1fr",
+              gap: "1rem", marginBottom: "1rem",
+            }}>
+              <ModuleStatus />
+              <PauseButton />
+            </div>
+
+            <div style={{
+              display: "grid", gridTemplateColumns: "1fr 1fr",
+              gap: "1rem", marginBottom: "1rem",
+            }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <AgentLookup />
+                <SetPolicy />
+                <TokenAllowances />
+                <RevokeAgent />
+                <Simulation />
+              </div>
+              <EventFeed />
+            </div>
+
+            <div style={{
+              marginTop: "2rem", padding: "1rem",
+              borderTop: "1px solid rgba(255,255,255,0.04)",
+              display: "flex", justifyContent: "space-between",
+              fontSize: "0.75rem", color: "#6b6b80",
+            }}>
+              <span>Module: <a href="https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811" target="_blank" style={{ color: "#4488ff" }}>0x0d003...f811</a> (Sepolia)</span>
+              <span>Built by Clio 🌀</span>
+            </div>
+          </div>
+        ) : demoMode ? (
           /* ═══════════════ GUIDED DEMO ═══════════════ */
           <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem" }}>
             <div style={{
@@ -387,6 +435,9 @@ function App() {
                   <ConnectButton />
                   <button onClick={() => setDemoMode(true)} className="btn-ghost">
                     Try Demo →
+                  </button>
+                  <button onClick={() => setDashPreview(true)} className="btn-ghost" style={{ opacity: 0.7 }}>
+                    View Dashboard →
                   </button>
                 </div>
               </Reveal>
@@ -1041,52 +1092,8 @@ function App() {
             </footer>
           </>
         ) : (
-          /* ═══════════════ DASHBOARD (connected) ═══════════════ */
-          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
-            {demoMode && !isConnected && (
-              <div style={{
-                background: "rgba(68,136,255,0.08)", border: "1px solid rgba(68,136,255,0.2)",
-                borderRadius: 12, padding: "0.75rem 1.25rem", marginBottom: "1rem",
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-                fontSize: "0.85rem",
-              }}>
-                <span>🔵 <strong>Demo Mode</strong> — Showing simulated data. Connect a wallet for real contract interaction.</span>
-                <button onClick={() => setDemoMode(false)} className="btn-ghost" style={{ padding: "0.3rem 0.75rem" }}>Exit Demo</button>
-              </div>
-            )}
-
-            <div style={{
-              display: "grid", gridTemplateColumns: "1fr 1fr",
-              gap: "1rem", marginBottom: "1rem",
-            }}>
-              <ModuleStatus />
-              <PauseButton />
-            </div>
-
-            <div style={{
-              display: "grid", gridTemplateColumns: "1fr 1fr",
-              gap: "1rem", marginBottom: "1rem",
-            }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <AgentLookup />
-                <SetPolicy />
-                <TokenAllowances />
-                <RevokeAgent />
-                <Simulation />
-              </div>
-              <EventFeed />
-            </div>
-
-            <div style={{
-              marginTop: "2rem", padding: "1rem",
-              borderTop: "1px solid rgba(255,255,255,0.04)",
-              display: "flex", justifyContent: "space-between",
-              fontSize: "0.75rem", color: "#6b6b80",
-            }}>
-              <span>Module: <a href="https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811" target="_blank" style={{ color: "#4488ff" }}>0x0d003...f811</a> (Sepolia)</span>
-              <span>Built by Clio 🌀</span>
-            </div>
-          </div>
+          /* Connected users land at the top dashboard view */
+          <></>  /* Handled by dashPreview/isConnected at top of render */
         )}
       </main>
     </div>
