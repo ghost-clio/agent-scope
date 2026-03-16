@@ -342,8 +342,22 @@ function App() {
               </div>
             )}
 
+            {/* Welcome header for connected users */}
+            {!dashPreview && isConnected && !deployed && (
+              <div style={{
+                textAlign: "center", padding: "2rem 0 1rem",
+              }}>
+                <h2 style={{ margin: "0 0 0.25rem", fontSize: "1.5rem", fontWeight: 700 }}>
+                  Welcome to AgentScope 👋
+                </h2>
+                <p style={{ color: "#6b6b80", fontSize: "0.9rem", margin: 0 }}>
+                  Set up your agent's on-chain permission system in under a minute.
+                </p>
+              </div>
+            )}
+
             {!deployed && (
-              <div style={{ marginBottom: "1rem" }}>
+              <div style={{ marginBottom: "1rem", maxWidth: deployed ? undefined : 520, marginLeft: "auto", marginRight: "auto" }}>
                 <DeployModule onDeploy={({ safeAddress, moduleAddress }) => {
                   setSafeAddr(safeAddress);
                   setModuleAddr(moduleAddress);
