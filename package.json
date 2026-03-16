@@ -15,6 +15,7 @@
     "demo:venice": "node demo/venice-demo.cjs",
     "demo:vault": "node demo/yield-vault-demo.cjs",
     "demo:locus": "node demo/locus-demo.cjs",
+    "demo:multi-agent": "npx hardhat run demo/multi-agent-demo.cjs",
     "dashboard": "cd dashboard && npm run dev"
   },
   "devDependencies": {

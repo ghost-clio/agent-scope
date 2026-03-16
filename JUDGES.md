@@ -44,18 +44,25 @@ node demo/tweet-to-policy-demo.cjs
 
 Paste any sentence like "spend max 0.5 ETH/day on Uniswap only" → get compiled calldata ready to deploy. This is the [ASP-1 Policy Compiler](./policy/compiler.ts).
 
-### 5. Read the ASP-1 spec (2 min)
+### 5. See multi-agent coordination (1 min)
+```bash
+npm run demo:multi-agent
+```
+
+An orchestrator agent scopes three worker agents (data, inference, execution). Each worker can only call its own contracts with its own limits. Orchestrator revokes a worker and re-deploys with tighter constraints — no human needed. This is the [`ai-orchestrator-agent.json`](./policy/examples/ai-orchestrator-agent.json) policy in action.
+
+### 6. Read the ASP-1 spec (2 min)
 [`spec/ASP-1.md`](./spec/ASP-1.md) — the chain-agnostic protocol standard this project proposes.
 
 This is the "what if this was a real standard" document. 333 lines. Written to EIP style. Covers schema, dual enforcement model, composability, and interop.
 
-### 6. Check the tests (1 min)
+### 7. Check the tests (1 min)
 ```bash
 npm test
 ```
-148 tests via `npm test`. Full breakdown: 35 core contract, 27 yield vault, 17 caveat enforcers, 26 ENS bridge, 43 policy compiler edge cases. All green. (+17 Solana via `anchor test` = 165 total)
+165 tests across 6 suites. Full breakdown: 35 core contract, 27 yield vault, 17 caveat enforcers, 26 ENS bridge, 43 policy compiler edge cases, 17 Solana. All green.
 
-### 7. Ghost Protocol — the full agent (1 min)
+### 8. Ghost Protocol — the full agent (1 min)
 **https://github.com/ghost-clio/ghost-protocol**
 
 A complete autonomous treasury agent: Venice.ai for confidential reasoning → AgentScope for on-chain enforcement → Uniswap for execution → `agent_log.json` for public accountability.
