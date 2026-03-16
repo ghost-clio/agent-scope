@@ -117,6 +117,76 @@ const compiled = compile(policy);        // → on-chain calldata
 console.log(summarize(policy));          // → human-readable summary
 ```
 
+## Solana SDK
+
+The Solana SDK provides the same API surface for the Anchor program:
+
+```typescript
+import { AgentScopeSolana } from "@ghost-clio/agent-scope-sdk/solana";
+import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
+
+const scope = new AgentScopeSolana({
+  program,                    // Anchor Program instance
+  owner: ownerKeypair.publicKey,
+});
+
+// Initialize vault (PDA)
+await scope.initializeVault();
+await scope.fundVault(5n * BigInt(LAMPORTS_PER_SOL)); // 5 SOL
+
+// Set agent policy
+await scope.setPolicy({
+  agent: agentKeypair.publicKey,
+  dailyLimitLamports: 2n * BigInt(LAMPORTS_PER_SOL),  // 2 SOL/day
+  perTxLimitLamports: BigInt(LAMPORTS_PER_SOL) / 2n,  // 0.5 SOL/tx
+  sessionExpiry: Math.floor(Date.now() / 1000) + 86400, // 24h
+  allowedPrograms: [raydiumProgram],
+});
+
+// Agent: check + execute
+const check = await scope.checkPermission(agent, 500_000_000n);
+if (check.allowed) {
+  await scope.executeTransfer(agent, recipient, 500_000_000n);
+}
+
+// Agent introspection
+console.log(await scope.getStatusPrompt(agent));
+// → "Daily limit: 2.0000 SOL, Remaining: 1.5000 SOL"
+```
+
+### Solana API
+
+#### Vault
+- `initializeVault()` — Create PDA vault
+- `fundVault(lamports)` — Deposit SOL
+- `getVaultBalance()` — Check balance
+
+#### Policy Management (owner)
+- `setPolicy(params)` — Create agent policy
+- `updatePolicy(params)` — Update without resetting spend
+- `revokeAgent(agent)` — Kill agent permissions
+- `setPaused(bool)` — Emergency pause
+- `setTokenAllowance(agent, mint, limit)` — SPL token daily limit
+
+#### Agent Execution
+- `executeTransfer(agent, recipient, lamports)` — SOL transfer
+- `executeCpi(agent, program, data, sol?)` — Cross-program invocation
+
+#### Queries
+- `getScope(agent)` — Full policy data + remaining budget
+- `checkPermission(agent, amount, program?, discriminator?)` — Client-side pre-flight
+- `getStatusPrompt(agent)` — Human-readable status for agent reasoning
+
+### PDA Helpers
+
+```typescript
+import { deriveVaultPda, derivePolicyPda, deriveTokenAllowancePda } from "@ghost-clio/agent-scope-sdk/solana";
+
+const [vaultPda] = deriveVaultPda(ownerPubkey);
+const [policyPda] = derivePolicyPda(vaultPda, agentPubkey);
+const [tokenPda] = deriveTokenAllowancePda(vaultPda, agentPubkey, mintPubkey);
+```
+
 ## License
 
 MIT
