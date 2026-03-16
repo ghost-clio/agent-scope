@@ -13,7 +13,7 @@ import { GuidedDemo } from "./components/GuidedDemo";
 import { PolicyBuilder } from "./components/PolicyBuilder";
 import { DeploymentMap } from "./components/DeploymentMap";
 import { JailbreakDemo } from "./components/JailbreakDemo";
-import { ChainToggle } from "./components/ChainToggle";
+// ChainToggle moved to header as ChainSwitch
 
 /* ═══════════════════════════════════════════════
    SCROLL REVEAL HOOK
@@ -222,9 +222,50 @@ const features = [
 /* ═══════════════════════════════════════════════
    MAIN APP
    ═══════════════════════════════════════════════ */
+type ChainMode = "evm" | "solana";
+
+function ChainSwitch({ mode, onSwitch }: { mode: ChainMode; onSwitch: (m: ChainMode) => void }) {
+  return (
+    <div style={{
+      display: "flex", borderRadius: 10, overflow: "hidden",
+      border: "1px solid rgba(255,255,255,0.08)",
+      background: "rgba(5,5,8,0.6)",
+    }}>
+      {([
+        { id: "evm" as ChainMode, label: "⟠ EVM", color: "#627EEA" },
+        { id: "solana" as ChainMode, label: "◎ Solana", color: "#9945FF" },
+      ]).map(chain => (
+        <button
+          key={chain.id}
+          onClick={() => onSwitch(chain.id)}
+          style={{
+            padding: "0.35rem 0.9rem",
+            fontSize: "0.75rem", fontWeight: 600,
+            border: "none", cursor: "pointer",
+            transition: "all 0.2s ease",
+            background: mode === chain.id ? `${chain.color}20` : "transparent",
+            color: mode === chain.id ? chain.color : "#6b6b80",
+            borderRight: chain.id === "evm" ? "1px solid rgba(255,255,255,0.06)" : "none",
+          }}
+        >
+          {chain.label}
+          {chain.id === "solana" && (
+            <span style={{
+              marginLeft: 4, fontSize: "0.5rem", padding: "1px 4px",
+              borderRadius: 4, background: "rgba(255,170,0,0.15)",
+              color: "#ffaa00", fontWeight: 700, verticalAlign: "middle",
+            }}>SOON</span>
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function App() {
   const { isConnected } = useAccount();
   const [demoMode, setDemoMode] = useState(false);
+  const [chainMode, setChainMode] = useState<ChainMode>("evm");
 
   // Smooth scroll (used by nav links)
   const _scrollTo = useCallback((id: string) => {
@@ -260,6 +301,7 @@ function App() {
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+          <ChainSwitch mode={chainMode} onSwitch={setChainMode} />
           <a href="https://github.com/ghost-clio/agent-scope" target="_blank"
             style={{ color: "#6b6b80", fontSize: "0.8rem", textDecoration: "none", transition: "color 0.2s" }}
             onMouseOver={e => (e.currentTarget.style.color = "#f0f0f5")}
@@ -453,14 +495,17 @@ function App() {
                 <div style={{ textAlign: "center", marginBottom: "3rem" }}>
                   <div className="section-divider" />
                   <h3 style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.03em", margin: 0 }}>
-                    Three lines to deploy a policy
+                    {chainMode === "evm" ? "Three lines to deploy a policy" : "Three lines to deploy a policy"}
                   </h3>
                   <p style={{ color: "#6b6b80", marginTop: "0.75rem", fontSize: "0.95rem" }}>
-                    The SDK wraps everything. TypeScript-native, viem-powered.
+                    {chainMode === "evm"
+                      ? "The SDK wraps everything. TypeScript-native, viem-powered."
+                      : "The SDK wraps everything. TypeScript-native, Anchor-powered."}
                   </p>
                 </div>
               </Reveal>
               <Reveal delay={100}>
+                {chainMode === "evm" ? (
                 <div className="code-block">
                   <div><span style={{ color: "#8844ff" }}>import</span>{" "}{"{"} AgentScopeClient {"}"} <span style={{ color: "#8844ff" }}>from</span> <span style={{ color: "#00ff88" }}>"@ghost-clio/agent-scope-sdk"</span>;</div>
                   <br />
@@ -476,6 +521,24 @@ function App() {
                   <div><span style={{ color: "rgba(107,107,128,0.6)" }}>// Agent executes within policy — chain enforces limits</span></div>
                   <div><span style={{ color: "#8844ff" }}>await</span> client.<span style={{ color: "#4488ff" }}>executeAsAgent</span>(uniswapRouter, swapCalldata, <span style={{ color: "#ffaa00" }}>parseEther("0.3")</span>);</div>
                 </div>
+                ) : (
+                <div className="code-block">
+                  <div><span style={{ color: "#8844ff" }}>import</span> * <span style={{ color: "#8844ff" }}>as</span> anchor <span style={{ color: "#8844ff" }}>from</span> <span style={{ color: "#00ff88" }}>"@coral-xyz/anchor"</span>;</div>
+                  <br />
+                  <div><span style={{ color: "rgba(107,107,128,0.6)" }}>// Set a policy: 2 SOL/day, Jupiter only, expires in 7 days</span></div>
+                  <div><span style={{ color: "#8844ff" }}>await</span> program.methods.<span style={{ color: "#4488ff" }}>setAgentPolicy</span>(</div>
+                  <div style={{ paddingLeft: "1.5rem" }}><span style={{ color: "#8844ff" }}>new</span> anchor.BN(<span style={{ color: "#ffaa00" }}>2 * LAMPORTS_PER_SOL</span>),  <span style={{ color: "rgba(107,107,128,0.6)" }}>// daily limit</span></div>
+                  <div style={{ paddingLeft: "1.5rem" }}><span style={{ color: "#8844ff" }}>new</span> anchor.BN(<span style={{ color: "#ffaa00" }}>0.5 * LAMPORTS_PER_SOL</span>), <span style={{ color: "rgba(107,107,128,0.6)" }}>// per-tx limit</span></div>
+                  <div style={{ paddingLeft: "1.5rem" }}><span style={{ color: "#8844ff" }}>new</span> anchor.BN(expiry),</div>
+                  <div style={{ paddingLeft: "1.5rem" }}>[<span style={{ color: "#00ff88" }}>JUPITER_PROGRAM_ID</span>],  <span style={{ color: "rgba(107,107,128,0.6)" }}>// allowed programs</span></div>
+                  <div style={{ paddingLeft: "1.5rem" }}>[],  <span style={{ color: "rgba(107,107,128,0.6)" }}>// allowed discriminators</span></div>
+                  <div>).<span style={{ color: "#4488ff" }}>accounts</span>({"{"} vault, policy, owner, agent {"}"}).<span style={{ color: "#4488ff" }}>rpc</span>();</div>
+                  <br />
+                  <div><span style={{ color: "rgba(107,107,128,0.6)" }}>// Agent executes within policy — chain enforces limits</span></div>
+                  <div><span style={{ color: "#8844ff" }}>await</span> program.methods.<span style={{ color: "#4488ff" }}>executeTransfer</span>(<span style={{ color: "#8844ff" }}>new</span> anchor.BN(amount))</div>
+                  <div style={{ paddingLeft: "1.5rem" }}>.<span style={{ color: "#4488ff" }}>accounts</span>({"{"} vault, policy, agent, recipient {"}"}).<span style={{ color: "#4488ff" }}>signers</span>([agent]).<span style={{ color: "#4488ff" }}>rpc</span>();</div>
+                </div>
+                )}
               </Reveal>
             </section>
 
@@ -615,29 +678,8 @@ function App() {
               </Reveal>
             </section>
 
-            {/* ── CHAIN AGNOSTIC ── */}
-            <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
-              <Reveal>
-                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-                  <div className="section-divider" />
-                  <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
-                    One protocol.<br />
-                    <span style={{ color: "#9945FF" }}>Any chain.</span>
-                  </h3>
-                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0, maxWidth: 550, marginLeft: "auto", marginRight: "auto" }}>
-                    ASP-1 defines the concepts. Each chain gets a native implementation.
-                    Same policy, different runtime.
-                  </p>
-                </div>
-              </Reveal>
-              <Reveal delay={100}>
-                <div className="glass-card" style={{ padding: "2.5rem" }}>
-                  <ChainToggle />
-                </div>
-              </Reveal>
-            </section>
-
-            {/* ── ERC-8004 ── */}
+            {/* ── ERC-8004 (EVM only) ── */}
+            {chainMode === "evm" && (
             <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
               <Reveal>
                 <div style={{
@@ -678,6 +720,46 @@ function App() {
                 </div>
               </Reveal>
             </section>
+            )}
+
+            {/* ── Solana coming soon banner (Solana mode) ── */}
+            {chainMode === "solana" && (
+            <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
+              <Reveal>
+                <div style={{
+                  background: "linear-gradient(135deg, rgba(153,69,255,0.06), rgba(20,241,149,0.06))",
+                  borderRadius: 24, border: "1px solid rgba(153,69,255,0.15)", padding: "3.5rem",
+                  textAlign: "center",
+                }}>
+                  <h3 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "1rem", color: "#9945FF" }}>
+                    ◎ Solana Program — Built
+                  </h3>
+                  <p style={{ color: "#6b6b80", maxWidth: 500, margin: "0 auto 1.5rem", lineHeight: 1.7 }}>
+                    Full Anchor program with 11 instructions, SPL token allowances, CPI execution,
+                    and complete EVM feature parity. PDA vault architecture native to Solana.
+                  </p>
+                  <div style={{
+                    display: "flex", gap: "2rem", justifyContent: "center",
+                    fontSize: "0.8rem", color: "#6b6b80", flexWrap: "wrap",
+                  }}>
+                    {["PDA Vault", "SPL Token Limits", "Program Whitelists", "CPI Execution", "Emergency Pause"].map(t => (
+                      <span key={t} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ color: "#9945FF" }}>✓</span> {t}
+                      </span>
+                    ))}
+                  </div>
+                  <div style={{
+                    marginTop: "2rem", padding: "0.75rem 1.5rem",
+                    background: "rgba(255,170,0,0.05)", border: "1px solid rgba(255,170,0,0.15)",
+                    borderRadius: 12, display: "inline-block",
+                    fontSize: "0.8rem", color: "#ffaa00",
+                  }}>
+                    🚀 Devnet deployment coming soon
+                  </div>
+                </div>
+              </Reveal>
+            </section>
+            )}
 
             {/* ── FOOTER ── */}
             <footer style={{
