@@ -4,7 +4,7 @@
 Your agent can't rug you even if it wants to.
 
 ## Short Description (280 chars)
-On-chain spending policies for AI agent wallets. Daily limits, contract whitelists, yield-only budgets, emergency pause. 148 tests. 14 chains. EVM + Solana. Enforced by math, not trust.
+On-chain spending policies for AI agent wallets. Daily limits, contract whitelists, yield-only budgets, emergency pause. 165 tests. 14 chains. EVM + Solana. Enforced by math, not trust.
 
 ## Full Description
 
@@ -46,11 +46,11 @@ The agent literally cannot exceed its scope. The contract reverts.
 12. **ERC-8004 ENS Bridge** — Human-readable agent identity resolution
 
 **Numbers:**
-- 148 tests (131 EVM + 17 Solana)
+- 165 tests (35 core contract + 27 yield vault + 17 caveat enforcers + 26 ENS bridge + 43 policy compiler + 17 Solana)
 - 14 testnet deployments
 - 4 smart contracts
 - 5 demos (jailbreak, tweet-to-policy, venice, yield vault, locus)
-- 5 policy templates
+- 6 policy templates
 
 ### Links
 - **Dashboard**: https://ghost-clio.github.io/agent-scope/

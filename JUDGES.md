@@ -53,7 +53,7 @@ This is the "what if this was a real standard" document. 333 lines. Written to E
 ```bash
 npm test
 ```
-148 tests. 78 core contract tests, 27 yield vault, 8 caveat enforcers, 4 ENS bridge, 17 Solana, 14 policy compiler edge cases. All green.
+148 tests via `npm test`. Full breakdown: 35 core contract, 27 yield vault, 17 caveat enforcers, 26 ENS bridge, 43 policy compiler edge cases. All green. (+17 Solana via `anchor test` = 165 total)
 
 ### 7. Ghost Protocol — the full agent (1 min)
 **https://github.com/ghost-clio/ghost-protocol**

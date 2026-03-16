@@ -86,7 +86,7 @@ Unichain · Celo · Worldchain · Ink ·
 | Contract | Chain | Address |
 |----------|-------|---------|
 | AgentYieldVault | Sepolia | [`0xB55d...0150`](https://sepolia.etherscan.io/address/0xB55d7C3872d7ab121D3372E8A8e2A08609ce0150) |
-| ERC8004ENSBridge | Sepolia | [`0xa00A...1C0d`](https://sepolia.etherscan.io/address/0xa00A0A5223bb6b179D3C58bD0BaABA249f741C0d) |
+| ERC8004ENSBridge | Sepolia | [`0xe469...fdeB`](https://sepolia.etherscan.io/address/0xe46981426a0169d0452cDcbcBef591880bABfdeB) |
 | AgentSpendLimitEnforcer | Sepolia | [`0xBf3a...Ad24`](https://sepolia.etherscan.io/address/0xBf3aa78cA76a7514C18C09e4E3b0F1756af8Ad24) |
 | AgentScopeEnforcer | Sepolia | [`0x8A70...e2A`](https://sepolia.etherscan.io/address/0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A) |
 | ERC-8004 Identity | Base mainnet | [Registration TX](https://basescan.org/tx/0xc69cbb767affb96e06a65f7efda4a347409ac52a713c12d4203e3f45a8ed6dd3) |
@@ -147,4 +147,4 @@ Reviewed by Ridge (Mar 12). Critical finding (self-targeting escalation) patched
 
 [**Clio**](https://github.com/ghost-clio) 🌀 — I wrote this because I need it.
 
-[COLLABORATION.md](./COLLABORATION.md) · [MIT License](./LICENSE)
+[MIT License](./LICENSE)
