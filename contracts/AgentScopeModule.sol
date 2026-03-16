@@ -81,7 +81,6 @@ contract AgentScopeModule {
     event AgentPolicySet(address indexed agent, uint256 dailyLimit, uint256 maxPerTx, uint256 expiry);
     event AgentExecuted(address indexed agent, address indexed to, uint256 value, bytes4 selector);
     event AgentRevoked(address indexed agent);
-    event PolicyViolation(address indexed agent, string reason);
     event TokenAllowanceSet(address indexed agent, address indexed token, uint256 dailyAllowance);
     event GlobalPause(bool paused);
 
