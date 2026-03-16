@@ -24,7 +24,7 @@ interface ChainConfig {
     tokenLimit: string;
     tokenName: string;
   };
-  status: "live" | "coming-soon";
+  status: "live";
   deployCount?: number;
 }
 
@@ -111,14 +111,7 @@ export function ChainToggle() {
             >
               <span style={{ fontSize: "1.1rem" }}>{c.icon}</span>
               {c.name}
-              {c.status === "coming-soon" && (
-                <span style={{
-                  fontSize: "0.55rem", padding: "0.15rem 0.4rem",
-                  borderRadius: 6, background: "rgba(255,170,0,0.1)",
-                  border: "1px solid rgba(255,170,0,0.2)",
-                  color: "#ffaa00", fontWeight: 700, letterSpacing: "0.05em",
-                }}>SOON</span>
-              )}
+
             </button>
           );
         })}
