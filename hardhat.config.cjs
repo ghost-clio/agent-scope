@@ -68,6 +68,32 @@ module.exports = {
       chainId: 80002,
       accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
     },
+    // ── Superchain Testnets (Round 2) ──
+    zoraSepolia: {
+      url: "https://sepolia.rpc.zora.energy",
+      chainId: 999999999,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    modeSepolia: {
+      url: "https://sepolia.mode.network",
+      chainId: 919,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    liskSepolia: {
+      url: "https://rpc.sepolia-api.lisk.com",
+      chainId: 4202,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    cyberTestnet: {
+      url: "https://rpc.testnet.cyber.co",
+      chainId: 111557560,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    metalL2Testnet: {
+      url: "https://testnet.rpc.metall2.com",
+      chainId: 1740,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
     // ── L2 Mainnets (deploy last — contract must be final) ──
     polygon: {
       url: "https://polygon-rpc.com",

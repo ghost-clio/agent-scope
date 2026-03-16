@@ -2,6 +2,8 @@ import { useState } from "react";
 
 const CONTRACT = "0x0d0034c6AC4640463bf480cB07BE770b08Bef811";
 
+const CONTRACT2 = "0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA";
+
 const chains = [
   { name: "Ethereum Sepolia", icon: "⟠", color: "#627EEA", explorer: `https://sepolia.etherscan.io/address/${CONTRACT}` },
   { name: "Base Sepolia", icon: "🔵", color: "#0052FF", explorer: `https://sepolia.basescan.org/address/${CONTRACT}` },
@@ -13,6 +15,10 @@ const chains = [
   { name: "Worldchain Sepolia", icon: "🌐", color: "#00C3B6", explorer: null },
   { name: "Ink Sepolia", icon: "🖋️", color: "#7B61FF", explorer: null },
   { name: "Status Network", icon: "💬", color: "#4360DF", explorer: null },
+  { name: "Zora Sepolia", icon: "✦", color: "#2B5DF0", explorer: `https://sepolia.explorer.zora.energy/address/${CONTRACT2}` },
+  { name: "Mode Sepolia", icon: "Ⓜ", color: "#DFFE00", explorer: `https://sepolia.explorer.mode.network/address/${CONTRACT2}` },
+  { name: "Lisk Sepolia", icon: "◆", color: "#0038FF", explorer: `https://sepolia-blockscout.lisk.com/address/${CONTRACT2}` },
+  { name: "Metal L2", icon: "⚙", color: "#FF6B35", explorer: `https://testnet.explorer.metall2.com/address/${CONTRACT2}` },
 ];
 
 const mainnetChains = [
@@ -40,7 +46,7 @@ export function DeploymentMap() {
           background: "linear-gradient(135deg, #00ff88 0%, #4488ff 50%, #8844ff 100%)",
           WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
           backgroundClip: "text",
-        }}>10</div>
+        }}>14</div>
         <div style={{ textAlign: "left" }}>
           <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>Testnet Chains</div>
           <div style={{ fontSize: "0.8rem", color: "#6b6b80" }}>Same address. Same bytecode. One protocol.</div>
