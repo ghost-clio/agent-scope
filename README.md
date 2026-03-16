@@ -434,11 +434,11 @@ The TypeScript SDK provides a clean API for both humans and agents:
 ```typescript
 import { AgentScope } from "./sdk";
 import { createPublicClient, createWalletClient, http } from "viem";
-import { mainnet } from "viem/chains";
+import { sepolia } from "viem/chains";
 
 const scope = new AgentScope({
-  moduleAddress: "0x...",
-  publicClient: createPublicClient({ chain: mainnet, transport: http() }),
+  moduleAddress: "0x0d0034c6AC4640463bf480cB07BE770b08Bef811",
+  publicClient: createPublicClient({ chain: sepolia, transport: http() }),
   walletClient: agentWallet, // optional — needed for execution
 });
 
