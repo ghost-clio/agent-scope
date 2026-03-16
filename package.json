@@ -6,8 +6,9 @@
   "license": "MIT",
   "author": "clio_ghost",
   "scripts": {
-    "test": "npx hardhat test",
-    "test:policy": "node --test policy/compiler.test.cjs",
+    "test": "npx hardhat test test/AgentScopeModule.test.cjs test/AgentYieldVault.test.cjs test/CaveatEnforcers.test.cjs test/ERC8004ENSBridge.test.cjs && node --test test/PolicyCompiler.test.cjs",
+    "test:contracts": "npx hardhat test test/AgentScopeModule.test.cjs test/AgentYieldVault.test.cjs test/CaveatEnforcers.test.cjs test/ERC8004ENSBridge.test.cjs",
+    "test:policy": "node --test test/PolicyCompiler.test.cjs",
     "compile": "npx hardhat compile",
     "demo:jailbreak": "node demo/jailbreak-demo.cjs",
     "demo:policy": "node demo/tweet-to-policy-demo.cjs",
