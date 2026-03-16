@@ -308,6 +308,54 @@ export class ScopedLocusAgent {
     };
   }
 
+  // ─────────────────────────────────────────────────────────
+  //  Checkout (Locus Checkout SDK)
+  // ─────────────────────────────────────────────────────────
+
+  /**
+   * Pay a Locus Checkout session with AgentScope policy enforcement.
+   * Preflight → policy check → pay → poll for confirmation.
+   */
+  async checkout(
+    sessionId: string,
+    memo: string,
+    payerEmail?: string,
+  ): Promise<PaymentResult> {
+    // Step 1: Preflight — get session dethe operator
+    let amount = 0;
+    try {
+      const preflight = await fetch(
+        `${this.config.baseUrl}/checkout/agent/preflight/${sessionId}`,
+        { headers: { Authorization: `Bearer ${this.config.apiKey}` } },
+      );
+      const data = await preflight.json() as any;
+      if (!data.success || !data.data?.canPay) {
+        return {
+          success: false,
+          policyCheck: { approved: false, reason: `Checkout not payable: ${data.data?.blockers?.join(", ") || "unknown"}` },
+          error: `Checkout preflight failed`,
+        };
+      }
+      amount = parseFloat(data.data?.amount || "0");
+    } catch (err: any) {
+      return {
+        success: false,
+        policyCheck: { approved: false, reason: `Preflight error: ${err.message}` },
+        error: err.message,
+      };
+    }
+
+    // Step 2: AgentScope policy check
+    const request: PaymentRequest = {
+      to: `checkout:${sessionId}`,
+      amountUsdc: amount,
+      memo,
+      category: "checkout",
+    };
+
+    return this.pay(request);
+  }
+
   /**
    * Generate a status prompt for the agent's context window.
    * Keeps the agent aware of its spending constraints.
