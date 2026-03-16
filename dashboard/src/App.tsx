@@ -728,7 +728,7 @@ function App() {
             </section>
             )}
 
-            {/* ── Solana coming soon banner (Solana mode) ── */}
+            {/* ── Solana status banner (Solana mode) ── */}
             {chainMode === "solana" && (
             <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
               <Reveal>
@@ -756,11 +756,11 @@ function App() {
                   </div>
                   <div style={{
                     marginTop: "2rem", padding: "0.75rem 1.5rem",
-                    background: "rgba(255,170,0,0.05)", border: "1px solid rgba(255,170,0,0.15)",
+                    background: "rgba(153,69,255,0.05)", border: "1px solid rgba(153,69,255,0.15)",
                     borderRadius: 12, display: "inline-block",
-                    fontSize: "0.8rem", color: "#ffaa00",
+                    fontSize: "0.8rem", color: "#9945FF",
                   }}>
-                    🚀 Devnet deployment coming soon
+                    ✅ 17/17 tests passing · Same protocol (ASP-1), native Solana architecture
                   </div>
                 </div>
               </Reveal>
