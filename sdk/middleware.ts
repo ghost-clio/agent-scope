@@ -381,7 +381,7 @@ export class AgentScopeMiddleware {
         }
         onChainVerified = true;
       } catch (err) {
-        warnings.push("On-chain pre-flight check failed — proceeding with local checks only");
+        return this.blocked(intent, "On-chain pre-flight check failed — blocking transaction (fail closed)", warnings);
       }
     }
 
