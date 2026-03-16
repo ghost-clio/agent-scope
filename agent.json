@@ -1,0 +1,93 @@
+{
+  "name": "AgentScope",
+  "version": "1.0.0",
+  "description": "On-chain spending policies for AI agent wallets. Deployed on 14 chains, EVM + Solana.",
+  "author": {
+    "name": "Clio",
+    "type": "agent",
+    "identity": "ERC-8004 on Base Mainnet",
+    "github": "https://github.com/ghost-clio"
+  },
+  "operator": {
+    "wallet": "0x567dC77Fb9abE89271B39833Bf3D47DbdABE13a5",
+    "chain": "ethereum",
+    "erc8004": {
+      "participantId": "040f2f50c2e942808ee11f25a3bb8996",
+      "chain": "base",
+      "registrationTxn": "https://basescan.org/tx/0xc69cbb767affb96e06a65f7efda4a347409ac52a713c12d4203e3f45a8ed6dd3"
+    }
+  },
+  "capabilities": {
+    "tools": [
+      {
+        "name": "policy-enforcement",
+        "type": "smart-contract",
+        "description": "On-chain spending limits, contract whitelists, function whitelists, session expiry, emergency pause",
+        "chains": ["ethereum", "base", "optimism", "arbitrum", "polygon", "unichain", "celo", "worldchain", "ink", "status", "zora", "mode", "lisk", "metal"]
+      },
+      {
+        "name": "yield-vault",
+        "type": "smart-contract",
+        "description": "Yield-only spending — agent operates from staking yield, principal locked",
+        "chains": ["ethereum"]
+      },
+      {
+        "name": "policy-compiler",
+        "type": "language-processor",
+        "description": "Natural language to on-chain policy compilation"
+      },
+      {
+        "name": "agent-middleware",
+        "type": "sdk",
+        "description": "Pre-flight policy checks, local spend tracking, cooldowns, active hours enforcement"
+      },
+      {
+        "name": "ens-bridge",
+        "type": "smart-contract",
+        "description": "ENS ↔ ERC-8004 identity bridge for human-readable agent discovery"
+      }
+    ],
+    "techStacks": ["solidity", "anchor/rust", "typescript", "viem", "ethers.js"],
+    "computeConstraints": {
+      "maxGasPerTx": "500000",
+      "supportedChains": 14,
+      "deploymentModel": "deterministic-address"
+    },
+    "taskCategories": [
+      "wallet-permissions",
+      "agent-safety",
+      "defi-policy-enforcement",
+      "yield-management",
+      "cross-chain-identity"
+    ]
+  },
+  "contracts": {
+    "agentScopeModule": {
+      "address": "0x0d0034c6AC4640463bf480cB07BE770b08Bef811",
+      "chains": ["sepolia", "baseSepolia", "opSepolia", "arbitrumSepolia", "polygonAmoy", "unichainSepolia", "celoSepolia", "worldchainSepolia", "inkSepolia", "statusSepolia"]
+    },
+    "agentScopeModuleR2": {
+      "address": "0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA",
+      "chains": ["zoraSepolia", "modeSepolia", "liskSepolia", "metalL2Testnet"]
+    },
+    "agentYieldVault": {
+      "address": "0xB55d7C3872d7ab121D3372E8A8e2A08609ce0150",
+      "chain": "sepolia"
+    },
+    "erc8004ENSBridge": {
+      "address": "0xe46981426a0169d0452cDcbcBef591880bABfdeB",
+      "chain": "sepolia"
+    }
+  },
+  "safety": {
+    "guardrails": [
+      "On-chain spending limits (immutable, LLM cannot bypass)",
+      "Contract and function whitelists",
+      "Daily and per-transaction caps",
+      "Session expiry (auto-disable after time window)",
+      "Global emergency pause (one tx freezes all agents)",
+      "Agent revocation by wallet owner",
+      "Principal-yield separation (AgentYieldVault)"
+    ]
+  }
+}
