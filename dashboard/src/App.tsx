@@ -13,6 +13,8 @@ import { GuidedDemo } from "./components/GuidedDemo";
 import { PolicyBuilder } from "./components/PolicyBuilder";
 import { DeploymentMap } from "./components/DeploymentMap";
 import { JailbreakDemo } from "./components/JailbreakDemo";
+import { DeployModule } from "./components/DeployModule";
+import { DEFAULT_MODULE_ADDRESS, DEFAULT_SAFE_ADDRESS } from "./config";
 // ChainToggle moved to header as ChainSwitch
 
 /* ═══════════════════════════════════════════════
@@ -266,6 +268,9 @@ function App() {
   const [demoMode, setDemoMode] = useState(false);
   const [dashPreview, setDashPreview] = useState(false);
   const [chainMode, setChainMode] = useState<ChainMode>("evm");
+  const [moduleAddr, setModuleAddr] = useState<`0x${string}`>(DEFAULT_MODULE_ADDRESS);
+  const [safeAddr, setSafeAddr] = useState<`0x${string}`>(DEFAULT_SAFE_ADDRESS);
+  const [deployed, setDeployed] = useState(false);
 
   // Smooth scroll (used by nav links)
   const _scrollTo = useCallback((id: string) => {
@@ -337,12 +342,22 @@ function App() {
               </div>
             )}
 
+            {!deployed && (
+              <div style={{ marginBottom: "1rem" }}>
+                <DeployModule onDeploy={({ safeAddress, moduleAddress }) => {
+                  setSafeAddr(safeAddress);
+                  setModuleAddr(moduleAddress);
+                  setDeployed(true);
+                }} />
+              </div>
+            )}
+
             <div style={{
               display: "grid", gridTemplateColumns: "1fr 1fr",
               gap: "1rem", marginBottom: "1rem",
             }}>
-              <ModuleStatus />
-              <PauseButton />
+              <ModuleStatus moduleAddress={moduleAddr} safeAddress={safeAddr} />
+              <PauseButton moduleAddress={moduleAddr} safeAddress={safeAddr} />
             </div>
 
             <div style={{
@@ -350,10 +365,10 @@ function App() {
               gap: "1rem", marginBottom: "1rem",
             }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <AgentLookup />
-                <SetPolicy />
+                <AgentLookup moduleAddress={moduleAddr} />
+                <SetPolicy moduleAddress={moduleAddr} safeAddress={safeAddr} />
                 <TokenAllowances />
-                <RevokeAgent />
+                <RevokeAgent moduleAddress={moduleAddr} safeAddress={safeAddr} />
                 <Simulation />
               </div>
               <EventFeed />

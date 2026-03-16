@@ -1,16 +1,16 @@
 import { useReadContract } from "wagmi";
 import abi from "../abi.json";
-import { MODULE_ADDRESS, SAFE_ADDRESS } from "../config";
+// addresses passed as props
 
-export function ModuleStatus() {
+export function ModuleStatus({ moduleAddress, safeAddress }: { moduleAddress: `0x${string}`; safeAddress: `0x${string}` }) {
   const { data: paused } = useReadContract({
-    address: MODULE_ADDRESS,
+    address: moduleAddress,
     abi,
     functionName: "paused",
   });
 
   useReadContract({
-    address: MODULE_ADDRESS,
+    address: moduleAddress,
     abi,
     functionName: "safe",
   });
@@ -70,7 +70,7 @@ export function ModuleStatus() {
             className="font-mono"
             style={{ fontSize: "0.8rem", color: "var(--accent-blue)" }}
           >
-            {MODULE_ADDRESS.slice(0, 6)}...{MODULE_ADDRESS.slice(-4)}
+            {moduleAddress.slice(0, 6)}...{moduleAddress.slice(-4)}
           </code>
 
           <div
@@ -87,7 +87,7 @@ export function ModuleStatus() {
             className="font-mono"
             style={{ fontSize: "0.8rem", color: "var(--accent-blue)" }}
           >
-            {SAFE_ADDRESS.slice(0, 6)}...{SAFE_ADDRESS.slice(-4)}
+            {safeAddress.slice(0, 6)}...{safeAddress.slice(-4)}
           </code>
         </div>
       </div>

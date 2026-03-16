@@ -1,10 +1,11 @@
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { encodeFunctionData } from "viem";
 import abi from "../abi.json";
-import { MODULE_ADDRESS } from "../config";
+import mockSafeAbi from "../abi-mocksafe.json";
 
-export function PauseButton() {
+export function PauseButton({ moduleAddress, safeAddress }: { moduleAddress: `0x${string}`; safeAddress: `0x${string}` }) {
   const { data: paused } = useReadContract({
-    address: MODULE_ADDRESS,
+    address: moduleAddress,
     abi,
     functionName: "paused",
   });
@@ -13,11 +14,16 @@ export function PauseButton() {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
   const handleTogglePause = () => {
-    writeContract({
-      address: MODULE_ADDRESS,
+    const pauseCalldata = encodeFunctionData({
       abi,
       functionName: "setPaused",
       args: [!paused],
+    });
+    writeContract({
+      address: safeAddress,
+      abi: mockSafeAbi.abi,
+      functionName: "callModule",
+      args: [moduleAddress, pauseCalldata],
     });
   };
 
