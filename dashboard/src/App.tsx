@@ -683,6 +683,170 @@ function App() {
               </Reveal>
             </section>
 
+            {/* ── YIELD VAULT (Lido) ── */}
+            {chainMode === "evm" && (
+            <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
+              <Reveal>
+                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+                  <div className="section-divider" />
+                  <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
+                    Yield-only budgets
+                  </h3>
+                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0, maxWidth: 560, marginLeft: "auto", marginRight: "auto" }}>
+                    Deposit wstETH as principal. Your agent spends only the yield. Principal is locked — the contract enforces it.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={100}>
+                <div className="glass-card" style={{ padding: "2.5rem" }}>
+                  <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
+                    {/* Principal locked */}
+                    <div style={{ flex: "1 1 200px" }}>
+                      <div style={{
+                        fontSize: "0.65rem", color: "#00ff88", textTransform: "uppercase",
+                        letterSpacing: "0.12em", fontWeight: 700, marginBottom: "0.75rem",
+                      }}>Principal</div>
+                      <div style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "0.25rem" }}>
+                        5.0 <span style={{ fontSize: "1rem", color: "#6b6b80" }}>wstETH</span>
+                      </div>
+                      <div style={{
+                        display: "inline-flex", alignItems: "center", gap: "0.4rem",
+                        padding: "0.3rem 0.75rem", borderRadius: 8,
+                        background: "rgba(0,255,136,0.06)", border: "1px solid rgba(0,255,136,0.15)",
+                        fontSize: "0.7rem", color: "#00ff88", fontWeight: 600,
+                      }}>
+                        🔒 LOCKED — agent cannot touch
+                      </div>
+                    </div>
+                    {/* Yield available */}
+                    <div style={{ flex: "1 1 200px" }}>
+                      <div style={{
+                        fontSize: "0.65rem", color: "#4488ff", textTransform: "uppercase",
+                        letterSpacing: "0.12em", fontWeight: 700, marginBottom: "0.75rem",
+                      }}>Available Yield</div>
+                      <div style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "0.25rem" }}>
+                        0.25 <span style={{ fontSize: "1rem", color: "#6b6b80" }}>wstETH</span>
+                      </div>
+                      <div style={{
+                        display: "inline-flex", alignItems: "center", gap: "0.4rem",
+                        padding: "0.3rem 0.75rem", borderRadius: 8,
+                        background: "rgba(68,136,255,0.06)", border: "1px solid rgba(68,136,255,0.15)",
+                        fontSize: "0.7rem", color: "#4488ff", fontWeight: 600,
+                      }}>
+                        💰 Agent spending budget
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    marginTop: "2rem", display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem",
+                  }}>
+                    {[
+                      { icon: "⛔", label: "Per-tx cap", value: "0.05 wstETH" },
+                      { icon: "📊", label: "Daily cap", value: "0.1 wstETH" },
+                      { icon: "👥", label: "Recipient whitelist", value: "Enforced" },
+                      { icon: "🔴", label: "Kill switch", value: "One tx" },
+                    ].map(item => (
+                      <div key={item.label} style={{
+                        padding: "0.75rem 1rem", borderRadius: 12,
+                        background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)",
+                        display: "flex", alignItems: "center", gap: "0.6rem",
+                      }}>
+                        <span style={{ fontSize: "1.1rem" }}>{item.icon}</span>
+                        <div>
+                          <div style={{ fontSize: "0.65rem", color: "#6b6b80" }}>{item.label}</div>
+                          <div style={{ fontSize: "0.8rem", fontWeight: 600 }}>{item.value}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{
+                    marginTop: "1.5rem", textAlign: "center",
+                    fontSize: "0.75rem", color: "#6b6b80",
+                  }}>
+                    Deployed on Sepolia:{" "}
+                    <a href="https://sepolia.etherscan.io/address/0xB55d7C3872d7ab121D3372E8A8e2A08609ce0150"
+                      target="_blank" rel="noopener noreferrer"
+                      style={{ color: "#4488ff", textDecoration: "none", fontFamily: "'JetBrains Mono', monospace" }}>
+                      0xB55d...0150
+                    </a>
+                    {" · "}27 tests passing
+                  </div>
+                </div>
+              </Reveal>
+            </section>
+            )}
+
+            {/* ── LOCUS INTEGRATION ── */}
+            {chainMode === "evm" && (
+            <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
+              <Reveal>
+                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+                  <div className="section-divider" />
+                  <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
+                    Scoped payments
+                  </h3>
+                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0, maxWidth: 560, marginLeft: "auto", marginRight: "auto" }}>
+                    AgentScope enforces the WHAT. <a href="https://paywithlocus.com" target="_blank" rel="noopener noreferrer" style={{ color: "#4488ff", textDecoration: "none" }}>Locus</a> handles the HOW. Policy checks run before every payment.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={100}>
+                <div className="glass-card" style={{ padding: "2.5rem" }}>
+                  <div style={{
+                    display: "grid", gridTemplateColumns: "1fr 1fr",
+                    gap: "1rem", marginBottom: "1.5rem",
+                  }}>
+                    {/* Policy side */}
+                    <div style={{
+                      padding: "1.5rem", borderRadius: 16,
+                      background: "rgba(0,255,136,0.03)", border: "1px solid rgba(0,255,136,0.1)",
+                    }}>
+                      <div style={{
+                        fontSize: "0.65rem", color: "#00ff88", textTransform: "uppercase",
+                        letterSpacing: "0.12em", fontWeight: 700, marginBottom: "1rem",
+                      }}>AgentScope Policy</div>
+                      <div style={{ fontSize: "0.8rem", lineHeight: 2, color: "#f0f0f5" }}>
+                        <div>Daily budget: <strong>25 USDC</strong></div>
+                        <div>Per-tx limit: <strong>10 USDC</strong></div>
+                        <div>Categories: <strong>api, transfer</strong></div>
+                        <div>Memo: <strong>required</strong></div>
+                      </div>
+                    </div>
+                    {/* Execution side */}
+                    <div style={{
+                      padding: "1.5rem", borderRadius: 16,
+                      background: "rgba(68,136,255,0.03)", border: "1px solid rgba(68,136,255,0.1)",
+                    }}>
+                      <div style={{
+                        fontSize: "0.65rem", color: "#4488ff", textTransform: "uppercase",
+                        letterSpacing: "0.12em", fontWeight: 700, marginBottom: "1rem",
+                      }}>Locus Execution</div>
+                      <div style={{ fontSize: "0.8rem", lineHeight: 2, color: "#f0f0f5" }}>
+                        <div>✅ Firecrawl API — 2.50 USDC</div>
+                        <div>✅ Venice inference — 5.00 USDC</div>
+                        <div>✅ Contractor — 8.00 USDC</div>
+                        <div style={{ color: "#ff3366" }}>🚫 15 USDC tx — blocked</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    padding: "1rem 1.5rem", borderRadius: 12,
+                    background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)",
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    fontSize: "0.8rem",
+                  }}>
+                    <span style={{ color: "#6b6b80" }}>Budget spent: 15.50 / 25 USDC</span>
+                    <span style={{ color: "#00ff88", fontWeight: 600 }}>3 approved · 4 blocked</span>
+                  </div>
+                </div>
+              </Reveal>
+            </section>
+            )}
+
             {/* ── ERC-8004 (EVM only) ── */}
             {chainMode === "evm" && (
             <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
