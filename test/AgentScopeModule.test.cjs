@@ -729,6 +729,55 @@ describe("AgentScopeModule", function () {
       expect(reason).to.equal("function_not_whitelisted");
     });
 
+    it("checkPermission returns token_limit_exceeded for over-limit ERC20 transfer", async function () {
+      // Deploy a mock ERC20 token to use as the "contract" target
+      const MockERC20 = await ethers.getContractFactory("MockERC20");
+      const token = await MockERC20.deploy("Test Token", "TEST");
+      await token.waitForDeployment();
+      const tokenAddr = await token.getAddress();
+
+      // Set agent policy
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0, [], [],
+        ])
+      );
+
+      // Set a token allowance of 100 tokens (100e18)
+      const allowance = ethers.parseEther("100");
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setTokenAllowance", [
+          agent.address, tokenAddr, allowance,
+        ])
+      );
+
+      // Build transfer(address,uint256) calldata for 200 tokens (over limit)
+      const overAmount = ethers.parseEther("200");
+      const transferData = token.interface.encodeFunctionData("transfer", [
+        randomContract.address,
+        overAmount,
+      ]);
+
+      const [allowed, reason] = await module.checkPermission(
+        agent.address, tokenAddr, 0, transferData
+      );
+      expect(allowed).to.be.false;
+      expect(reason).to.equal("token_limit_exceeded");
+
+      // Within-limit transfer should be allowed
+      const okAmount = ethers.parseEther("50");
+      const okData = token.interface.encodeFunctionData("transfer", [
+        randomContract.address,
+        okAmount,
+      ]);
+      const [allowed2] = await module.checkPermission(
+        agent.address, tokenAddr, 0, okData
+      );
+      expect(allowed2).to.be.true;
+    });
+
     it("two agents should have independent budgets", async function () {
       const budget = HALF_ETH;
 

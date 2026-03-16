@@ -458,6 +458,34 @@ contract AgentScopeModule {
             if (value > remaining) return (false, "daily_limit_exceeded");
         }
 
+        // Token allowance check
+        if (data.length >= 68) {
+            bytes4 sel = bytes4(data[:4]);
+            if (sel == 0xa9059cbb || sel == 0x095ea7b3) {
+                uint256 tokenAmount = abi.decode(data[36:68], (uint256));
+                uint256 allowance_ = tokenAllowances[agent][to];
+                if (allowance_ > 0) {
+                    uint256 tSpent = tokenSpent[agent][to];
+                    if (block.timestamp >= tokenWindowStart[agent][to] + 24 hours) {
+                        tSpent = 0;
+                    }
+                    uint256 tokenRemaining = allowance_ > tSpent ? allowance_ - tSpent : 0;
+                    if (tokenAmount > tokenRemaining) return (false, "token_limit_exceeded");
+                }
+            } else if (sel == 0x23b872dd && data.length >= 100) {
+                uint256 tokenAmount = abi.decode(data[68:100], (uint256));
+                uint256 allowance_ = tokenAllowances[agent][to];
+                if (allowance_ > 0) {
+                    uint256 tSpent = tokenSpent[agent][to];
+                    if (block.timestamp >= tokenWindowStart[agent][to] + 24 hours) {
+                        tSpent = 0;
+                    }
+                    uint256 tokenRemaining = allowance_ > tSpent ? allowance_ - tSpent : 0;
+                    if (tokenAmount > tokenRemaining) return (false, "token_limit_exceeded");
+                }
+            }
+        }
+
         return (true, "");
     }
 }
