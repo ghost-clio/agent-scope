@@ -424,7 +424,7 @@ function App() {
               {(chainMode === "evm" ? [
                 { label: "Policy checks", value: 8420, suffix: "+" },
                 { label: "Lines of Solidity", value: 847 },
-                { label: "Unit tests", value: 113 },
+                { label: "Unit tests", value: 140 },
                 { label: "Violations caught", value: 312 },
               ] : [
                 { label: "Instructions", value: 11 },
