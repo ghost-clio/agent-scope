@@ -4,7 +4,7 @@
 
 On-chain spending policies for AI agent wallets. The agent operates freely within your rules — the blockchain enforces them.
 
-> [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
+> [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments) · [**For Judges →**](./JUDGES.md)
 
 [![Tests](https://img.shields.io/badge/tests-148%20passing-brightgreen)](#tests)
 [![Chains](https://img.shields.io/badge/chains-14%20testnets-blue)](#deployments)
@@ -132,7 +132,7 @@ L2 mainnet deployments scheduled for March 20.
 contracts/          Solidity — AgentScopeModule, YieldVault, enforcers, ENS bridge
 solana/             Anchor — AgentScope Solana program
 sdk/                TypeScript — client, middleware, Locus integration
-policy/             ASP-1 policy language — compiler, schema, templates
+policy/             ASP-1 policy language — compiler, schema, 6 example policies
 spec/               Protocol specification (ASP-1)
 dashboard/          React dashboard (live on GitHub Pages)
 demo/               5 CLI demos

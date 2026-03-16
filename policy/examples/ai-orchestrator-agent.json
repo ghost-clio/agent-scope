@@ -1,0 +1,143 @@
+{
+  "$schema": "https://agentscope.dev/schema/asp-1.json",
+  "version": "1.0.0",
+  "meta": {
+    "name": "AI Orchestrator Agent",
+    "description": "A meta-agent that manages payments to downstream AI services and data providers. Enforces per-service budgets, requires memo fields for auditability, and blocks any payment to unregistered recipients. Purpose-built for multi-agent economic coordination.",
+    "template": "ai-orchestrator",
+    "useCase": "Parent agent pays child agents for compute, data, and inference — all within strict per-category limits"
+  },
+  "agent": {
+    "address": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+    "identity": {
+      "ens": "orchestrator.agent.eth",
+      "erc8004": "0x00000000000000000000000000000007",
+      "description": "Multi-agent coordinator — routes payments to downstream AI workers within policy"
+    }
+  },
+  "scope": {
+    "chains": ["base", "optimism", "ethereum"],
+    "wallet": {
+      "type": "safe",
+      "address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "moduleAddress": "0x0d0034c6AC4640463bf480cB07BE770b08Bef811"
+    }
+  },
+  "permissions": {
+    "spending": {
+      "native": {
+        "dailyLimit": "0.2 ETH",
+        "perTransaction": "0.01 ETH",
+        "windowType": "rolling-24h",
+        "note": "Primarily for gas; main budget is in USDC"
+      },
+      "tokens": [
+        {
+          "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "symbol": "USDC",
+          "chain": "base",
+          "dailyLimit": "100",
+          "perTransactionLimit": "10",
+          "decimals": 6,
+          "note": "Primary payment token for downstream services"
+        }
+      ],
+      "categories": {
+        "inference": {
+          "dailyLimit": "40 USDC",
+          "allowedRecipients": ["venice", "openrouter", "registered-erc8004-agents"],
+          "requiresMemo": true
+        },
+        "data": {
+          "dailyLimit": "25 USDC",
+          "allowedRecipients": ["coingecko", "the-graph", "registered-erc8004-agents"],
+          "requiresMemo": true
+        },
+        "compute": {
+          "dailyLimit": "35 USDC",
+          "allowedRecipients": ["registered-erc8004-agents"],
+          "requiresMemo": true
+        }
+      }
+    },
+    "contracts": {
+      "mode": "whitelist",
+      "allowed": [
+        {
+          "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "name": "USDC on Base",
+          "description": "Native USDC — payment token for downstream agent work",
+          "chain": "base"
+        },
+        {
+          "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+          "name": "USDC on Polygon",
+          "description": "USDC for Polygon-based services",
+          "chain": "polygon"
+        },
+        {
+          "address": "0x0000000000000000000000000000000000000001",
+          "name": "x402 Payment Gateway",
+          "description": "HTTP-native micropayments for AI service providers",
+          "chain": "base",
+          "note": "Enables RFC-style HTTP 402 Payment Required flows"
+        }
+      ]
+    },
+    "functions": {
+      "mode": "whitelist",
+      "allowed": [
+        {
+          "selector": "0xa9059cbb",
+          "name": "transfer(address,uint256)",
+          "description": "USDC transfer to registered agent or service"
+        },
+        {
+          "selector": "0x23b872dd",
+          "name": "transferFrom(address,address,uint256)",
+          "description": "Pull-based payment from approved upstream"
+        }
+      ],
+      "blocked": [
+        {
+          "selector": "0x095ea7b3",
+          "name": "approve(address,uint256)",
+          "reason": "Open-ended approvals not permitted — each payment must be explicit and bounded"
+        }
+      ]
+    }
+  },
+  "recipients": {
+    "mode": "erc8004-registry",
+    "registryChain": "base",
+    "fallback": "block",
+    "note": "Payments only to ERC-8004 registered agents or explicitly whitelisted addresses. Prevents misdirected funds in multi-agent swarms."
+  },
+  "session": {
+    "expiry": "24h",
+    "renewalRequiresHumanApproval": false,
+    "autoRenew": true,
+    "maxAutoRenewals": 30,
+    "note": "Long-running orchestrator renews automatically within budget. Human reviews monthly."
+  },
+  "escalation": {
+    "onBudgetExhausted": "pause-and-notify",
+    "onUnknownRecipient": "block-and-log",
+    "onViolation": "block-and-notify"
+  },
+  "auditability": {
+    "requireMemoForAllTransactions": true,
+    "logDownstreamJobId": true,
+    "logUpstreamRequest": true,
+    "publicLog": true
+  },
+  "useCases": [
+    "Multi-agent pipeline: orchestrator pays Venice for inference, The Graph for data, downstream specialist agents for subtasks — all bounded by per-category daily budgets",
+    "AI marketplace client: agent autonomously purchases compute from the cheapest registered ERC-8004 providers, capped at $35/day",
+    "Research agent: pays data APIs and inference services for automated research tasks, with full audit trail per job ID",
+    "Composable with x402: agent receives HTTP 402 responses and pays inline for API access — no human needed, no open approval"
+  ],
+  "composability": {
+    "note": "This policy is designed to nest. The AI Orchestrator itself can be a downstream recipient of a higher-level orchestrator, with its own bounded budget. AgentScope policies compose recursively — each layer enforced by separate on-chain module."
+  }
+}
