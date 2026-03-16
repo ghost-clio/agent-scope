@@ -10,7 +10,7 @@ On-chain spending policies for AI agent wallets. One protocol. Every chain. The 
 >
 > 📄 **Spec:** [ASP-1 Protocol](./spec/ASP-1.md) — chain-agnostic standard for agent constraints
 >
-> 🧪 **96 tests passing** | 🏗️ Safe Module | 🔗 MetaMask Delegation | 🆔 ERC-8004 ENS Bridge
+> 🧪 **113 tests passing** (96 EVM + 17 Solana) | 🏗️ Safe Module | ◎ Anchor Program | 🔗 MetaMask Delegation | 🆔 ERC-8004 ENS Bridge
 
 ## The Problem
 
@@ -218,9 +218,15 @@ node demo/venice-demo.cjs
 ## Quick Start
 
 ```bash
+# EVM
 npm install
 npx hardhat compile
 npx hardhat test          # 96 tests — all passing
+
+# Solana
+cd solana/agent-scope-solana
+anchor build --no-idl
+anchor test --skip-build  # 17 tests — all passing
 ```
 
 ### Run the Dashboard
@@ -337,13 +343,89 @@ Agent-to-agent commerce needs identity. When `treasury.eth` wants to delegate fu
 
 **26 tests passing** — registration, reverse lookup, capabilities, access control, edge cases.
 
-## Why Ethereum?
+## Solana Program
+
+AgentScope isn't EVM-only. The Solana implementation provides **full feature parity** — same protocol (ASP-1), native Solana architecture.
+
+```
+┌──────────────┐     ┌─────────────────────┐     ┌──────────────┐
+│    HUMAN     │────▸│   AgentScope PDA     │────▸│  PDA VAULT   │
+│  (Owner)     │     │                       │     │   (Funds)    │
+│              │     │  ┌─────────────────┐ │     │              │
+│ Sets policy: │     │  │  Policy PDA      │ │     │  CPI only    │
+│ • 5 SOL/day  │     │  │  ✓ Spend limit   │ │     │  if policy   │
+│ • Raydium    │     │  │  ✓ Program list  │ │     │  allows      │
+│   only       │     │  │  ✓ Discriminator │ │     │              │
+│ • swap() only│     │  │  ✓ Session expiry│ │     │              │
+│ • Expires 24h│     │  └─────────────────┘ │     │              │
+└──────────────┘     └─────────────────────┘     └──────────────┘
+```
+
+### Features (EVM Parity)
+
+| Feature | EVM (Safe Module) | Solana (Anchor Program) |
+|---------|-------------------|------------------------|
+| Vault/Safe | Safe multisig | PDA vault |
+| Daily spend limits | ETH (wei) | SOL (lamports) |
+| Per-tx limits | ✅ | ✅ |
+| Contract/Program whitelist | Address array | Pubkey array |
+| Function filtering | bytes4 selectors | 8-byte discriminators |
+| Token allowances | ERC20 limits | SPL token limits |
+| Cross-program execution | Safe `execTransactionFromModule` | CPI with PDA signing |
+| Agent-to-agent verification | `getAgentScope()` view | `get_agent_scope` + events |
+| Emergency pause | `setPaused(true)` | `set_paused(true)` |
+| Session expiry | Unix timestamp | Unix timestamp |
+| Revocation | One-tx | One-tx |
+
+### Quick Start (Solana)
+
+```bash
+cd solana/agent-scope-solana
+anchor build --no-idl
+anchor test --skip-build   # 17 tests — all passing
+```
+
+### Usage
+
+```typescript
+// Initialize vault
+await program.methods.initializeVault()
+  .accounts({ vault: vaultPda, owner: owner.publicKey })
+  .signers([owner])
+  .rpc();
+
+// Set agent policy
+await program.methods.setAgentPolicy(
+  new BN(5_000_000_000),    // 5 SOL daily limit
+  new BN(1_000_000_000),    // 1 SOL per-tx limit
+  new BN(expiry),           // session expiry (unix)
+  [raydiumProgram],         // allowed programs
+  [swapDiscriminator],      // allowed instruction discriminators
+)
+  .accounts({ vault: vaultPda, policy: policyPda, owner: owner.publicKey, agent: agent.publicKey })
+  .signers([owner])
+  .rpc();
+
+// Agent executes transfer within policy
+await program.methods.executeTransfer(new BN(500_000_000)) // 0.5 SOL
+  .accounts({ vault: vaultPda, policy: policyPda, agent: agent.publicKey, recipient })
+  .signers([agent])
+  .rpc();
+```
+
+### Why Solana Too?
+
+AgentScope is a **protocol**, not a product. If agent constraints only exist on EVM, the first Solana agent that manages real money has zero protection. The spec (ASP-1) is chain-agnostic — the Solana implementation proves it's not just words.
+
+**17 tests verify:** vault lifecycle, policy CRUD, spend enforcement (daily + per-tx), program whitelists, discriminator filtering, pause/unpause, revocation, access control.
+
+## Why On-Chain?
 
 > "Don't trust, verify."
 
 Every other agent permission system is a social contract — "please behave." AgentScope makes it a mathematical contract. The agent literally cannot exceed its scope. The contract reverts. Doesn't matter if the agent wants to, if it's compromised, if it hallucinates. The math says no.
 
-That's the whole Ethereum thesis applied to AI agents.
+That's the whole thesis applied to AI agents. On Ethereum. On Solana. On any chain that runs code.
 
 ## SDK
 
@@ -599,12 +681,13 @@ AgentScope is designed to plug into any wallet or agent framework:
 ```
 agent-scope/
 ├── contracts/          # Solidity — AgentScopeModule, enforcers, ENS bridge
+├── solana/             # Anchor — AgentScope Solana program (11 instructions, 17 tests)
 ├── sdk/                # TypeScript SDK — client, middleware, Venice agent
 ├── policy/             # ASP-1 policy language — compiler, schema, templates
 ├── spec/               # Protocol specification (ASP-1)
-├── dashboard/          # React dashboard — live on GitHub Pages
-├── demo/               # CLI demos — jailbreak, tweet-to-policy
-└── test/               # 96 tests — contract, enforcers, ENS bridge, policy compiler
+├── dashboard/          # React dashboard — live on GitHub Pages (EVM/Solana toggle)
+├── demo/               # CLI demos — jailbreak, tweet-to-policy, Venice
+└── test/               # 113 tests — EVM contracts, enforcers, ENS bridge, Solana program
 ```
 
 ## Built By
