@@ -15,6 +15,6 @@ export function setAddresses(module: `0x${string}`, safe: `0x${string}`) {
 
 export const config = getDefaultConfig({
   appName: "AgentScope",
-  projectId: "agentscope-dashboard",
+  projectId: "338943d2f18d0bfcad8c276a12a52107",
   chains: [sepolia],
 });
