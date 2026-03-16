@@ -48,6 +48,7 @@ contract AgentYieldVault is ReentrancyGuard {
 
     // Whitelist
     bool public whitelistEnabled;
+    uint256 public activeRecipientCount;
     address[] public allowedRecipients;
     mapping(address => bool) public isAllowedRecipient;
 
@@ -180,6 +181,7 @@ contract AgentYieldVault is ReentrancyGuard {
         if (!isAllowedRecipient[recipient]) {
             isAllowedRecipient[recipient] = true;
             allowedRecipients.push(recipient);
+            activeRecipientCount++;
             whitelistEnabled = true;
             emit RecipientAdded(recipient);
         }
@@ -189,6 +191,12 @@ contract AgentYieldVault is ReentrancyGuard {
         if (isAllowedRecipient[recipient]) {
             isAllowedRecipient[recipient] = false;
             // Don't bother removing from array — check mapping
+            if (activeRecipientCount > 0) {
+                activeRecipientCount--;
+            }
+            if (activeRecipientCount == 0) {
+                whitelistEnabled = false;
+            }
             emit RecipientRemoved(recipient);
         }
     }

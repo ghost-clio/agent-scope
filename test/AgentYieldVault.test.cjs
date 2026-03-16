@@ -257,6 +257,28 @@ describe("AgentYieldVault", function () {
       await vault.connect(agent).spendYield(recipient.address, ethers.parseEther("0.1"));
       expect(await mockToken.balanceOf(recipient.address)).to.equal(ethers.parseEther("0.1"));
     });
+
+    it("should auto-disable whitelist when last recipient is removed", async function () {
+      // Add two recipients — whitelist should be enabled
+      await vault.addRecipient(recipient.address);
+      await vault.addRecipient(outsider.address);
+      expect(await vault.whitelistEnabled()).to.be.true;
+      expect(await vault.activeRecipientCount()).to.equal(2);
+
+      // Remove one — whitelist stays enabled
+      await vault.removeRecipient(recipient.address);
+      expect(await vault.whitelistEnabled()).to.be.true;
+      expect(await vault.activeRecipientCount()).to.equal(1);
+
+      // Remove last — whitelist should disable automatically
+      await vault.removeRecipient(outsider.address);
+      expect(await vault.whitelistEnabled()).to.be.false;
+      expect(await vault.activeRecipientCount()).to.equal(0);
+
+      // Agent should now be able to send to any address
+      await vault.connect(agent).spendYield(outsider.address, ethers.parseEther("0.1"));
+      expect(await mockToken.balanceOf(outsider.address)).to.equal(ethers.parseEther("0.1"));
+    });
   });
 
   describe("Vault status", function () {
