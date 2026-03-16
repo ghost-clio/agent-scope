@@ -163,16 +163,18 @@ function DemoEventFeed() {
    ANIMATED STAT COUNTER
    ═══════════════════════════════════════════════ */
 function AnimatedStat({ label, value, suffix = "" }: { label: string; value: number; suffix?: string }) {
-  const [display, setDisplay] = useState(0);
+  const [display, setDisplay] = useState(value); // Start with real value (for agent judges / screenshots)
   const ref = useRef<HTMLDivElement>(null);
   const started = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Reset to 0 then animate up when scrolled into view
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !started.current) {
         started.current = true;
+        setDisplay(0); // Reset to animate from 0
         const duration = 1800;
         const start = performance.now();
         const step = (now: number) => {
