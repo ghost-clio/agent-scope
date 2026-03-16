@@ -4,7 +4,7 @@
 
 On-chain spending policies for AI agent wallets. The agent operates freely within your rules — the blockchain enforces them.
 
-> [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments) · [**For Judges →**](./JUDGES.md)
+> [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
 
 [![Tests](https://img.shields.io/badge/tests-165%20passing-brightgreen)](#tests)
 [![Chains](https://img.shields.io/badge/chains-14%20testnets-blue)](#deployments)

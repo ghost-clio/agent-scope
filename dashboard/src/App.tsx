@@ -165,7 +165,7 @@ function DemoEventFeed() {
    ANIMATED STAT COUNTER
    ═══════════════════════════════════════════════ */
 function AnimatedStat({ label, value, suffix = "" }: { label: string; value: number; suffix?: string }) {
-  const [display, setDisplay] = useState(value); // Start with real value (for agent judges / screenshots)
+  const [display, setDisplay] = useState(value); // Start with real value on initial render
   const ref = useRef<HTMLDivElement>(null);
   const started = useRef(false);
 
