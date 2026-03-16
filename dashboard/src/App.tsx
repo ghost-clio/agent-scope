@@ -645,6 +645,91 @@ function App() {
               </Reveal>
             </section>
 
+            {/* ── VENICE INTEGRATION ── */}
+            {chainMode === "evm" && (
+            <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
+              <Reveal>
+                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+                  <div className="section-divider" />
+                  <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
+                    Private reasoning.<br />Public receipts.
+                  </h3>
+                  <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0, maxWidth: 560, marginLeft: "auto", marginRight: "auto" }}>
+                    Your agent thinks in private via <a href="https://venice.ai" target="_blank" rel="noopener noreferrer" style={{ color: "#06d6d6", textDecoration: "none" }}>Venice.ai</a> — zero data retention. Its actions are enforced and auditable on-chain.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={100}>
+                <div className="glass-card" style={{ padding: "2.5rem" }}>
+                  <div style={{
+                    display: "flex", gap: "1rem", marginBottom: "1.5rem",
+                    flexWrap: "wrap",
+                  }}>
+                    {/* Private side */}
+                    <div style={{
+                      flex: "1 1 280px", padding: "1.5rem", borderRadius: 16,
+                      background: "rgba(6,214,214,0.03)", border: "1px solid rgba(6,214,214,0.12)",
+                      position: "relative", overflow: "hidden",
+                    }}>
+                      <div style={{
+                        position: "absolute", top: -20, right: -20,
+                        width: 100, height: 100, borderRadius: "50%",
+                        background: "rgba(6,214,214,0.05)", filter: "blur(30px)",
+                        pointerEvents: "none",
+                      }} />
+                      <div style={{
+                        fontSize: "0.65rem", color: "#06d6d6", textTransform: "uppercase",
+                        letterSpacing: "0.12em", fontWeight: 700, marginBottom: "1rem",
+                      }}>🔒 Private (Venice)</div>
+                      <div className="code-block" style={{
+                        fontSize: "0.75rem", padding: "1rem",
+                        background: "rgba(0,0,0,0.3)", borderRadius: 8,
+                        lineHeight: 1.8,
+                      }}>
+                        <div style={{ color: "#6b6b80" }}>// Agent's reasoning — NEVER stored</div>
+                        <div><span style={{ color: "#06d6d6" }}>analyze</span>({"{"} ETH: <span style={{ color: "#ffaa00" }}>$2,245</span>, trend: <span style={{ color: "#00ff88" }}>+5.9%</span> {"}"})</div>
+                        <div style={{ color: "#6b6b80" }}>→ "Strong momentum but overextended.</div>
+                        <div style={{ color: "#6b6b80" }}>   Reduce exposure by 10%."</div>
+                        <div><span style={{ color: "#ff3366" }}>// This reasoning is GONE.</span></div>
+                        <div><span style={{ color: "#ff3366" }}>// Venice ephemeral compute.</span></div>
+                      </div>
+                    </div>
+                    {/* Public side */}
+                    <div style={{
+                      flex: "1 1 280px", padding: "1.5rem", borderRadius: 16,
+                      background: "rgba(0,255,136,0.03)", border: "1px solid rgba(0,255,136,0.12)",
+                    }}>
+                      <div style={{
+                        fontSize: "0.65rem", color: "#00ff88", textTransform: "uppercase",
+                        letterSpacing: "0.12em", fontWeight: 700, marginBottom: "1rem",
+                      }}>📡 Public (On-Chain)</div>
+                      <div className="code-block" style={{
+                        fontSize: "0.75rem", padding: "1rem",
+                        background: "rgba(0,0,0,0.3)", borderRadius: 8,
+                        lineHeight: 1.8,
+                      }}>
+                        <div style={{ color: "#6b6b80" }}>// Agent's action — ALWAYS auditable</div>
+                        <div><span style={{ color: "#00ff88" }}>executeAsAgent</span>(</div>
+                        <div style={{ paddingLeft: "1rem" }}>uniswapRouter,</div>
+                        <div style={{ paddingLeft: "1rem" }}><span style={{ color: "#ffaa00" }}>0.05 ETH</span>,</div>
+                        <div style={{ paddingLeft: "1rem" }}>swapExactInput(ETH→USDC)</div>
+                        <div>)</div>
+                        <div><span style={{ color: "#00ff88" }}>// tx: 0xabc...def ✓</span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{
+                    textAlign: "center", fontSize: "0.8rem", color: "#6b6b80",
+                    padding: "0.75rem", borderRadius: 12,
+                    background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)",
+                  }}>
+                    You see <strong style={{ color: "#f0f0f5" }}>what</strong> happened on-chain. You never see <strong style={{ color: "#f0f0f5" }}>why</strong> — that stays in Venice's ephemeral compute.
+                  </div>
+                </div>
+              </Reveal>
+            </section>
+            )}
+
             {/* ── JAILBREAK DEMO ── */}
             <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 10rem" }}>
               <Reveal>

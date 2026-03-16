@@ -5,6 +5,17 @@
   "description": "AgentScope — Your agent can't rug you even if it wants to",
   "license": "MIT",
   "author": "clio_ghost",
+  "scripts": {
+    "test": "npx hardhat test",
+    "test:policy": "node --test policy/compiler.test.cjs",
+    "compile": "npx hardhat compile",
+    "demo:jailbreak": "node demo/jailbreak-demo.cjs",
+    "demo:policy": "node demo/tweet-to-policy-demo.cjs",
+    "demo:venice": "node demo/venice-demo.cjs",
+    "demo:vault": "node demo/yield-vault-demo.cjs",
+    "demo:locus": "node demo/locus-demo.cjs",
+    "dashboard": "cd dashboard && npm run dev"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.2",
     "hardhat": "^2.28.6",
