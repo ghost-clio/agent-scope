@@ -357,7 +357,7 @@ function App() {
                   fontSize: "0.75rem", color: "var(--accent-green)", marginBottom: "2rem", fontWeight: 500,
                 }}>
                   <span className="live-dot" />
-                  {chainMode === "evm" ? "Live on Sepolia · Safe Module" : "Anchor Program · Devnet Soon"}
+                  {chainMode === "evm" ? "Live on Sepolia · Safe Module" : "Anchor Program · 17 Tests Passing"}
                 </div>
               </Reveal>
 
