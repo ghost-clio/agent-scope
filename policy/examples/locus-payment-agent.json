@@ -1,0 +1,50 @@
+{
+  "$schema": "../schema.json",
+  "name": "Locus Payment Agent",
+  "description": "Agent that pays for APIs, services, and tasks through Locus — constrained by AgentScope policy. Budget, categories, and memo requirements enforced before any payment executes.",
+  "version": "1.0.0",
+  "chain": "base",
+  "integration": "locus",
+  "policy": {
+    "spendingLimits": {
+      "dailyLimit": "25 USDC",
+      "perTransactionLimit": "10 USDC",
+      "tokenAllowances": [
+        {
+          "token": "USDC",
+          "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "dailyLimit": "25000000"
+        }
+      ]
+    },
+    "allowedCategories": ["api", "transfer", "checkout"],
+    "blockedCategories": ["deploy"],
+    "contractWhitelist": [
+      {
+        "name": "Locus Payment API",
+        "endpoint": "https://beta-api.paywithlocus.com/api/pay/send",
+        "description": "USDC transfer via Locus smart wallet on Base"
+      },
+      {
+        "name": "Locus Wrapped APIs",
+        "endpoint": "https://beta-api.paywithlocus.com/api/wrapped/*",
+        "description": "Pay-per-use API marketplace (Firecrawl, OpenAI, etc.)"
+      },
+      {
+        "name": "Locus Checkout",
+        "endpoint": "https://beta-api.paywithlocus.com/api/checkout/*",
+        "description": "Stripe-style USDC checkout for services"
+      }
+    ],
+    "requireMemo": true,
+    "auditLog": true,
+    "sessionExpiry": "24h"
+  },
+  "useCases": [
+    "Agent pays for web scraping API calls (Firecrawl via Locus wrapped APIs)",
+    "Agent pays for private AI inference (Venice via Locus)",
+    "Agent transfers USDC to contractors for completed tasks",
+    "Agent processes checkout payments for SaaS subscriptions",
+    "All payments logged with reasoning — full audit trail"
+  ]
+}
