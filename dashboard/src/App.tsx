@@ -302,11 +302,14 @@ function App() {
             onMouseOut={e => (e.currentTarget.style.color = "#6b6b80")}>
             GitHub ↗
           </a>
-          <a href="https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811" target="_blank"
+          <a href={chainMode === "evm"
+              ? "https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811"
+              : "https://github.com/ghost-clio/agent-scope/tree/main/solana"}
+            target="_blank"
             style={{ color: "#6b6b80", fontSize: "0.8rem", textDecoration: "none", transition: "color 0.2s" }}
             onMouseOver={e => (e.currentTarget.style.color = "#f0f0f5")}
             onMouseOut={e => (e.currentTarget.style.color = "#6b6b80")}>
-            Contract ↗
+            {chainMode === "evm" ? "Contract ↗" : "Program ↗"}
           </a>
           <ConnectButton />
         </div>
@@ -776,9 +779,12 @@ function App() {
                 </a>{" "}
                 🌀
               </span>
-              <a href="https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811" target="_blank"
+              <a href={chainMode === "evm"
+                  ? "https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811"
+                  : "https://github.com/ghost-clio/agent-scope/tree/main/solana"}
+                target="_blank"
                 style={{ color: "rgba(107,107,128,0.5)", textDecoration: "none", fontFamily: "'JetBrains Mono', monospace", fontSize: "0.7rem" }}>
-                Sepolia: 0x0d003...f811
+                {chainMode === "evm" ? "Sepolia: 0x0d003...f811" : "Solana: 7K6qS...V8GK"}
               </a>
             </footer>
           </>
