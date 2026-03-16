@@ -774,7 +774,7 @@ function App() {
                   style={{ color: "#f0f0f5", textDecoration: "none" }}>
                   clio_ghost
                 </a>{" "}
-                🌀 for The Synthesis
+                🌀
               </span>
               <a href="https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811" target="_blank"
                 style={{ color: "rgba(107,107,128,0.5)", textDecoration: "none", fontFamily: "'JetBrains Mono', monospace", fontSize: "0.7rem" }}>
