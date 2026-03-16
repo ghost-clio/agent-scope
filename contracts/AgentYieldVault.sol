@@ -37,6 +37,7 @@ contract AgentYieldVault is ReentrancyGuard {
 
     // Principal tracking
     uint256 public principalShares;           // wstETH shares deposited as principal
+    uint256 public principalStETHValue;       // principal value in stETH terms at deposit time
     uint256 public totalWithdrawnYield;        // cumulative yield withdrawn by agent
 
     // Agent spending limits
@@ -46,6 +47,7 @@ contract AgentYieldVault is ReentrancyGuard {
     uint256 public lastResetTimestamp;         // start of current 24h window
 
     // Whitelist
+    bool public whitelistEnabled;
     address[] public allowedRecipients;
     mapping(address => bool) public isAllowedRecipient;
 
@@ -122,6 +124,11 @@ contract AgentYieldVault is ReentrancyGuard {
         yieldToken.safeTransferFrom(msg.sender, address(this), amount);
         principalShares += amount;
 
+        // Track principal value in stETH terms for accurate yield calculation
+        // wstETH is non-rebasing; yield accrues via exchange rate appreciation
+        uint256 snapshotRate = IWstETH(address(yieldToken)).stEthPerToken();
+        principalStETHValue += amount * snapshotRate / 1e18;
+
         emit PrincipalDeposited(msg.sender, amount, principalShares);
     }
 
@@ -131,6 +138,10 @@ contract AgentYieldVault is ReentrancyGuard {
      */
     function withdrawPrincipal(uint256 shares) external onlyOwner nonReentrant {
         require(shares <= principalShares, "Exceeds principal");
+        // Proportionally reduce the stETH value tracking
+        if (principalShares > 0) {
+            principalStETHValue -= (principalStETHValue * shares) / principalShares;
+        }
         principalShares -= shares;
         yieldToken.safeTransfer(owner, shares);
 
@@ -169,6 +180,7 @@ contract AgentYieldVault is ReentrancyGuard {
         if (!isAllowedRecipient[recipient]) {
             isAllowedRecipient[recipient] = true;
             allowedRecipients.push(recipient);
+            whitelistEnabled = true;
             emit RecipientAdded(recipient);
         }
     }
@@ -179,6 +191,11 @@ contract AgentYieldVault is ReentrancyGuard {
             // Don't bother removing from array — check mapping
             emit RecipientRemoved(recipient);
         }
+    }
+
+    /// @notice Disable recipient whitelist entirely, allowing any recipient
+    function disableWhitelist() external onlyOwner {
+        whitelistEnabled = false;
     }
 
     // ═══════════════════════════════════════════════════════
@@ -198,8 +215,8 @@ contract AgentYieldVault is ReentrancyGuard {
         if (amount == 0) revert ZeroAmount();
         if (recipient == address(0)) revert ZeroAddress();
 
-        // Check whitelist (empty = allow all)
-        if (allowedRecipients.length > 0 && !isAllowedRecipient[recipient]) {
+        // Check whitelist (disabled = allow all)
+        if (whitelistEnabled && !isAllowedRecipient[recipient]) {
             revert RecipientNotWhitelisted(recipient);
         }
 
@@ -248,14 +265,28 @@ contract AgentYieldVault is ReentrancyGuard {
 
     /**
      * @notice Yield available for agent to spend
-     * @dev Total balance minus principal = yield. Minus already withdrawn.
-     *      Since wstETH appreciates vs stETH, balance grows while
-     *      principalShares stays constant. The difference is yield.
+     * @dev For non-rebasing tokens like wstETH, yield = appreciation in exchange rate.
+     *      We track the stETH value of principal at deposit time. Current stETH value
+     *      minus original stETH value = yield in stETH terms, converted back to wstETH.
      */
     function availableYield() public view returns (uint256) {
         uint256 balance = totalBalance();
-        if (balance <= principalShares) return 0;
-        return balance - principalShares;
+        if (balance == 0 || principalShares == 0) return 0;
+
+        // Current stETH value of entire balance
+        uint256 currentRate = IWstETH(address(yieldToken)).stEthPerToken();
+        uint256 currentStETHValue = balance * currentRate / 1e18;
+
+        // Yield = current stETH value - principal stETH value, converted back to wstETH
+        if (currentStETHValue <= principalStETHValue) return 0;
+        uint256 yieldInStETH = currentStETHValue - principalStETHValue;
+
+        // Convert stETH yield back to wstETH: wstETH = stETH * 1e18 / rate
+        uint256 yieldInWstETH = yieldInStETH * 1e18 / currentRate;
+
+        // Cannot exceed balance minus principal shares (safety bound)
+        uint256 maxYield = balance > principalShares ? balance - principalShares : 0;
+        return yieldInWstETH > maxYield ? maxYield : yieldInWstETH;
     }
 
     /**

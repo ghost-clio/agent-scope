@@ -257,6 +257,28 @@ describe("AgentScopeModule", function () {
       expect(allowed).to.be.false;
       expect(reason).to.equal("cannot_target_module");
     });
+
+    it("should revert when agent targets the Safe itself", async function () {
+      // Agent tries to call the Safe directly — privilege escalation vector
+      await expect(
+        module.connect(agent).executeAsAgent(
+          await mockSafe.getAddress(),
+          0,
+          "0x"
+        )
+      ).to.be.revertedWithCustomError(module, "CannotTargetModule");
+    });
+
+    it("should block Safe-targeting in checkPermission", async function () {
+      const [allowed, reason] = await module.checkPermission(
+        agent.address,
+        await mockSafe.getAddress(),
+        0,
+        "0x"
+      );
+      expect(allowed).to.be.false;
+      expect(reason).to.equal("cannot_target_module");
+    });
   });
 
   describe("Token Allowance Enforcement", function () {

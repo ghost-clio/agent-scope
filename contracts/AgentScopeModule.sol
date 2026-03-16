@@ -130,6 +130,7 @@ contract AgentScopeModule {
 
     /// @param _safe The Safe this module serves
     constructor(address _safe) {
+        require(_safe != address(0), "zero address");
         safe = _safe;
     }
 
@@ -237,8 +238,8 @@ contract AgentScopeModule {
         uint256 value,
         bytes calldata data
     ) external whenNotPaused nonReentrant returns (bool success) {
-        // ── Check 0: Cannot target this module (prevents privilege escalation) ──
-        if (to == address(this)) revert CannotTargetModule();
+        // ── Check 0: Cannot target this module or the Safe (prevents privilege escalation) ──
+        if (to == address(this) || to == safe) revert CannotTargetModule();
 
         Policy storage policy = _policies[msg.sender];
 
@@ -247,14 +248,12 @@ contract AgentScopeModule {
 
         // ── Check 2: Session not expired ──
         if (policy.sessionExpiry != 0 && block.timestamp > policy.sessionExpiry) {
-            emit PolicyViolation(msg.sender, "session_expired");
             revert SessionExpired();
         }
 
         // ── Check 3: Contract whitelist (O(1) mapping lookup) ──
         if (_contractWhitelistEnabled[msg.sender]) {
             if (!_contractWhitelist[msg.sender][to]) {
-                emit PolicyViolation(msg.sender, "contract_not_whitelisted");
                 revert ContractNotWhitelisted(to);
             }
         }
@@ -263,7 +262,6 @@ contract AgentScopeModule {
         if (data.length >= 4 && _functionWhitelistEnabled[msg.sender]) {
             bytes4 selector = bytes4(data[:4]);
             if (!_functionWhitelist[msg.sender][selector]) {
-                emit PolicyViolation(msg.sender, "function_not_whitelisted");
                 revert FunctionNotWhitelisted(selector);
             }
         }
@@ -284,7 +282,6 @@ contract AgentScopeModule {
         // ── Check 6: Per-transaction ETH limit ──
         if (value > 0 && policy.maxPerTxWei > 0) {
             if (value > policy.maxPerTxWei) {
-                emit PolicyViolation(msg.sender, "per_tx_limit_exceeded");
                 revert PerTxLimitExceeded(value, policy.maxPerTxWei);
             }
         }
@@ -300,9 +297,8 @@ contract AgentScopeModule {
                 state.windowStart = block.timestamp;
             }
 
-            uint256 remaining = policy.dailySpendLimitWei - state.spent;
+            uint256 remaining = policy.dailySpendLimitWei > state.spent ? policy.dailySpendLimitWei - state.spent : 0;
             if (value > remaining) {
-                emit PolicyViolation(msg.sender, "daily_limit_exceeded");
                 revert DailyLimitExceeded(value, remaining);
             }
 
@@ -334,7 +330,7 @@ contract AgentScopeModule {
     function _enforceTokenLimit(address agent, address token, uint256 amount) internal {
         uint256 allowance = tokenAllowances[agent][token];
 
-        // If no allowance set (0), token is unrestricted
+        // NOTE: allowance of 0 means unrestricted. Use setTokenAllowance() to limit specific tokens.
         if (allowance == 0) return;
 
         // Reset window if 24h has passed
@@ -343,9 +339,8 @@ contract AgentScopeModule {
             tokenWindowStart[agent][token] = block.timestamp;
         }
 
-        uint256 tokenRemaining = allowance - tokenSpent[agent][token];
+        uint256 tokenRemaining = allowance > tokenSpent[agent][token] ? allowance - tokenSpent[agent][token] : 0;
         if (amount > tokenRemaining) {
-            emit PolicyViolation(agent, "token_limit_exceeded");
             revert TokenLimitExceeded(token, amount, tokenRemaining);
         }
 
@@ -406,11 +401,11 @@ contract AgentScopeModule {
         allowedContracts = _contractList[agent];
         allowedFunctions = _functionList[agent];
 
-        // Calculate remaining budget
+        // Calculate remaining budget (saturating subtraction to prevent underflow)
         if (block.timestamp >= state.windowStart + 24 hours) {
             remainingBudget = policy.dailySpendLimitWei; // Window reset
         } else {
-            remainingBudget = policy.dailySpendLimitWei - state.spent;
+            remainingBudget = policy.dailySpendLimitWei > state.spent ? policy.dailySpendLimitWei - state.spent : 0;
         }
     }
 
@@ -428,7 +423,7 @@ contract AgentScopeModule {
         bytes calldata data
     ) external view returns (bool allowed, string memory reason) {
         if (paused) return (false, "module_paused");
-        if (to == address(this)) return (false, "cannot_target_module");
+        if (to == address(this) || to == safe) return (false, "cannot_target_module");
 
         Policy storage policy = _policies[agent];
 
@@ -459,7 +454,7 @@ contract AgentScopeModule {
             if (block.timestamp >= state.windowStart + 24 hours) {
                 remaining = policy.dailySpendLimitWei;
             } else {
-                remaining = policy.dailySpendLimitWei - state.spent;
+                remaining = policy.dailySpendLimitWei > state.spent ? policy.dailySpendLimitWei - state.spent : 0;
             }
             if (value > remaining) return (false, "daily_limit_exceeded");
         }

@@ -128,6 +128,7 @@ contract ERC8004ENSBridge is Ownable {
 
     /// @param _ens Address of the ENS registry (0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e on mainnet)
     constructor(address _ens) Ownable(msg.sender) {
+        require(_ens != address(0), "zero address");
         ens = IENS(_ens);
     }
 
@@ -337,6 +338,7 @@ contract ERC8004ENSBridge is Ownable {
     }
 
     function withdraw() external onlyOwner {
-        payable(owner()).transfer(address(this).balance);
+        (bool ok,) = payable(owner()).call{value: address(this).balance}("");
+        require(ok, "withdraw failed");
     }
 }
