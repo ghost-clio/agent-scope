@@ -424,7 +424,7 @@ function App() {
             }}>
               {(chainMode === "evm" ? [
                 { label: "Testnet chains", value: 14 },
-                { label: "Lines of code", value: 8400, suffix: "+" },
+                { label: "Lines of code", value: 14800, suffix: "+" },
                 { label: "Unit tests", value: 140 },
                 { label: "Smart contracts", value: 4 },
               ] : [
