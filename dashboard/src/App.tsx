@@ -423,10 +423,10 @@ function App() {
               display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "2rem",
             }}>
               {(chainMode === "evm" ? [
-                { label: "Policy checks", value: 8420, suffix: "+" },
-                { label: "Lines of Solidity", value: 847 },
+                { label: "Testnet chains", value: 14 },
+                { label: "Lines of code", value: 8400, suffix: "+" },
                 { label: "Unit tests", value: 140 },
-                { label: "Violations caught", value: 312 },
+                { label: "Smart contracts", value: 4 },
               ] : [
                 { label: "Instructions", value: 11 },
                 { label: "Lines of Rust", value: 780 },
