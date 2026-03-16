@@ -153,7 +153,7 @@ pub mod agent_scope_solana {
         **ctx.accounts.recipient.to_account_info().try_borrow_mut_lamports()? += amount;
 
         // Track spend
-        policy.daily_spent = policy.daily_spent.checked_add(amount).unwrap();
+        policy.daily_spent = policy.daily_spent.checked_add(amount).ok_or(AgentScopeError::DailyLimitExceeded)?;
 
         emit!(Execution {
             vault: vault.key(),
@@ -223,8 +223,26 @@ pub mod agent_scope_solana {
                     );
 
                     // Token allowance enforcement: first remaining_account must be
-                    // the TokenAllowance PDA. We read/write it via raw data.
+                    // the TokenAllowance PDA. Validate it's the correct PDA before reading.
                     if let Some(token_allowance_info) = ctx.remaining_accounts.first() {
+                        // Validate PDA ownership and derivation
+                        require!(
+                            token_allowance_info.owner == &crate::ID,
+                            AgentScopeError::InvalidTokenAllowance
+                        );
+
+                        // Extract the mint from the account data (offset 72 = 8 disc + 32 vault + 32 agent)
+                        let data_ref = token_allowance_info.try_borrow_data()?;
+                        if data_ref.len() >= 104 {
+                            let stored_vault = Pubkey::try_from(&data_ref[8..40]).unwrap();
+                            let stored_agent = Pubkey::try_from(&data_ref[40..72]).unwrap();
+                            require!(
+                                stored_vault == vault.key() && stored_agent == policy.agent,
+                                AgentScopeError::InvalidTokenAllowance
+                            );
+                        }
+                        drop(data_ref);
+
                         let mut data = token_allowance_info.try_borrow_mut_data()?;
                         // Skip 8-byte discriminator + 32 vault + 32 agent + 32 mint = offset 104
                         // daily_limit: u64 at 104, daily_spent: u64 at 112, last_reset: i64 at 120
@@ -241,10 +259,10 @@ pub mod agent_scope_solana {
 
                             if daily_limit > 0 {
                                 require!(
-                                    daily_spent.checked_add(token_amount).unwrap() <= daily_limit,
+                                    daily_spent.checked_add(token_amount).ok_or(AgentScopeError::TokenLimitExceeded)? <= daily_limit,
                                     AgentScopeError::TokenLimitExceeded
                                 );
-                                daily_spent = daily_spent.checked_add(token_amount).unwrap();
+                                daily_spent = daily_spent.checked_add(token_amount).ok_or(AgentScopeError::TokenLimitExceeded)?;
                                 data[112..120].copy_from_slice(&daily_spent.to_le_bytes());
                             }
                         }
@@ -293,7 +311,7 @@ pub mod agent_scope_solana {
 
         // Track SOL spend
         if sol_amount > 0 {
-            policy.daily_spent = policy.daily_spent.checked_add(sol_amount).unwrap();
+            policy.daily_spent = policy.daily_spent.checked_add(sol_amount).ok_or(AgentScopeError::DailyLimitExceeded)?;
         }
 
         emit!(CpiExecution {
@@ -349,7 +367,7 @@ pub mod agent_scope_solana {
         }
 
         require!(
-            effective_spent.checked_add(amount).unwrap() <= policy.daily_limit_lamports,
+            effective_spent.checked_add(amount).ok_or(AgentScopeError::DailyLimitExceeded)? <= policy.daily_limit_lamports,
             AgentScopeError::DailyLimitExceeded
         );
 
@@ -506,7 +524,7 @@ fn enforce_policy(vault: &Vault, policy: &mut AgentPolicy, amount: u64) -> Resul
 
     // Check: daily limit
     require!(
-        policy.daily_spent.checked_add(amount).unwrap() <= policy.daily_limit_lamports,
+        policy.daily_spent.checked_add(amount).ok_or(AgentScopeError::DailyLimitExceeded)? <= policy.daily_limit_lamports,
         AgentScopeError::DailyLimitExceeded
     );
 
@@ -681,6 +699,7 @@ pub struct ExecuteTransfer<'info> {
         seeds = [b"policy", vault.key().as_ref(), agent.key().as_ref()],
         bump = policy.bump,
         has_one = vault,
+        has_one = agent,
     )]
     pub policy: Account<'info, AgentPolicy>,
     pub agent: Signer<'info>,
@@ -703,6 +722,7 @@ pub struct ExecuteCpi<'info> {
         seeds = [b"policy", vault.key().as_ref(), agent.key().as_ref()],
         bump = policy.bump,
         has_one = vault,
+        has_one = agent,
     )]
     pub policy: Account<'info, AgentPolicy>,
     pub agent: Signer<'info>,
@@ -901,4 +921,6 @@ pub enum AgentScopeError {
     CannotTargetVault,
     #[msg("SPL token daily limit exceeded")]
     TokenLimitExceeded,
+    #[msg("Invalid token allowance PDA: wrong owner, vault, or agent")]
+    InvalidTokenAllowance,
 }
