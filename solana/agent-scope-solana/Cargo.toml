@@ -4,6 +4,9 @@ members = [
 ]
 resolver = "2"
 
+[workspace.dependencies]
+proc-macro2 = "=1.0.98"
+
 [profile.release]
 overflow-checks = true
 lto = "fat"
