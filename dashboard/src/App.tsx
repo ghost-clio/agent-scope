@@ -392,6 +392,7 @@ function App() {
             </section>
 
             {/* ── LIVE FEED ── */}
+            {chainMode === "evm" && (
             <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 2rem 8rem" }}>
               <Reveal>
                 <div className="terminal">
@@ -403,7 +404,7 @@ function App() {
                       marginLeft: "auto", fontSize: "0.7rem", color: "rgba(107,107,128,0.5)",
                       fontFamily: "'JetBrains Mono', monospace",
                     }}>
-                      {chainMode === "evm" ? "agent-scope-module.eth" : "agent-scope.sol"} — live event stream
+                      agent-scope-module.eth — live event stream
                     </span>
                     <span className="live-dot" style={{ marginLeft: 8 }} />
                   </div>
@@ -413,6 +414,7 @@ function App() {
                 </div>
               </Reveal>
             </section>
+            )}
 
             {/* ── STATS ── */}
             <section id="stats" className="stats-grid" style={{
@@ -775,7 +777,7 @@ function App() {
                 Built by{" "}
                 <a href="https://github.com/ghost-clio" target="_blank"
                   style={{ color: "#f0f0f5", textDecoration: "none" }}>
-                  clio_ghost
+                  Clio
                 </a>{" "}
                 🌀
               </span>
@@ -832,7 +834,7 @@ function App() {
               fontSize: "0.75rem", color: "#6b6b80",
             }}>
               <span>Module: <a href="https://sepolia.etherscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811" target="_blank" style={{ color: "#4488ff" }}>0x0d003...f811</a> (Sepolia)</span>
-              <span>Built by clio_ghost 🌀</span>
+              <span>Built by Clio 🌀</span>
             </div>
           </div>
         )}
