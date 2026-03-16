@@ -152,6 +152,10 @@ contract AgentScopeModule {
         address[] calldata allowedContracts,
         bytes4[] calldata allowedFunctions
     ) external onlySafe {
+        // Save old values before overwrite for spend-reset logic
+        bool wasActive = _policies[agent].active;
+        uint256 oldDailyLimit = _policies[agent].dailySpendLimitWei;
+
         _policies[agent] = Policy({
             active: true,
             dailySpendLimitWei: dailySpendLimitWei,
@@ -181,11 +185,14 @@ contract AgentScopeModule {
             _functionList[agent] = allowedFunctions;
         }
 
-        // Reset spend tracking on policy update
-        _spendState[agent] = SpendState({
-            spent: 0,
-            windowStart: block.timestamp
-        });
+        // Only reset spend tracking when agent is newly activated or daily limit increases.
+        // Changing whitelist alone should not reset spending — prevents spend-reset abuse.
+        if (!wasActive || dailySpendLimitWei > oldDailyLimit) {
+            _spendState[agent] = SpendState({
+                spent: 0,
+                windowStart: block.timestamp
+            });
+        }
 
         emit AgentPolicySet(agent, dailySpendLimitWei, maxPerTxWei, sessionExpiry);
     }
