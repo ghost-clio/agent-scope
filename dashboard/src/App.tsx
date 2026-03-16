@@ -252,9 +252,9 @@ function ChainSwitch({ mode, onSwitch }: { mode: ChainMode; onSwitch: (m: ChainM
           {chain.id === "solana" && (
             <span style={{
               marginLeft: 4, fontSize: "0.5rem", padding: "1px 4px",
-              borderRadius: 4, background: "rgba(255,170,0,0.15)",
-              color: "#ffaa00", fontWeight: 700, verticalAlign: "middle",
-            }}>SOON</span>
+              borderRadius: 4, background: "rgba(153,69,255,0.15)",
+              color: "#9945FF", fontWeight: 700, verticalAlign: "middle",
+            }}>LIVE</span>
           )}
         </button>
       ))}
