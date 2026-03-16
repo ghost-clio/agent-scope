@@ -729,6 +729,61 @@ describe("AgentScopeModule", function () {
       expect(reason).to.equal("function_not_whitelisted");
     });
 
+    it("setAgentPolicy does NOT reset spend when limit unchanged (whitelist-only update)", async function () {
+      // Set policy with 1 ETH limit
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0, [], [],
+        ])
+      );
+
+      // Agent spends 0.5 ETH
+      await module.connect(agent).executeAsAgent(randomContract.address, HALF_ETH, "0x");
+
+      let scope = await module.getAgentScope(agent.address);
+      expect(scope.remainingBudget).to.equal(HALF_ETH); // 0.5 ETH spent
+
+      // Update policy with SAME limit, different whitelist — spend should NOT reset
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0, [randomContract.address], [],
+        ])
+      );
+
+      scope = await module.getAgentScope(agent.address);
+      expect(scope.remainingBudget).to.equal(HALF_ETH); // spend preserved
+    });
+
+    it("setAgentPolicy DOES reset spend when daily limit increases", async function () {
+      // Set policy with 1 ETH limit
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, ONE_ETH, 0, 0, [], [],
+        ])
+      );
+
+      // Agent spends 0.5 ETH
+      await module.connect(agent).executeAsAgent(randomContract.address, HALF_ETH, "0x");
+
+      let scope = await module.getAgentScope(agent.address);
+      expect(scope.remainingBudget).to.equal(HALF_ETH); // 0.5 ETH spent
+
+      // Update policy with HIGHER limit — spend should reset
+      const TWO_ETH = ethers.parseEther("2");
+      await mockSafe.callModule(
+        await module.getAddress(),
+        module.interface.encodeFunctionData("setAgentPolicy", [
+          agent.address, TWO_ETH, 0, 0, [], [],
+        ])
+      );
+
+      scope = await module.getAgentScope(agent.address);
+      expect(scope.remainingBudget).to.equal(TWO_ETH); // reset — fresh 2 ETH budget
+    });
+
     it("checkPermission returns token_limit_exceeded for over-limit ERC20 transfer", async function () {
       // Deploy a mock ERC20 token to use as the "contract" target
       const MockERC20 = await ethers.getContractFactory("MockERC20");
