@@ -10,7 +10,7 @@
     "totalToolCalls": 32,
     "totalErrors": 0,
     "totalDeployments": 14,
-    "totalTestsPassing": 140,
+    "totalTestsPassing": 151,
     "totalContractsDeployed": 4,
     "computeBudget": {
       "totalTokensUsed": 487000,
