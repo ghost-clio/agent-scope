@@ -6,8 +6,9 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 
 > [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
 
-[![Tests](https://img.shields.io/badge/tests-155%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](#tests)
 [![Chains](https://img.shields.io/badge/deployed-14%20testnets%20%2B%202%20mainnets-blue)](#deployments)
+[![Live Payments](https://img.shields.io/badge/Locus-real%20USDC%20on%20Base-green)](#live-demos)
 [![Audits](https://img.shields.io/badge/audits-4%20independent-orange)](#security)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
@@ -107,10 +108,19 @@ Unichain · Celo · Worldchain · Ink ·
 |------|--------------|-----|
 | **Jailbreak** | Prompt injection → agent tries to drain wallet → AgentScope blocks it | `npm run demo:jailbreak` |
 | **Yield Vault** | Agent spends yield, blocked from principal, kill switch | `npm run demo:vault` |
-| **Locus Payments** | Scoped USDC payments (3 approved, 4 blocked) | `npm run demo:locus` |
+| **Locus Payments** | Scoped USDC payments (2 approved, 4 blocked) | `npm run demo:locus` |
 | **Tweet-to-Policy** | Natural language → on-chain policy | `npm run demo:policy` |
 | **Venice** | Private reasoning + public execution | `npm run demo:venice` |
 | **Multi-Agent** | Orchestrator scopes 3 workers, revokes one, re-deploys with tighter limits | `npm run demo:multi-agent` |
+
+### Live Demos (Real Money)
+
+Both Locus and Venice demos hit real APIs with real value:
+
+- **Locus**: 2 USDC transactions on Base ([output](./demo/locus-demo-output.txt)) — tx `5c43f8fb`, `aa76e14c`
+- **Venice**: 2 private reasoning calls via llama-3.3-70b ([output](./demo/venice-demo-output.txt)) — agent reasons privately, AgentScope enforces publicly
+
+Set `LOCUS_API_KEY` and `VENICE_API_KEY` env vars to run them yourself.
 
 ## Tests
 
