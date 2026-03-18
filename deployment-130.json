@@ -1,0 +1,9 @@
+{
+  "network": "unichain",
+  "chainId": 130,
+  "deployedAt": "2026-03-18T17:18:47.213Z",
+  "contracts": {
+    "mockSafe": "0x51157a48b0A00D6C9C49f0AaEe98a27511DD180a",
+    "agentScopeModule": "0x0d0034c6AC4640463bf480cB07BE770b08Bef811"
+  }
+}

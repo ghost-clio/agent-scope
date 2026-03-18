@@ -7,7 +7,7 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 > [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
 
 [![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](#tests)
-[![Chains](https://img.shields.io/badge/deployed-14%20testnets%20%2B%202%20mainnets-blue)](#deployments)
+[![Chains](https://img.shields.io/badge/deployed-12%20mainnets%20%2B%2014%20testnets%20%2B%20Solana-blue)](#deployments)
 [![Live Payments](https://img.shields.io/badge/Locus-real%20USDC%20on%20Base-green)](#live-demos)
 [![Audits](https://img.shields.io/badge/audits-4%20independent-orange)](#security)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -94,13 +94,23 @@ Unichain · Celo · Worldchain · Ink ·
 | AgentScopeEnforcer | Sepolia | [`0x8A70...e2A`](https://sepolia.etherscan.io/address/0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A) |
 | ERC-8004 Identity | Base mainnet | [Registration TX](https://basescan.org/tx/0xc69cbb767affb96e06a65f7efda4a347409ac52a713c12d4203e3f45a8ed6dd3) |
 
-### Mainnets
+### Mainnets (12 EVM chains + Solana)
 
 | Chain | Address | Explorer |
 |-------|---------|----------|
-| **Arbitrum** | `0x0d0034c6AC4640463bf480cB07BE770b08Bef811` | [arbiscan](https://arbiscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
-| **Optimism** | `0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA` | [optimistic.etherscan](https://optimistic.etherscan.io/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
-| **Base** | Deploying... | — |
+| **Arbitrum** | `0x0d0034c6...Bef811` | [arbiscan](https://arbiscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Optimism** | `0x1AA76A89...56EDA` | [etherscan](https://optimistic.etherscan.io/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
+| **Base** | `0x0d0034c6...Bef811` | [basescan](https://basescan.org/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Celo** | `0x0d0034c6...Bef811` | [celoscan](https://celoscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Mode** | `0x0d0034c6...Bef811` | [explorer](https://explorer.mode.network/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Zora** | `0x0d0034c6...Bef811` | [explorer](https://explorer.zora.energy/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Lisk** | `0x0d0034c6...Bef811` | [blockscout](https://blockscout.lisk.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Unichain** | `0x0d0034c6...Bef811` | [uniscan](https://uniscan.xyz/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Worldchain** | `0x0d0034c6...Bef811` | [worldscan](https://worldscan.org/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Ink** | `0x0d0034c6...Bef811` | [explorer](https://explorer.inkonchain.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Polygon** | `0x0d3973FB...3a5` | [polygonscan](https://polygonscan.com/address/0x0d3973FB015cC30A2EB7b06a0C49E1E1925DFd48) |
+| **Metal L2** | `0x0d0034c6...Bef811` | [explorer](https://explorer.metall2.com/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
+| **Solana (devnet)** | `GgKr1Pd3wPz54kXJZ7HWY4VLbHQwnfWcNqCgKZvn3dq1` | [explorer](https://explorer.solana.com/address/GgKr1Pd3wPz54kXJZ7HWY4VLbHQwnfWcNqCgKZvn3dq1?cluster=devnet) |
 
 ## Demos
 

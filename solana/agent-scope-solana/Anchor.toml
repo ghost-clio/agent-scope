@@ -5,7 +5,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-agent_scope_solana = "7K6qSQKWBh3sNzAnQADJMcGvAx6zMALGnPvhxhFoV8GK"
+agent_scope_solana = "GgKr1Pd3wPz54kXJZ7HWY4VLbHQwnfWcNqCgKZvn3dq1"
+
+[programs.devnet]
+agent_scope_solana = "GgKr1Pd3wPz54kXJZ7HWY4VLbHQwnfWcNqCgKZvn3dq1"
 
 [registry]
 url = "https://api.apr.dev"
