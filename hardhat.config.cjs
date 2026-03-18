@@ -8,6 +8,11 @@ module.exports = {
     settings: { optimizer: { enabled: true, runs: 200 } },
   },
   networks: {
+    ethereum: {
+      url: "https://ethereum-rpc.publicnode.com",
+      chainId: 1,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
     sepolia: {
       url: process.env.SEPOLIA_RPC || "https://rpc.sepolia.org",
       accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
