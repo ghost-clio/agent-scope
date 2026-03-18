@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::system_program;
 use anchor_lang::solana_program::instruction::Instruction;
 use anchor_lang::solana_program::program::invoke_signed;
-declare_id!("7K6qSQKWBh3sNzAnQADJMcGvAx6zMALGnPvhxhFoV8GK");
+declare_id!("GgKr1Pd3wPz54kXJZ7HWY4VLbHQwnfWcNqCgKZvn3dq1");
 
 /// SPL Token program ID
 const SPL_TOKEN_ID: Pubkey = Pubkey::new_from_array([

@@ -96,7 +96,7 @@ module.exports = {
     },
     // ── L2 Mainnets (deploy last — contract must be final) ──
     polygon: {
-      url: "https://polygon-rpc.com",
+      url: "https://polygon.drpc.org",
       chainId: 137,
       accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
     },
@@ -110,19 +110,55 @@ module.exports = {
       chainId: 8453,
       accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
     },
-    linea: {
-      url: "https://rpc.linea.build",
-      chainId: 59144,
-      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
-    },
-    scroll: {
-      url: "https://rpc.scroll.io",
-      chainId: 534352,
-      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
-    },
     optimism: {
       url: "https://mainnet.optimism.io",
       chainId: 10,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    celo: {
+      url: "https://forno.celo.org",
+      chainId: 42220,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    zora: {
+      url: "https://rpc.zora.energy",
+      chainId: 7777777,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    mode: {
+      url: "https://mainnet.mode.network",
+      chainId: 34443,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    lisk: {
+      url: "https://rpc.api.lisk.com",
+      chainId: 1135,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    unichain: {
+      url: "https://mainnet.unichain.org",
+      chainId: 130,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    worldchain: {
+      url: "https://worldchain-mainnet.g.alchemy.com/public",
+      chainId: 480,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    ink: {
+      url: "https://rpc-gel.inkonchain.com",
+      chainId: 57073,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+    },
+    statusNetwork: {
+      url: "https://public.rpc.status.network",
+      chainId: 2020,
+      accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
+      gasPrice: 0,
+    },
+    metalL2: {
+      url: "https://rpc.metall2.com",
+      chainId: 1750,
       accounts: process.env.DEPLOYER_KEY ? [process.env.DEPLOYER_KEY] : [],
     },
   },
