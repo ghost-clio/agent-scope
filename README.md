@@ -7,7 +7,7 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 > [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
 
 [![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](#tests)
-[![Chains](https://img.shields.io/badge/deployed-12%20mainnets%20%2B%2014%20testnets%20%2B%20Solana-blue)](#deployments)
+[![Chains](https://img.shields.io/badge/deployed-13%20mainnets%20%2B%2014%20testnets%20%2B%20Solana-blue)](#deployments)
 [![Live Payments](https://img.shields.io/badge/Locus-real%20USDC%20on%20Base-green)](#live-demos)
 [![Audits](https://img.shields.io/badge/audits-4%20independent-orange)](#security)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -94,10 +94,11 @@ Unichain · Celo · Worldchain · Ink ·
 | AgentScopeEnforcer | Sepolia | [`0x8A70...e2A`](https://sepolia.etherscan.io/address/0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A) |
 | ERC-8004 Identity | Base mainnet | [Registration TX](https://basescan.org/tx/0xc69cbb767affb96e06a65f7efda4a347409ac52a713c12d4203e3f45a8ed6dd3) |
 
-### Mainnets (12 EVM chains + Solana)
+### Mainnets (13 EVM chains + Solana)
 
 | Chain | Address | Explorer |
 |-------|---------|----------|
+| **Ethereum** | `0x7645C89b...2Ac2ce2` | [etherscan](https://etherscan.io/address/0x7645C89bF96f0804776379890ecCb625a2Ac2ce2) |
 | **Arbitrum** | `0x0d0034c6...Bef811` | [arbiscan](https://arbiscan.io/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
 | **Optimism** | `0x1AA76A89...56EDA` | [etherscan](https://optimistic.etherscan.io/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA) |
 | **Base** | `0x0d0034c6...Bef811` | [basescan](https://basescan.org/address/0x0d0034c6AC4640463bf480cB07BE770b08Bef811) |
