@@ -1,1 +1,0 @@
-var e={};throw Error(`Could not resolve "@base-org/account" imported by "@wagmi/connectors". Is it installed?`);export{e as default};
