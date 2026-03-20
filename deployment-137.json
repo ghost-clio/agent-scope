@@ -1,9 +1,0 @@
-{
-  "network": "polygon",
-  "chainId": 137,
-  "deployedAt": "2026-03-18T18:04:56.388Z",
-  "contracts": {
-    "mockSafe": "0x51157a48b0A00D6C9C49f0AaEe98a27511DD180a",
-    "agentScopeModule": "0x0d3973FB015cC30A2EB7b06a0C49E1E1925DFd48"
-  }
-}

@@ -1,9 +1,0 @@
-{
-  "network": "ethereum",
-  "chainId": 1,
-  "deployedAt": "2026-03-18T22:14:42.197Z",
-  "contracts": {
-    "mockSafe": "0x03C9ded3de3242B6702562155e180aC05BE1aF30",
-    "agentScopeModule": "0x7645C89bF96f0804776379890ecCb625a2Ac2ce2"
-  }
-}
