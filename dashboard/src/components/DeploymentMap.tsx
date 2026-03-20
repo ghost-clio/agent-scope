@@ -22,12 +22,18 @@ const chains = [
 ];
 
 const mainnetChains = [
-  { name: "Arbitrum", color: "#28A0F0" },
-  { name: "Base", color: "#0052FF" },
-  { name: "Optimism", color: "#FF0420" },
-  { name: "Polygon", color: "#8247E5" },
-  { name: "Linea", color: "#61DFFF" },
-  { name: "Scroll", color: "#FFEEDA" },
+  { name: "Arbitrum", color: "#28A0F0", explorer: `https://arbiscan.io/address/${CONTRACT}` },
+  { name: "Optimism", color: "#FF0420", explorer: `https://optimistic.etherscan.io/address/0x1AA76A89bB61B0069aa7E54c9af9D6614C756EDA` },
+  { name: "Base", color: "#0052FF", explorer: `https://basescan.org/address/${CONTRACT}` },
+  { name: "Celo", color: "#FCFF52", explorer: `https://celoscan.io/address/${CONTRACT}` },
+  { name: "Mode", color: "#DFFE00", explorer: `https://explorer.mode.network/address/${CONTRACT}` },
+  { name: "Zora", color: "#2B5DF0", explorer: `https://explorer.zora.energy/address/${CONTRACT}` },
+  { name: "Lisk", color: "#0038FF", explorer: `https://blockscout.lisk.com/address/${CONTRACT}` },
+  { name: "Unichain", color: "#FF007A", explorer: null },
+  { name: "Worldchain", color: "#00C3B6", explorer: null },
+  { name: "Ink", color: "#7B61FF", explorer: null },
+  { name: "Polygon", color: "#8247E5", explorer: `https://polygonscan.com/address/0x0d3973FB015cC30A2EB7b06a0C49E1E1925DFd48` },
+  { name: "Metal L2", color: "#FF6B35", explorer: `https://explorer.metall2.com/address/${CONTRACT}` },
 ];
 
 export function DeploymentMap() {
@@ -111,32 +117,66 @@ export function DeploymentMap() {
         ))}
       </div>
 
-      {/* Mainnet coming soon */}
+      {/* Mainnet deployments LIVE */}
       <div style={{
-        padding: "1.25rem 1.5rem", borderRadius: 16,
-        background: "rgba(255,170,0,0.03)",
-        border: "1px solid rgba(255,170,0,0.1)",
-        display: "flex", alignItems: "center", gap: "1rem",
+        padding: "1.5rem", borderRadius: 16,
+        background: "rgba(0,255,136,0.03)",
+        border: "1px solid rgba(0,255,136,0.12)",
+        marginBottom: "1rem",
       }}>
-        <span style={{ fontSize: "1.2rem" }}>🚀</span>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#ffaa00", marginBottom: "0.25rem" }}>
-            L2 Mainnet Deployments — March 20
+        <div style={{ 
+          display: "flex", alignItems: "center", gap: "1rem",
+          marginBottom: "1rem",
+        }}>
+          <span style={{ fontSize: "1.2rem" }}>✅</span>
+          <div>
+            <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "#00ff88", marginBottom: "0.25rem" }}>
+              12 Mainnet Chains — LIVE
+            </div>
+            <div style={{ fontSize: "0.7rem", color: "#6b6b80" }}>
+              Production-ready on Ethereum L2s
+            </div>
           </div>
-          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-            {mainnetChains.map(c => (
-              <span key={c.name} style={{
-                fontSize: "0.7rem", color: "#6b6b80",
-                display: "flex", alignItems: "center", gap: 4,
+        </div>
+        <div className="grid-5col">
+          {mainnetChains.map((c) => (
+            <a
+              key={c.name}
+              href={c.explorer || undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex", flexDirection: "column", alignItems: "center",
+                gap: "0.35rem", padding: "0.75rem 0.35rem",
+                borderRadius: 12,
+                background: "rgba(255,255,255,0.02)",
+                border: `1px solid rgba(0,255,136,0.08)`,
+                cursor: c.explorer ? "pointer" : "default",
+                textDecoration: "none",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = `${c.color}12`;
+                e.currentTarget.style.borderColor = `${c.color}40`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                e.currentTarget.style.borderColor = "rgba(0,255,136,0.08)";
+              }}
+            >
+              <span style={{
+                fontSize: "0.65rem", color: "#6b6b80",
+                textAlign: "center", fontWeight: 500,
               }}>
-                <span style={{
-                  width: 5, height: 5, borderRadius: "50%",
-                  background: c.color, opacity: 0.5,
-                }} />
                 {c.name}
               </span>
-            ))}
-          </div>
+              <span style={{
+                width: 5, height: 5, borderRadius: "50%",
+                background: "#00ff88",
+                boxShadow: "0 0 6px rgba(0,255,136,0.4)",
+              }} />
+            </a>
+          ))}
         </div>
       </div>
     </div>
