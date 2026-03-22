@@ -15,6 +15,7 @@ import { DeploymentMap } from "./components/DeploymentMap";
 import { JailbreakDemo } from "./components/JailbreakDemo";
 import { DeployModule } from "./components/DeployModule";
 import { LocusWallet } from "./components/LocusWallet";
+import { AgentWalletOverview } from "./components/AgentWalletOverview";
 import { DEFAULT_MODULE_ADDRESS, DEFAULT_SAFE_ADDRESS } from "./config";
 // ChainToggle moved to header as ChainSwitch
 
@@ -432,6 +433,7 @@ function App() {
                   gap: "1rem", marginBottom: "1rem",
                 }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    <AgentWalletOverview safeAddress={safeAddr} />
                     <LocusWallet />
                     <SetPolicy moduleAddress={moduleAddr} safeAddress={safeAddr} />
                     <TokenAllowances />
