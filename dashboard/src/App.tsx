@@ -273,6 +273,23 @@ function App() {
   const [safeAddr, setSafeAddr] = useState<`0x${string}`>(DEFAULT_SAFE_ADDRESS);
   const [deployed, setDeployed] = useState(false);
 
+  // Auto-detect if module is already deployed on-chain
+  useEffect(() => {
+    if (!deployed && moduleAddr !== "0x0000000000000000000000000000000000000000") {
+      fetch(`https://sepolia.drpc.org`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0", id: 1, method: "eth_getCode",
+          params: [moduleAddr, "latest"]
+        })
+      })
+        .then(r => r.json())
+        .then(d => { if (d.result && d.result !== "0x") setDeployed(true); })
+        .catch(() => {});
+    }
+  }, [moduleAddr, deployed]);
+
   // Smooth scroll (used by nav links)
   const _scrollTo = useCallback((id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
