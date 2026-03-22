@@ -45,6 +45,8 @@ The contract reverts if any rule is violated. Doesn't matter if the agent is jai
 ## Quick Start
 
 ```bash
+git clone https://github.com/ghost-clio/agent-scope.git
+cd agent-scope
 npm install
 npm test                    # 155 tests (112 EVM + 43 policy compiler)
 npm run demo:jailbreak      # Watch a jailbroken agent get stopped
