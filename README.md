@@ -6,17 +6,7 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 
 > [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
 
-
-
-
-
-
 https://github.com/user-attachments/assets/2f9aef88-ed43-43d8-8def-232439e52e1c
-
-
-
-
-
 
 [![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](#tests)
 [![Chains](https://img.shields.io/badge/deployed-13%20mainnets%20%2B%2014%20testnets%20%2B%20Solana-blue)](#deployments)
@@ -48,7 +38,7 @@ The contract reverts if any rule is violated. Doesn't matter if the agent is jai
 git clone https://github.com/ghost-clio/agent-scope.git
 cd agent-scope
 npm install
-npm test                    # 155 tests (112 EVM + 43 policy compiler)
+npm test                    # 155 tests (112 contract + 43 policy compiler)
 npm run demo:jailbreak      # Watch a jailbroken agent get stopped
 npm run demo:multi-agent    # Multi-agent coordination with revoke + re-deploy
 npm run demo:vault          # Yield-only spending demo
@@ -152,8 +142,8 @@ Set `LOCUS_API_KEY` and `VENICE_API_KEY` env vars to run them yourself.
 | Suite | Tests | Run |
 |-------|-------|-----|
 | AgentScopeModule | 40 | `npx hardhat test test/AgentScopeModule.test.cjs` |
-| AgentYieldVault | 27 | `npx hardhat test test/AgentYieldVault.test.cjs` |
-| CaveatEnforcers | 19 | `npx hardhat test test/CaveatEnforcers.test.cjs` |
+| AgentYieldVault | 29 | `npx hardhat test test/AgentYieldVault.test.cjs` |
+| CaveatEnforcers | 17 | `npx hardhat test test/CaveatEnforcers.test.cjs` |
 | ERC8004ENSBridge | 26 | `npx hardhat test test/ERC8004ENSBridge.test.cjs` |
 | PolicyCompiler | 43 | `node --test test/PolicyCompiler.test.cjs` |
 | Solana Program | 17 | `cd solana/agent-scope-solana && anchor test` |
@@ -180,7 +170,7 @@ policy/             ASP-1 policy language — compiler, schema, 6 example polici
 spec/               Protocol specification (ASP-1)
 dashboard/          React dashboard (live on GitHub Pages)
 demo/               5 CLI demos
-test/               165 tests (148 via npm test + 17 Solana)
+test/               172 tests (155 via npm test + 17 Solana)
 ```
 
 ## Security
