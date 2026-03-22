@@ -16,7 +16,7 @@ export function TokenAllowances() {
   const [tokenAddress, setTokenAddress] = useState("");
   const [dailyAmount, setDailyAmount] = useState("1000");
   const [decimals, setDecimals] = useState(18);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });

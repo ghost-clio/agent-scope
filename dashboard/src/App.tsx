@@ -416,11 +416,11 @@ function App() {
                 }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     <LocusWallet />
-                    <AgentLookup moduleAddress={moduleAddr} />
                     <SetPolicy moduleAddress={moduleAddr} safeAddress={safeAddr} />
                     <TokenAllowances />
-                    <RevokeAgent moduleAddress={moduleAddr} safeAddress={safeAddr} />
+                    <AgentLookup moduleAddress={moduleAddr} />
                     <Simulation />
+                    <RevokeAgent moduleAddress={moduleAddr} safeAddress={safeAddr} />
                   </div>
                   <EventFeed />
                 </div>

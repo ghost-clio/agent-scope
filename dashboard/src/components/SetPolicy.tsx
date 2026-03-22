@@ -11,7 +11,7 @@ export function SetPolicy({ moduleAddress, safeAddress }: { moduleAddress: `0x${
   const [expiryHours, setExpiryHours] = useState("24");
   const [contracts, setContracts] = useState("");
   const [functions, setFunctions] = useState("");
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
