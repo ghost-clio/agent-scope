@@ -9,3 +9,5 @@ coverage/
 dashboard/node_modules
 node_modules/
 typechain-types/
+conversation-log.md
+*-output.txt
