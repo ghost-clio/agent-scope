@@ -6,7 +6,6 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 
 > [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
 
-<video src="https://github.com/ghost-clio/agent-scope/releases/download/v1.1/agentscope-pitch-final.mp4" width="100%" controls></video>
 
 [![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](#tests)
 [![Chains](https://img.shields.io/badge/deployed-13%20mainnets%20%2B%2014%20testnets%20%2B%20Solana-blue)](#deployments)
