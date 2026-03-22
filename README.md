@@ -145,6 +145,44 @@ Both Locus and Venice demos hit real APIs with real value:
 
 Set `LOCUS_API_KEY` and `VENICE_API_KEY` env vars to run them yourself.
 
+## Venice Ghost Protocol — Private Cognition, Public Accountability
+
+AgentScope integrates Venice AI's private inference as the agent's **reasoning layer**. The architecture separates what an agent *thinks* (private, zero data retention) from what it *does* (on-chain, auditable, constrained).
+
+```
+┌─────────────────────────────────────────┐
+│       Venice Private Inference           │
+│  • Agent reasons about market data       │
+│  • Model: llama-3.3-70b (uncensored)     │
+│  • Zero data retention — Venice forgets  │
+│  • Decision: "swap 0.05 ETH → USDC"     │
+└──────────────┬──────────────────────────┘
+               │ decision only (reasoning stays private)
+┌──────────────▼──────────────────────────┐
+│       AgentScope (On-Chain)              │
+│  • Pre-flight: checkPermission()         │
+│  • Enforced: daily limit, whitelist      │
+│  • Executed: executeAsAgent()            │
+│  • Auditable: events on-chain            │
+│  • Reasoning: NEVER included in tx data  │
+└─────────────────────────────────────────┘
+```
+
+**Run it yourself:**
+```bash
+VENICE_API_KEY=... npm run demo:venice
+```
+
+**What you'll see — 3 real scenarios:**
+
+1. **ETH drops 8%** → Venice privately reasons "hold, 70% chance of recovery" → No tx needed → Nothing on-chain to trace
+2. **Whale buy detected** → Venice says "buy 0.1 ETH of TOKEN-X" → AgentScope **BLOCKS** it (contract not whitelisted) → Agent can think freely, but can't act outside its scope
+3. **Unauthorized contract** → Agent tries `0xDEADBEEF...` → Immediately blocked by contract allowlist
+
+**The principle:** Venice provides uncensored, private reasoning with zero data retention. AgentScope provides immutable, on-chain constraints. Together: the agent's mind is private. The agent's hands are bound. 🔐
+
+Full SDK: [`sdk/venice-agent.ts`](./sdk/venice-agent.ts) | Demo output: [`demo/venice-demo-output.txt`](./demo/venice-demo-output.txt)
+
 ## Tests
 
 | Suite | Tests | Run |
