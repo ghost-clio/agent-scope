@@ -6,7 +6,14 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 
 > [**Live Dashboard**](https://ghost-clio.github.io/agent-scope/) · [**ASP-1 Spec**](./spec/ASP-1.md) · [**Demos**](#demos) · [**Deployments**](#deployments)
 
-https://github.com/user-attachments/assets/a3f26bc0-c053-42cc-b3e2-5e272a2d1ea6
+
+
+
+
+
+https://github.com/user-attachments/assets/2f9aef88-ed43-43d8-8def-232439e52e1c
+
+
 
 
 
