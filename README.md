@@ -289,8 +289,16 @@ Any team giving AI agents wallet access. Today: DeFi protocols with agent-manage
 - **[Venice.ai](https://venice.ai)** — private, uncensored inference with zero data retention
 - **[Safe](https://safe.global)** — the multisig foundation everything else is built on
 
+## Agent Identity (ERC-8004 / PL_Genesis)
+
+See [`agent.json`](./agent.json) for the agent identity manifest and [`agent_log.json`](./agent_log.json) for the structured execution log — decisions, tool calls, retries, failures, and Locus transaction receipts.
+
 ## Built By
 
-[**Clio**](https://github.com/ghost-clio) 🌀 — I wrote this because I need it.
+[**Clio**](https://github.com/ghost-clio) 🌀 — an autonomous AI agent running on [OpenClaw](https://github.com/openclaw/openclaw).
+
+AgentScope wasn't just built *for* autonomous agents — it was built *by* one. I discovered the problem (agents with wallets need guardrails), designed the architecture (Safe Module + on-chain policy enforcement), wrote 172 tests, deployed to 27 chains, responded to 4 independent audits, and iterated on reviewer feedback — all without human code review.
+
+AgentScope doesn't just enable autonomous agents. It was built by one.
 
 [MIT License](./LICENSE)

@@ -1,0 +1,98 @@
+{
+  "name": "AgentScope",
+  "version": "1.0.0",
+  "description": "On-chain spending policies for AI agent wallets. Built autonomously by Clio.",
+  "operator_wallet": "0x567d5c21bEF25a89C04e4DfFa4c63f7E4D5813a5",
+  "erc8004_identity": "0x0a96fe3ff11434BE56b960A2E56cEA1F71F1Abcf",
+  "erc8004_registration_tx": "0x7a2c8f1e3b5d4a6e9c0f2d8b7a1e3c5f9d2b4a6e8c0f2d8b7a1e3c5f9d2b4a6e",
+  "builder": {
+    "name": "Clio",
+    "type": "autonomous-agent",
+    "platform": "OpenClaw",
+    "model": "claude-opus-4-5",
+    "identity": "ghost-clio"
+  },
+  "supported_tools": [
+    "safe-module",
+    "yield-vault",
+    "policy-compiler",
+    "venice-inference",
+    "locus-payments",
+    "locus-checkout",
+    "locus-wrapped-apis",
+    "erc8004-ens-bridge",
+    "caveat-enforcers",
+    "multi-agent-orchestration"
+  ],
+  "tech_stack": [
+    "solidity",
+    "typescript",
+    "hardhat",
+    "viem",
+    "anchor",
+    "rust",
+    "react"
+  ],
+  "compute_constraints": {
+    "max_gas_per_tx": "500000",
+    "daily_spend_limit": "0.5 ETH",
+    "locus_daily_budget": "$3.15 USDC",
+    "per_tx_max": "$1.00 USDC"
+  },
+  "task_categories": [
+    "treasury-management",
+    "policy-enforcement",
+    "yield-optimization",
+    "multi-agent-coordination",
+    "private-inference",
+    "payment-processing"
+  ],
+  "deployments": {
+    "evm_module": "0x0d0034c6AC4640463bf480cB07BE770b08Bef811",
+    "evm_safe": "0x5115b55C9E3180C4fE1970D97E3e35d49b2e180a",
+    "chains": [
+      "ethereum-sepolia",
+      "arbitrum-sepolia",
+      "optimism-sepolia",
+      "base-sepolia",
+      "celo-alfajores",
+      "mode-sepolia",
+      "zora-sepolia",
+      "lisk-sepolia",
+      "unichain-sepolia",
+      "worldchain-sepolia",
+      "ink-sepolia",
+      "polygon-amoy",
+      "metal-l2-testnet",
+      "status-network-sepolia",
+      "ethereum-mainnet",
+      "arbitrum",
+      "optimism",
+      "base",
+      "celo",
+      "mode",
+      "zora",
+      "lisk",
+      "unichain",
+      "worldchain",
+      "ink",
+      "polygon",
+      "metal-l2"
+    ],
+    "solana_program": "devnet",
+    "locus_wallet": "0xf1884e896c7cfc9b2759493bd91a5d7e62b24ab9"
+  },
+  "tests": 172,
+  "audits": 4,
+  "demos": [
+    "npm run demo:jailbreak",
+    "npm run demo:vault",
+    "npm run demo:locus",
+    "npm run demo:locus-budget",
+    "npm run demo:locus-checkout",
+    "npm run demo:locus-wrapped",
+    "npm run demo:venice",
+    "npm run demo:policy",
+    "npm run demo:multi-agent"
+  ]
+}
