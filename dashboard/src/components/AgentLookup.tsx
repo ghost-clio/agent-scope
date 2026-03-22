@@ -1,12 +1,22 @@
 import { useState } from "react";
-import { useReadContract } from "wagmi";
+import { useReadContract, useEnsAddress } from "wagmi";
 import { formatEther, isAddress } from "viem";
+import { mainnet } from "wagmi/chains";
 import abi from "../abi.json";
 
 
 export function AgentLookup({ moduleAddress }: { moduleAddress: `0x${string}` }) {
   const [agentAddress, setAgentAddress] = useState("");
   const [query, setQuery] = useState("");
+
+  // ENS resolution
+  const isEns = agentAddress.endsWith(".eth");
+  const { data: ensResolved } = useEnsAddress({
+    name: isEns ? agentAddress : undefined,
+    chainId: mainnet.id,
+  });
+
+  const resolvedAddress = isEns ? ensResolved : (isAddress(agentAddress) ? agentAddress as `0x${string}` : undefined);
 
   const { data: scope, isLoading, error } = useReadContract({
     address: moduleAddress,
@@ -17,8 +27,9 @@ export function AgentLookup({ moduleAddress }: { moduleAddress: `0x${string}` })
   });
 
   const handleLookup = () => {
-    if (isAddress(agentAddress)) {
-      setQuery(agentAddress);
+    const addr = resolvedAddress || agentAddress;
+    if (isAddress(addr)) {
+      setQuery(addr as string);
     }
   };
 
@@ -52,7 +63,7 @@ export function AgentLookup({ moduleAddress }: { moduleAddress: `0x${string}` })
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
         <input
           type="text"
-          placeholder="0x... agent address"
+          placeholder="0x... or name.eth"
           value={agentAddress}
           onChange={(e) => setAgentAddress(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleLookup()}
@@ -72,6 +83,12 @@ export function AgentLookup({ moduleAddress }: { moduleAddress: `0x${string}` })
           Lookup
         </button>
       </div>
+
+      {isEns && ensResolved && (
+        <div style={{ fontSize: "0.7rem", color: "var(--accent-green)", marginBottom: "0.5rem", fontFamily: "monospace" }}>
+          ✓ {agentAddress} → {ensResolved.slice(0, 10)}...{ensResolved.slice(-6)}
+        </div>
+      )}
 
       {isLoading && (
         <p style={{ color: "var(--text-secondary)" }}>Loading scope...</p>
