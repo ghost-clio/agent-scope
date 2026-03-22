@@ -9,7 +9,7 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 https://github.com/user-attachments/assets/2f9aef88-ed43-43d8-8def-232439e52e1c
 
 [![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](#tests)
-[![Chains](https://img.shields.io/badge/deployed-13%20mainnets%20%2B%2014%20testnets%20%2B%20Solana-blue)](#deployments)
+[![Chains](https://img.shields.io/badge/deployed-13%20mainnets%20%2B%2014%20testnets%20%2B%20Solana%20devnet-blue)](#deployments)
 [![Live Payments](https://img.shields.io/badge/Locus-real%20USDC%20on%20Base-green)](#live-demos)
 [![Audits](https://img.shields.io/badge/audits-4%20independent-orange)](#security)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -106,7 +106,7 @@ Unichain · Celo · Worldchain · Ink ·
 | AgentScopeEnforcer | Sepolia | [`0x8A70...e2A`](https://sepolia.etherscan.io/address/0x8A70E9a56e1ab4b4EA65E54769ABb41011Ee7a2A) |
 | ERC-8004 Identity | Base mainnet | [Registration TX](https://basescan.org/tx/0xc69cbb767affb96e06a65f7efda4a347409ac52a713c12d4203e3f45a8ed6dd3) |
 
-### Mainnets (13 EVM chains + Solana)
+### Mainnets (13 EVM chains) + Solana Devnet
 
 | Chain | Address | Explorer |
 |-------|---------|----------|

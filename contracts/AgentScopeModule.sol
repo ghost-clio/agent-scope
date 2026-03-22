@@ -276,9 +276,9 @@ contract AgentScopeModule {
         if (data.length >= 68) {
             bytes4 selector = bytes4(data[:4]);
             // transfer(address,uint256) = 0xa9059cbb
-            // approve(address,uint256)  = 0x095ea7b3
+            // approve(address,uint256)  = 0x095ea7b3 — NOT counted (sets allowance, doesn't move tokens)
             // transferFrom(address,address,uint256) = 0x23b872dd
-            if (selector == 0xa9059cbb || selector == 0x095ea7b3) {
+            if (selector == 0xa9059cbb) {
                 _enforceTokenLimit(msg.sender, to, abi.decode(data[36:68], (uint256)));
             } else if (selector == 0x23b872dd && data.length >= 100) {
                 _enforceTokenLimit(msg.sender, to, abi.decode(data[68:100], (uint256)));
