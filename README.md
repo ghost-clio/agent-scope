@@ -245,6 +245,11 @@ AgentScope is designed to work alongside emerging agent standards:
 - **[ERC-7715](https://eips.ethereum.org/EIPS/eip-7715)** — MetaMask delegation framework. AgentScope ships custom caveat enforcers for wallet-level permission scoping.
 - **[Safe{Wallet}](https://safe.global)** — Smart account infrastructure. AgentScope deploys as a Safe module.
 
+**Companion projects:**
+- [**Aegis**](https://github.com/ghost-clio/aegis-agent) — Autonomous treasury with pre-signing policy enforcement, smart DCA, and yield hunting
+- [**Lido MCP**](https://github.com/ghost-clio/lido-mcp) — MCP server for Lido staking operations (stake, unstake, vote, monitor yields)
+- [**Ghost Protocol**](https://github.com/ghost-clio/ghost-protocol) — Private reasoning (Venice.ai) + scoped execution (AgentScope) in a live treasury agent
+
 ## Gas Costs
 
 | Operation | Gas | Cost (30 gwei, ETH=$3500) |
