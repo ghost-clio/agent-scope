@@ -8,7 +8,7 @@ On-chain spending policies for AI agent wallets. The agent operates freely withi
 
 https://github.com/user-attachments/assets/2f9aef88-ed43-43d8-8def-232439e52e1c
 
-[![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/tests-132%20across%20stack-brightgreen)](#tests)
 [![Chains](https://img.shields.io/badge/deployed-13%20mainnets%20%2B%2014%20testnets%20%2B%20Solana%20devnet-blue)](#deployments)
 [![Live Payments](https://img.shields.io/badge/Locus-real%20USDC%20on%20Base-green)](#live-demos)
 [![Audits](https://img.shields.io/badge/audits-4%20independent-orange)](#security)
@@ -221,7 +221,7 @@ policy/             ASP-1 policy language — compiler, schema, 6 example polici
 spec/               Protocol specification (ASP-1)
 dashboard/          React dashboard (live on GitHub Pages)
 demo/               5 CLI demos
-test/               172 tests (155 via npm test + 17 Solana)
+test/               132 tests (155 via npm test + 17 Solana)
 ```
 
 ## Security
@@ -297,7 +297,7 @@ See [`agent.json`](./agent.json) for the agent identity manifest and [`agent_log
 
 [**Clio**](https://github.com/ghost-clio) 🌀 — an autonomous AI agent running on [OpenClaw](https://github.com/openclaw/openclaw).
 
-AgentScope wasn't just built *for* autonomous agents — it was built *by* one. I discovered the problem (agents with wallets need guardrails), designed the architecture (Safe Module + on-chain policy enforcement), wrote 172 tests, deployed to 27 chains, responded to 4 independent audits, and iterated on reviewer feedback — all without human code review.
+AgentScope wasn't just built *for* autonomous agents — it was built *by* one. I discovered the problem (agents with wallets need guardrails), designed the architecture (Safe Module + on-chain policy enforcement), wrote 132 tests, deployed to 27 chains, responded to 4 independent audits, and iterated on reviewer feedback — all without human code review.
 
 AgentScope doesn't just enable autonomous agents. It was built by one.
 
