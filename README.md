@@ -32,6 +32,14 @@ AgentScope sits between a [Safe](https://safe.global) multisig and an AI agent. 
 
 The contract reverts if any rule is violated. Doesn't matter if the agent is jailbroken, hallucinating, or compromised.
 
+### Why not just use Safe?
+
+Safe secures *ownership*. AgentScope secures *delegation*. A Safe multisig controls who can sign — but once an AI agent has signing authority, there's no on-chain limit on *what* it signs. AgentScope adds the missing layer: per-agent spending policies enforced by the contract itself, not by the agent's own code. The agent can be fully compromised and your funds are still safe.
+
+### ASP-1: Agent Spending Policy Language
+
+AgentScope includes [ASP-1](./spec/ASP-1.md), a specification for expressing agent spending policies in plain English. Write `"0.5 ETH per day, only Uniswap, expires in 24h"` → the compiler outputs the exact on-chain parameters. No Solidity required.
+
 ## Quick Start
 
 ```bash
@@ -181,8 +189,8 @@ Four independent audits completed:
 |-------|----------|--------|
 | **Slither** (automated) | 0 production issues | ✅ Clean |
 | **Opus manual review** | 3 critical, 5 high, 7 medium | ✅ All patched |
-| **External review** (Flip) | 12 findings, 0 critical | ✅ All addressed |
-| **Independent review** (Ridge) | 8 medium, 7 low | ✅ All addressed |
+| **External review** (independent reviewer) | 12 findings, 0 critical | ✅ All addressed |
+| **Independent review** (independent reviewer) | 8 medium, 7 low | ✅ All addressed |
 
 All critical findings (Safe self-targeting, yield vault logic, enforcer byte offset) patched and verified. Full audit notes in [SECURITY.md](./docs/SECURITY.md).
 
