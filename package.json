@@ -2,7 +2,7 @@
   "name": "agent-scope",
   "version": "1.0.0",
   "type": "module",
-  "description": "AgentScope — Your agent can't rug you even if it wants to",
+  "description": "AgentScope \u2014 Your agent can't rug you even if it wants to",
   "license": "MIT",
   "author": "clio_ghost",
   "scripts": {
@@ -16,7 +16,8 @@
     "demo:vault": "node demo/yield-vault-demo.cjs",
     "demo:locus": "node demo/locus-demo.cjs",
     "demo:multi-agent": "npx hardhat run demo/multi-agent-demo.cjs",
-    "dashboard": "cd dashboard && npm run dev"
+    "dashboard": "cd dashboard && npm run dev",
+    "demo:ecosystem": "node demo/ecosystem-demo.cjs"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.2",
