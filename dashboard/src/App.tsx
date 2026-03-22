@@ -14,6 +14,7 @@ import { PolicyBuilder } from "./components/PolicyBuilder";
 import { DeploymentMap } from "./components/DeploymentMap";
 import { JailbreakDemo } from "./components/JailbreakDemo";
 import { DeployModule } from "./components/DeployModule";
+import { LocusWallet } from "./components/LocusWallet";
 import { DEFAULT_MODULE_ADDRESS, DEFAULT_SAFE_ADDRESS } from "./config";
 // ChainToggle moved to header as ChainSwitch
 
@@ -337,7 +338,7 @@ function App() {
                 display: "flex", justifyContent: "space-between", alignItems: "center",
                 fontSize: "0.85rem",
               }}>
-                <span>🔵 <strong>Preview Mode</strong> — Reading live contract data from Sepolia. Connect a wallet to set policies.</span>
+                <span>🔍 <strong>Live View</strong> — Reading real contract data on Sepolia. Connect wallet to manage your agent's policies.</span>
                 <button onClick={() => { setDashPreview(false); setDemoMode(false); }} className="btn-ghost" style={{ padding: "0.3rem 0.75rem" }}>← Back</button>
               </div>
             )}
@@ -414,6 +415,7 @@ function App() {
                   gap: "1rem", marginBottom: "1rem",
                 }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    <LocusWallet />
                     <AgentLookup moduleAddress={moduleAddr} />
                     <SetPolicy moduleAddress={moduleAddr} safeAddress={safeAddr} />
                     <TokenAllowances />
