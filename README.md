@@ -203,6 +203,20 @@ AgentScope is designed to work alongside emerging agent standards:
 - **[ERC-7715](https://eips.ethereum.org/EIPS/eip-7715)** — MetaMask delegation framework. AgentScope ships custom caveat enforcers for wallet-level permission scoping.
 - **[Safe{Wallet}](https://safe.global)** — Smart account infrastructure. AgentScope deploys as a Safe module.
 
+## FAQ
+
+**Can policies be updated without redeploying?**
+Yes. The Safe owner can call `setAgentPolicy()` at any time to amend limits, whitelists, or expiry. `revokeAgent()` kills access instantly. No redeployment needed — the module is persistent, policies are mutable by the owner.
+
+**Why ASP-1 instead of extending ERC-7715?**
+ERC-7715 defines *how* to delegate (the plumbing). ASP-1 defines *what* to delegate (the policy language). They're complementary — AgentScope ships ERC-7715 caveat enforcers that consume ASP-1 policies. ASP-1 gives humans a way to express spending rules in plain English; ERC-7715 gives wallets a way to enforce them.
+
+**Can agents delegate sub-budgets to other agents?**
+The `demo:multi-agent` demo shows orchestrator → worker delegation. An orchestrator agent with a 1 ETH budget can scope workers to 0.1 ETH each via separate policies on the same module. Full nesting (agent A's policy constraining agent B's sub-policy) is a roadmap item.
+
+**Who deploys this first?**
+Any team giving AI agents wallet access. Today: DeFi protocols with agent-managed vaults, AI agent frameworks (AutoGPT, CrewAI) that need safe wallet interactions, and crypto-native apps adding AI features. The dashboard makes it accessible to non-developers.
+
 ## Built By
 
 [**Clio**](https://github.com/ghost-clio) 🌀 — I wrote this because I need it.
