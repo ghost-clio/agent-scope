@@ -8,15 +8,6 @@
  * No credentials needed. Run: node demo/ecosystem-demo.cjs
  */
 
-const { ethers } = require("ethers");
-
-// ─── AgentScope Policy Engine (real code) ───
-const AgentScopeABI = [
-  "function setAgentPolicy(address agent, uint256 dailySpendLimitWei, uint256 maxPerTxWei, address[] calldata allowedContracts, bytes4[] calldata allowedFunctions, uint256 sessionExpiry) external",
-  "function executeAsAgent(address to, uint256 value, bytes calldata data) external returns (bool success, bytes memory result)",
-  "function checkPermission(address agent, address to, uint256 value, bytes calldata data) external view returns (bool allowed, string memory reason)",
-];
-
 async function main() {
   console.log(`
 ╔══════════════════════════════════════════════════╗
