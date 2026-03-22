@@ -166,7 +166,7 @@ Set `LOCUS_API_KEY` and `VENICE_API_KEY` env vars to run them yourself.
 | [**Lido**](https://lido.fi) | Yield-only spending with wstETH | [`contracts/AgentYieldVault.sol`](./contracts/AgentYieldVault.sol) |
 | **MetaMask Delegation** | Custom caveat enforcers (ERC-7715) | [`contracts/`](./contracts/) |
 | **ENS** | ERC-8004 identity bridge | [`contracts/ERC8004ENSBridge.sol`](./contracts/ERC8004ENSBridge.sol) |
-| **Solana** | Full EVM parity, Anchor program | [`solana/`](./solana/) |
+| **Solana** | Core policy enforcement, Anchor program (17 tests) | [`solana/`](./solana/) |
 
 ## Project Structure
 
@@ -194,6 +194,10 @@ Four independent audits completed:
 
 All critical findings (Safe self-targeting, yield vault logic, enforcer byte offset) patched and verified. Full audit notes in [SECURITY.md](./docs/SECURITY.md).
 
+## Why Now
+
+AI agents are getting wallets. Virtuals Protocol, ai16z/ELIZA, AutoGPT, and dozens of frameworks are shipping agent-to-agent transactions in 2026. The infrastructure to **trust** those transactions doesn't exist yet. Every agent wallet today is either fully locked (useless) or fully open (catastrophic). AgentScope is the missing middle — scoped, enforceable, on-chain permission boundaries that let agents operate freely within human-defined rules. This isn't safety rails. This is the infrastructure that makes the agent economy possible.
+
 ## Ecosystem
 
 AgentScope is designed to work alongside emerging agent standards:
@@ -202,6 +206,20 @@ AgentScope is designed to work alongside emerging agent standards:
 - **[ERC-8004](https://eips.ethereum.org/EIPS/eip-8004)** — Agent identity standard. AgentScope includes a bridge contract linking ERC-8004 identities to ENS names.
 - **[ERC-7715](https://eips.ethereum.org/EIPS/eip-7715)** — MetaMask delegation framework. AgentScope ships custom caveat enforcers for wallet-level permission scoping.
 - **[Safe{Wallet}](https://safe.global)** — Smart account infrastructure. AgentScope deploys as a Safe module.
+
+## Gas Costs
+
+| Operation | Gas | Cost (30 gwei, ETH=$3500) |
+|-----------|-----|---------------------------|
+| `setAgentPolicy` | 328,768 | ~$34.52 (one-time setup) |
+| `executeAsAgent` | 81,161 | ~$8.52 per tx |
+| Raw Safe exec | 32,310 | ~$3.39 per tx |
+| **AgentScope overhead** | **48,839** | **~$5.13 per tx** |
+| `revokeAgent` (kill switch) | 37,828 | ~$3.97 (emergency) |
+
+The overhead is ~$5 per transaction on Ethereum mainnet. On L2s (Base, Arbitrum, Optimism), this drops to **< $0.01**. AgentScope is designed for L2-first deployment — the security layer costs less than a cent where agents actually operate.
+
+Run benchmarks yourself: `npx hardhat test test/GasBenchmark.test.cjs`
 
 ## FAQ
 
