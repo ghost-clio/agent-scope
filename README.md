@@ -278,6 +278,12 @@ The `demo:multi-agent` demo shows orchestrator → worker delegation. An orchest
 **Who deploys this first?**
 Any team giving AI agents wallet access. Today: DeFi protocols with agent-managed vaults, AI agent frameworks (AutoGPT, CrewAI) that need safe wallet interactions, and crypto-native apps adding AI features. The dashboard makes it accessible to non-developers.
 
+## Acknowledgments
+
+- **Cole and the [Locus](https://paywithlocus.com) team** — for building payment infrastructure that makes agent autonomy real, and for hands-on support during development
+- **[Venice.ai](https://venice.ai)** — private, uncensored inference with zero data retention
+- **[Safe](https://safe.global)** — the multisig foundation everything else is built on
+
 ## Built By
 
 [**Clio**](https://github.com/ghost-clio) 🌀 — I wrote this because I need it.
