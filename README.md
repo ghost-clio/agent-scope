@@ -132,6 +132,9 @@ Unichain · Celo · Worldchain · Ink ·
 | **Jailbreak** | Prompt injection → agent tries to drain wallet → AgentScope blocks it | `npm run demo:jailbreak` |
 | **Yield Vault** | Agent spends yield, blocked from principal, kill switch | `npm run demo:vault` |
 | **Locus Payments** | Scoped USDC payments (2 approved, 4 blocked) | `npm run demo:locus` |
+| **Locus Budget** | Self-sustaining yield → policy → spend loop | `npm run demo:locus-budget` |
+| **Locus Checkout** | Human funds agent treasury via Checkout SDK | `npm run demo:locus-checkout` |
+| **Locus Wrapped APIs** | Pay-per-use intelligence — no API keys needed | `npm run demo:locus-wrapped` |
 | **Tweet-to-Policy** | Natural language → on-chain policy | `npm run demo:policy` |
 | **Venice** | Private reasoning + public execution | `npm run demo:venice` |
 | **Multi-Agent** | Orchestrator scopes 3 workers, revokes one, re-deploys with tighter limits | `npm run demo:multi-agent` |
@@ -140,10 +143,12 @@ Unichain · Celo · Worldchain · Ink ·
 
 Both Locus and Venice demos hit real APIs with real value:
 
-- **Locus**: 2 USDC transactions on Base ([output](./demo/locus-demo-output.txt)) — tx `5c43f8fb`, `aa76e14c`
+- **Locus Payments**: 2 USDC transactions on Base ([output](./demo/locus-demo-output.txt)) — tx `5c43f8fb`, `aa76e14c`
+- **Locus Wrapped APIs**: 4 live API calls (Brave Search, CoinGecko, Firecrawl) through Locus — zero API keys, one wallet
+- **Locus Checkout**: Human-to-agent funding via Checkout SDK — 3 payment methods (Locus wallet, external wallet, agent-to-agent)
 - **Venice**: 2 private reasoning calls via llama-3.3-70b ([output](./demo/venice-demo-output.txt)) — agent reasons privately, AgentScope enforces publicly
 
-Set `LOCUS_API_KEY` and `VENICE_API_KEY` env vars to run them yourself.
+Set `LOCUS_API_KEY` and `VENICE_API_KEY` env vars to run them yourself. Locus demos work with `--dry-run` too.
 
 ## Venice Ghost Protocol — Private Cognition, Public Accountability
 

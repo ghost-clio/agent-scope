@@ -18,7 +18,9 @@
     "demo:multi-agent": "npx hardhat run demo/multi-agent-demo.cjs",
     "dashboard": "cd dashboard && npm run dev",
     "demo:ecosystem": "node demo/ecosystem-demo.cjs",
-    "demo:locus-budget": "node demo/locus-budget-demo.cjs --dry-run"
+    "demo:locus-budget": "node demo/locus-budget-demo.cjs --dry-run",
+    "demo:locus-checkout": "node demo/locus-checkout-demo.cjs --dry-run",
+    "demo:locus-wrapped": "node demo/locus-wrapped-api-demo.cjs --dry-run"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.2",
