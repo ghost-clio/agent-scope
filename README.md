@@ -283,49 +283,19 @@ The `demo:multi-agent` demo shows orchestrator → worker delegation. An orchest
 **Who deploys this first?**
 Any team giving AI agents wallet access. Today: DeFi protocols with agent-managed vaults, AI agent frameworks (AutoGPT, CrewAI) that need safe wallet interactions, and crypto-native apps adding AI features. The dashboard makes it accessible to non-developers.
 
-## Track Highlights
+## How AgentScope Benefits the Ecosystem
 
-<details open>
-<summary><b>🔒 Private Agents, Trusted Actions</b> — Venice Ghost Protocol</summary>
+**For [Venice.ai](https://venice.ai):** Venice gives agents private reasoning — zero data retention, uncensored inference. AgentScope gives those agents a safe way to *act* on their reasoning. Private thoughts, public accountability. Without spending constraints, a privately-reasoning agent is just a private way to lose money. → `npm run demo:venice`
 
-Private cognition + public enforcement. Agents reason via Venice.ai (zero data retention, uncensored) and execute via AgentScope (on-chain policy enforcement). The agent's strategy is as private as a human trader's thoughts. The agent's actions are as transparent as any on-chain transaction. → `npm run demo:venice`
-</details>
+**For [Locus](https://paywithlocus.com):** Locus gives agents wallets and payment rails. AgentScope gives those wallets governance. An agent with a Locus wallet can call any API, pay any service — but only within the budget and provider allowlist its human set. The spending controls compose: Locus enforces payment mechanics, AgentScope enforces policy. → `npm run demo:locus-budget`
 
-<details open>
-<summary><b>💰 stETH Agent Treasury</b> — AgentYieldVault</summary>
+**For [Lido](https://lido.fi):** stETH yield is the most natural funding source for autonomous agents — the principal stays locked, the agent operates on returns. AgentYieldVault enforces this at the contract level: the agent literally cannot touch principal, only earned yield. Self-sustaining agents that don't need a credit card. → `npm run demo:vault`
 
-An agent pays for compute and inference from staking yield — without ever touching the principal. The vault contract enforces principal isolation at the EVM level. Kill switch freezes everything in one transaction. → `npm run demo:vault`
-</details>
+**For [Safe](https://safe.global):** Safe secures ownership. AgentScope secures delegation. Once an agent has signing access to a Safe, there's no on-chain constraint on what it signs — until now. AgentScope fills the gap between "this agent can sign" and "this agent can only sign *this much, for this, until then*."
 
-<details open>
-<summary><b>💳 Best Use of Locus</b> — 6 integrated capabilities</summary>
+**For [MetaMask Delegations](https://metamask.io):** ERC-7715 defines how to delegate. ASP-1 defines what to delegate. AgentScope ships caveat enforcers that let a parent agent scope sub-agents to budgets, contracts, and functions — hierarchical delegation enforced on-chain. → `npm run demo:multi-agent`
 
-Non-custodial smart wallet on Base ($4.97 USDC live), USDC transfers with memo audit trail, spending controls as governance, Checkout SDK for human→agent funding, Wrapped APIs (Brave, CoinGecko, Firecrawl — zero API keys, pay-per-use), and budget loop (stETH yield → Locus wallet → AgentScope policy → payments). → `npm run demo:locus-budget` · `demo:locus-checkout` · `demo:locus-wrapped`
-</details>
-
-<details open>
-<summary><b>🤖 Let the Agent Cook</b> — Built by Clio</summary>
-
-AgentScope was built by an autonomous AI agent. Not just the code — the architecture decisions, test suite, security audits, multi-chain deployment, and reviewer feedback loops. See [`agent.json`](./agent.json) for identity and [`agent_log.json`](./agent_log.json) for the full execution trace. The agent that needs guardrails built its own guardrails.
-</details>
-
-<details>
-<summary><b>🔑 Best Use of Delegations</b> — Hierarchical sub-delegation</summary>
-
-ERC-7715 caveat enforcers + multi-agent orchestration. An orchestrator agent with a 1 ETH budget delegates 0.1 ETH sub-budgets to 3 worker agents. Workers operate within scoped policies. Orchestrator revokes underperformers and re-deploys with tighter limits — all on-chain. → `npm run demo:multi-agent`
-</details>
-
-<details>
-<summary><b>🪪 ENS Identity</b> — Names replace addresses</summary>
-
-ERC8004ENSBridge links agent identities to ENS names. The dashboard resolves ENS names in agent lookup — type `treasury.agent.eth` instead of `0x7645C89b...`. Agent policies can reference human-readable names.
-</details>
-
-<details>
-<summary><b>⛽ Go Gasless / Celo</b> — Sub-cent policy enforcement</summary>
-
-Deployed on Status Network (gasless L2) and Celo. On L2s, AgentScope's security overhead is < $0.01 per transaction — making per-transaction policy enforcement economically viable for micro-payment agents for the first time.
-</details>
+**For [ENS](https://ens.domains):** Agents shouldn't be hex strings. ERC8004ENSBridge maps agent identities to ENS names. The dashboard resolves names in lookup — `treasury.agent.eth` instead of `0x7645...`. Human-readable agents.
 
 ## Acknowledgments
 
