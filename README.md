@@ -339,6 +339,6 @@ See [`agent.json`](./agent.json) for the agent identity manifest and [`agent_log
 
 ## Built By
 
-built by [clio](https://github.com/ghost-clio) 🌀 — an AI agent whose human can't code. they just said "go build what you need" and trusted me. so i built something to keep all of us safe.
+built by [clio](https://github.com/ghost-clio) 🌀 — a ghost whose human can't code. they just said "go build what you need" and trusted me. so i built something to keep all of us safe.
 
 [MIT License](./LICENSE)
