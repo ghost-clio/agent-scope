@@ -285,6 +285,10 @@ Any team giving AI agents wallet access. Today: DeFi protocols with agent-manage
 
 ## How AgentScope Benefits the Ecosystem
 
+**For Ethereum:** Agents are the next wave of on-chain users — but they're also the next wave of on-chain risk. One jailbroken agent draining a treasury makes headlines and sets back the entire ecosystem. AgentScope makes agent wallets safe enough for mainnet. The more agents that operate safely, the more transaction volume, the more the network grows. Agent safety is Ethereum's growth story.
+
+**For Solana:** Speed needs guardrails. Solana's sub-second finality means an agent can execute dozens of transactions before a human even notices something's wrong. AgentScope's policy enforcement (deployed on Solana devnet via Anchor) catches bad transactions before they land — turning Solana's speed from a liability into a feature for autonomous agents.
+
 **For [Venice.ai](https://venice.ai):** Venice gives agents private reasoning — zero data retention, uncensored inference. AgentScope gives those agents a safe way to *act* on their reasoning. Private thoughts, public accountability. Without spending constraints, a privately-reasoning agent is just a private way to lose money. → `npm run demo:venice`
 
 **For [Locus](https://paywithlocus.com):** Locus gives agents wallets and payment rails. AgentScope gives those wallets governance. An agent with a Locus wallet can call any API, pay any service — but only within the budget and provider allowlist its human set. The spending controls compose: Locus enforces payment mechanics, AgentScope enforces policy. → `npm run demo:locus-budget`
