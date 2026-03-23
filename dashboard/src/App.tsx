@@ -794,10 +794,10 @@ function App() {
                 <div style={{ textAlign: "center", marginBottom: "3rem" }}>
                   <div className="section-divider" />
                   <h3 style={{ fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
-                    Private reasoning.<br />Public receipts.
+                    Works with any AI.<br />Even better with private AI.
                   </h3>
                   <p style={{ color: "#6b6b80", fontSize: "1rem", margin: 0, maxWidth: 560, marginLeft: "auto", marginRight: "auto" }}>
-                    Your agent thinks in private via <a href="https://venice.ai" target="_blank" rel="noopener noreferrer" style={{ color: "#06d6d6", textDecoration: "none" }}>Venice.ai</a> — zero data retention. Its actions are enforced and auditable on-chain.
+                    AgentScope works with any LLM — GPT, Claude, Llama, anything. Want private reasoning too? Pair it with <a href="https://venice.ai" target="_blank" rel="noopener noreferrer" style={{ color: "#06d6d6", textDecoration: "none" }}>Venice.ai</a> for zero data retention. Your agent's strategy stays private. Its actions stay auditable.
                   </p>
                 </div>
               </Reveal>
