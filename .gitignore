@@ -1,0 +1,12 @@
+.env
+.solana-deployer.json
+.synthesis
+.synthesis-api-key
+.synthesis-credentials.json
+artifacts/
+cache/
+coverage/
+dashboard/node_modules
+node_modules/
+typechain-types/
+*-output.txt
