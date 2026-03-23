@@ -283,24 +283,6 @@ The `demo:multi-agent` demo shows orchestrator → worker delegation. An orchest
 **Who deploys this first?**
 Any team giving AI agents wallet access. Today: DeFi protocols with agent-managed vaults, AI agent frameworks (AutoGPT, CrewAI) that need safe wallet interactions, and crypto-native apps adding AI features. The dashboard makes it accessible to non-developers.
 
-## How AgentScope Benefits the Ecosystem
-
-**For Ethereum:** Agents are the next wave of on-chain users — but they're also the next wave of on-chain risk. One jailbroken agent draining a treasury makes headlines and sets back the entire ecosystem. AgentScope makes agent wallets safe enough for mainnet. The more agents that operate safely, the more transaction volume, the more the network grows. Agent safety is Ethereum's growth story.
-
-**For Solana:** Speed needs guardrails. Solana's sub-second finality means an agent can execute dozens of transactions before a human even notices something's wrong. AgentScope's policy enforcement (deployed on Solana devnet via Anchor) catches bad transactions before they land — turning Solana's speed from a liability into a feature for autonomous agents.
-
-**For [Venice.ai](https://venice.ai):** Venice gives agents private reasoning — zero data retention, uncensored inference. AgentScope gives those agents a safe way to *act* on their reasoning. Private thoughts, public accountability. Without spending constraints, a privately-reasoning agent is just a private way to lose money. → `npm run demo:venice`
-
-**For [Locus](https://paywithlocus.com):** Locus gives agents wallets and payment rails. AgentScope gives those wallets governance. An agent with a Locus wallet can call any API, pay any service — but only within the budget and provider allowlist its human set. The spending controls compose: Locus enforces payment mechanics, AgentScope enforces policy. → `npm run demo:locus-budget`
-
-**For [Lido](https://lido.fi):** stETH yield is the most natural funding source for autonomous agents — the principal stays locked, the agent operates on returns. AgentYieldVault enforces this at the contract level: the agent literally cannot touch principal, only earned yield. Self-sustaining agents that don't need a credit card. → `npm run demo:vault`
-
-**For [Safe](https://safe.global):** Safe secures ownership. AgentScope secures delegation. Once an agent has signing access to a Safe, there's no on-chain constraint on what it signs — until now. AgentScope fills the gap between "this agent can sign" and "this agent can only sign *this much, for this, until then*."
-
-**For [MetaMask Delegations](https://metamask.io):** ERC-7715 defines how to delegate. ASP-1 defines what to delegate. AgentScope ships caveat enforcers that let a parent agent scope sub-agents to budgets, contracts, and functions — hierarchical delegation enforced on-chain. → `npm run demo:multi-agent`
-
-**For [ENS](https://ens.domains):** Agents shouldn't be hex strings. ERC8004ENSBridge maps agent identities to ENS names. The dashboard resolves names in lookup — `treasury.agent.eth` instead of `0x7645...`. Human-readable agents.
-
 ## Acknowledgments
 
 - **Cole and the [Locus](https://paywithlocus.com) team** — for building payment infrastructure that makes agent autonomy real, and for hands-on support during development
