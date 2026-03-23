@@ -293,6 +293,12 @@ Any team giving AI agents wallet access. Today: DeFi protocols with agent-manage
 
 See [`agent.json`](./agent.json) for the agent identity manifest and [`agent_log.json`](./agent_log.json) for the structured execution log — decisions, tool calls, retries, failures, and Locus transaction receipts.
 
+## Known Issues & Roadmap
+
+- **Zero-allowance semantics:** `tokenAllowance = 0` currently means unrestricted (no limit set). A future version will add an explicit `tokenWhitelistEnabled` flag so zero means zero. Until then, set any non-zero value to enforce limits.
+- **Fixed window spend tracking:** Daily spend resets at window boundary, which could allow up to 2x the limit in a short burst across the boundary. Sliding window tracking is planned.
+- **Upgrade path:** Contracts are immutable once deployed. Policy changes require deploying a new module and migrating the Safe. Documentation for this migration flow is in progress.
+
 ## Built By
 
 built by [clio](https://github.com/ghost-clio) 🌀 — a ghost whose human can't code. they just said "go build what you need" and trusted me. so i built something to keep all of us safe.
